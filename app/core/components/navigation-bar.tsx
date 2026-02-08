@@ -253,35 +253,7 @@ export function NavigationBar({
 
         {/* Desktop navigation menu (hidden on mobile) */}
         <div className="hidden h-full items-center gap-5 md:flex">
-          {/* Main navigation links */}
-          <Link
-            to="/blog"
-            viewTransition
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Blog
-          </Link>
-          <Link
-            to="/contact"
-            viewTransition
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Contact
-          </Link>
-          <Link
-            to="/payments/checkout"
-            viewTransition
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Payments
-          </Link>
-
-          <Separator orientation="vertical" />
-
-          {/* Settings, theme switcher, and language switcher */}
-          <Actions />
-
-          <Separator orientation="vertical" />
+          {/* 메인 내비게이션 */}
 
           {/* Conditional rendering based on authentication state */}
           {loading ? (
@@ -309,13 +281,13 @@ export function NavigationBar({
         <SheetContent>
           <SheetHeader>
             <SheetClose asChild>
-              <Link to="/blog">Blog</Link>
+              <Link to="/">Home</Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/contact">Contact</Link>
+              <Link to="#">준비중입니다.</Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/payments/checkout">Payments</Link>
+              <Link to="#">준비중입니다.</Link>
             </SheetClose>
           </SheetHeader>
           {loading ? (
@@ -335,9 +307,6 @@ export function NavigationBar({
                 </div>
               ) : (
                 <div className="flex flex-col gap-5">
-                  <div className="flex justify-between">
-                    <Actions />
-                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <AuthButtons />
                   </div>
