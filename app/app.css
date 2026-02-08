@@ -6,8 +6,10 @@
 
 @theme {
   --font-sans:
-    "Geist", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", sans-serif;
 }
 
 html,
@@ -15,10 +17,19 @@ body {
   @apply dark:bg-background bg-white;
 }
 
+/* 컬러 가이드
+ * background: #0F1117
+ * text_1: #ffffff | text_2: #9B9B9B | text_3: #94A3B8
+ * primary: #7C4DFF | secondary: #BB86FC
+ * success: #03DAC6 | warning: #FACC15
+ */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
+  --text-1: oklch(0.145 0 0);
+  --text-2: oklch(0.45 0 0);
+  --text-3: oklch(0.5 0.02 250);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -31,6 +42,8 @@ body {
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
+  --success: oklch(0.75 0.15 175);
+  --warning: oklch(0.88 0.18 95);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -51,37 +64,43 @@ body {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  /* 컬러 가이드 반영 */
+  --background: #000;
+  --foreground: #ffffff;
+  --text-1: #ffffff;
+  --text-2: #9b9b9b;
+  --text-3: #94a3b8;
+  --card: #1a1d26;
+  --card-foreground: #ffffff;
+  --popover: #1a1d26;
+  --popover-foreground: #ffffff;
+  --primary: #7c4dff;
+  --primary-foreground: #ffffff;
+  --secondary: #bb86fc;
+  --secondary-foreground: #0f1117;
+  --muted: #1a1d26;
+  --muted-foreground: #9b9b9b;
+  --accent: #1a1d26;
+  --accent-foreground: #ffffff;
+  --success: #03dac6;
+  --warning: #facc15;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #7c4dff;
+  --chart-1: #7c4dff;
+  --chart-2: #03dac6;
+  --chart-3: #facc15;
+  --chart-4: #bb86fc;
+  --chart-5: #94a3b8;
+  --sidebar: #1a1d26;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7c4dff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(124, 77, 255, 0.15);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #7c4dff;
 }
 
 @theme inline {
@@ -91,6 +110,9 @@ body {
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-text-1: var(--text-1);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -103,6 +125,8 @@ body {
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
