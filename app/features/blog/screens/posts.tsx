@@ -1,15 +1,15 @@
 /**
- * Blog Posts Screen
+ * 블로그 글 목록 화면
  *
- * This component displays a list of blog posts from MDX files in the docs directory.
- * It uses mdx-bundler to extract frontmatter from MDX files and renders a grid of
- * blog post cards with images, titles, descriptions, and metadata.
+ * docs 디렉터리의 MDX 파일에서 블로그 글 목록을 가져와 표시합니다.
+ * mdx-bundler로 frontmatter를 추출하고, 이미지·제목·설명·메타데이터가 있는
+ * 블로그 카드 그리드를 렌더링합니다.
  *
- * The blog implementation demonstrates:
- * 1. MDX content handling with frontmatter extraction
- * 2. File system operations for reading blog content
- * 3. Responsive grid layout for different screen sizes
- * 4. View transitions for smooth navigation between pages
+ * 구현 내용:
+ * 1. frontmatter 추출을 통한 MDX 콘텐츠 처리
+ * 2. 블로그 콘텐츠 읽기를 위한 파일 시스템 연산
+ * 3. 화면 크기별 반응형 그리드 레이아웃
+ * 4. 페이지 간 부드러운 전환을 위한 View transitions
  */
 import type { Route } from "./+types/posts";
 
@@ -21,10 +21,10 @@ import { Link } from "react-router";
 import { Badge } from "~/core/components/ui/badge";
 
 /**
- * Meta function for the blog posts page
+ * 블로그 목록 페이지 메타 함수
  *
- * Sets the page title using the application name from environment variables
- * and adds a meta description for SEO purposes
+ * 환경 변수의 앱 이름으로 페이지 제목을 설정하고,
+ * SEO를 위한 meta description을 추가합니다.
  */
 export const meta: Route.MetaFunction = () => {
   return [
@@ -34,15 +34,15 @@ export const meta: Route.MetaFunction = () => {
 };
 
 /**
- * Interface defining the structure of MDX frontmatter
+ * MDX frontmatter 구조 정의
  *
- * Each MDX blog post file must include these metadata fields in its frontmatter:
- * - title: The title of the blog post
- * - description: A brief summary of the post content
- * - date: Publication date (used for sorting)
- * - category: The post category for filtering/grouping
- * - author: The name of the post author
- * - slug: URL-friendly identifier for the post
+ * 각 MDX 블로그 글 파일의 frontmatter에 다음 메타데이터 필드가 필요합니다:
+ * - title: 블로그 글 제목
+ * - description: 글 내용 요약
+ * - date: 발행일 (정렬에 사용)
+ * - category: 필터/그룹용 카테고리
+ * - author: 작성자 이름
+ * - slug: URL용 식별자
  */
 interface Frontmatter {
   title: string;
@@ -54,28 +54,28 @@ interface Frontmatter {
 }
 
 /**
- * Loader function for the blog posts page
+ * 블로그 목록 페이지 로더
  *
- * This function reads all MDX files from the docs directory and extracts their frontmatter:
- * 1. Determines the path to the docs directory containing MDX blog posts
- * 2. Reads all files in the directory and filters for .mdx files
- * 3. Processes each MDX file to extract its frontmatter metadata
- * 4. Sorts the posts by date (newest first)
- * 5. Returns the frontmatter data to be used by the component
+ * docs 디렉터리의 모든 MDX 파일을 읽어 frontmatter를 추출합니다:
+ * 1. MDX 블로그 글이 있는 docs 디렉터리 경로 결정
+ * 2. 디렉터리 내 모든 파일 읽기 후 .mdx만 필터링
+ * 3. 각 MDX 파일 처리하여 frontmatter 메타데이터 추출
+ * 4. 날짜 기준 정렬 (최신순)
+ * 5. 컴포넌트에서 사용할 frontmatter 데이터 반환
  *
- * @returns Object containing an array of blog post frontmatter data
+ * @returns 블로그 글 frontmatter 배열을 담은 객체
  */
 export async function loader() {
-  // Get the path to the docs directory containing MDX files
+  // MDX 파일이 있는 docs 디렉터리 경로
   const docsPath = path.join(process.cwd(), "app", "features", "blog", "docs");
 
-  // Read all files in the docs directory
+  // docs 디렉터리 내 모든 파일 읽기
   const files = await readdir(docsPath);
 
-  // Filter for MDX files only
+  // .mdx 파일만 필터링
   const mdxFiles = files.filter((file) => file.endsWith(".mdx"));
 
-  // Extract frontmatter from each MDX file
+  // 각 MDX 파일에서 frontmatter 추출
   const frontmatters = await Promise.all(
     mdxFiles.map(async (file) => {
       const filePath = path.join(docsPath, file);
@@ -84,43 +84,38 @@ export async function loader() {
     }),
   );
 
-  // Sort posts by date, newest first
+  // 날짜 기준 최신순 정렬
   frontmatters.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  // Return the frontmatter data
+  // frontmatter 데이터 반환
   return {
     frontmatters: frontmatters as Frontmatter[],
   };
 }
 
 /**
- * Blog Posts Component
+ * 블로그 글 목록 컴포넌트
  *
- * This component renders the blog posts page with a header and a grid of blog post cards.
- * Each card displays:
- * - Featured image (matching the post slug)
- * - Category badge
- * - Post title
- * - Post description
- * - Author and date information
+ * 헤더와 블로그 카드 그리드로 목록 페이지를 렌더링합니다.
+ * 각 카드에는 다음이 표시됩니다:
+ * - 대표 이미지 (글 slug와 매칭)
+ * - 카테고리 뱃지
+ * - 글 제목·설명
+ * - 작성자 및 날짜
  *
- * The component uses responsive design with different layouts for mobile and desktop:
- * - Single column on mobile devices
- * - Three-column grid on desktop devices
+ * 반응형: 모바일은 1열, 데스크톱은 3열 그리드입니다.
+ * 목록과 개별 글 페이지 간 부드러운 전환을 위해 view transitions를 사용합니다.
  *
- * It also implements view transitions for smooth navigation between the posts list
- * and individual post pages.
- *
- * @param loaderData - Data from the loader containing blog post frontmatter
+ * @param loaderData - 로더에서 전달된 블로그 글 frontmatter
  */
 export default function Posts({
   loaderData: { frontmatters },
 }: Route.ComponentProps) {
   return (
     <div className="flex flex-col gap-16">
-      {/* Page header with title and subtitle */}
+      {/* 페이지 헤더 (제목·부제목) */}
       <header className="flex flex-col items-center">
         <h1 className="text-center text-3xl font-semibold tracking-tight md:text-5xl">
           Blog
@@ -130,35 +125,35 @@ export default function Posts({
         </p>
       </header>
 
-      {/* Responsive grid of blog post cards */}
+      {/* 블로그 카드 반응형 그리드 */}
       <div className="grid grid-cols-1 gap-16 md:grid-cols-3 md:gap-8">
         {frontmatters.map((frontmatter) => (
           <Link
             to={`/blog/${frontmatter.slug}`}
             key={frontmatter.slug}
             className="flex flex-col gap-4"
-            viewTransition // Enable smooth transitions between pages
+            viewTransition // 페이지 간 부드러운 전환
           >
-            {/* Post featured image */}
+            {/* 글 대표 이미지 */}
             <img
               src={`/blog/${frontmatter.slug}.jpg`}
               alt={frontmatter.title}
               className="aspect-square w-full rounded-xl object-cover object-center"
             />
-            {/* Category badge */}
+            {/* 카테고리 뱃지 */}
             <Badge variant="secondary" className="text-sm">
               {frontmatter.category}
             </Badge>
             <div>
-              {/* Post title */}
+              {/* 글 제목 */}
               <h2 className="text-lg font-bold md:text-2xl">
                 {frontmatter.title}
               </h2>
-              {/* Post description */}
+              {/* 글 설명 */}
               <p className="text-muted-foreground text-pretty md:text-lg">
                 {frontmatter.description}
               </p>
-              {/* Author and date information */}
+              {/* 작성자 및 날짜 */}
               <span className="text-muted-foreground mt-2 block text-sm">
                 By {frontmatter.author} on{" "}
                 {new Date(frontmatter.date).toLocaleDateString("ko-KR")}
