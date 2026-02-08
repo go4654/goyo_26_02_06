@@ -59,6 +59,10 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css",
   },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap",
+  },
   { rel: "stylesheet", href: nProgressStyles },
 ];
 

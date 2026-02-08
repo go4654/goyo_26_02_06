@@ -3,8 +3,8 @@ import { Link, Outlet } from "react-router";
 
 function BlogNav() {
   return (
-    <nav className="mx-auto flex h-16 items-center justify-between border-b px-5 shadow-xs backdrop-blur-lg transition-opacity md:px-10">
-      <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between py-3">
+    <nav className="mx-auto flex h-16 items-center justify-between border-b px-5 shadow-xs backdrop-blur-lg transition-opacity md:px-[100px]">
+      <div className="md:max-w-[1680px]items-center mx-auto flex h-full w-full justify-between py-3">
         <h1 className="flex items-center gap-2 text-lg">
           <Link
             to="/"

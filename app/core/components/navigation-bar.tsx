@@ -17,7 +17,6 @@
  * - Unauthenticated state with sign in/sign up buttons
  */
 import { CogIcon, HomeIcon, LogOutIcon, MenuIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { LOGO_URL } from "../constant/imgUrls";
@@ -236,18 +235,15 @@ export function NavigationBar({
   avatarUrl?: string | null;
   loading: boolean;
 }) {
-  // Get translation function for internationalization
-  const { t } = useTranslation();
-
   return (
     <nav
       className={
-        "mx-auto flex h-16 w-full items-center justify-between border-b px-5 shadow-xs backdrop-blur-lg transition-opacity md:px-10"
+        "justify-betweenpx-5 fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center shadow-xs transition-opacity md:px-[120px]"
       }
     >
-      <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between py-3">
+      <div className="md:max-w-[1680px]items-center mx-auto flex h-full w-full justify-between py-3">
         {/* Application logo/title with link to home */}
-        <Link to="/">
+        <Link to="/" className="mt-1">
           <img src={LOGO_URL} alt="Goyo" className="w-[110px]" />
         </Link>
 
