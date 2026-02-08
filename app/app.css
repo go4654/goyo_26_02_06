@@ -48,6 +48,10 @@
   --text-caption: 16px;
   --text-caption--line-height: 30px;
   --text-caption--font-weight: 400;
+
+  --text-small: 14px;
+  --text-small--line-height: 30px;
+  --text-small--font-weight: 400;
 }
 
 html,
@@ -203,41 +207,30 @@ body {
       opacity: 0.3;
     }
   }
-  --animate-aurora:
-    aurora 8s ease-in-out infinite alternate
-;
+  --animate-aurora: aurora 8s ease-in-out infinite alternate;
   @keyframes aurora {
-  0% {
-    background-position:
-    0% 50%;
-    transform:
-    rotate(-5deg) scale(0.9);
+    0% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
     }
-  25% {
-    background-position:
-    50% 100%;
-    transform:
-    rotate(5deg) scale(1.1);
+    25% {
+      background-position: 50% 100%;
+      transform: rotate(5deg) scale(1.1);
     }
-  50% {
-    background-position:
-    100% 50%;
-    transform:
-    rotate(-3deg) scale(0.95);
+    50% {
+      background-position: 100% 50%;
+      transform: rotate(-3deg) scale(0.95);
     }
-  75% {
-    background-position:
-    50% 0%;
-    transform:
-    rotate(3deg) scale(1.05);
+    75% {
+      background-position: 50% 0%;
+      transform: rotate(3deg) scale(1.05);
     }
-  100% {
-    background-position:
-    0% 50%;
-    transform:
-    rotate(-5deg) scale(0.9);
+    100% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
     }
-  }}
+  }
+}
 
 @layer base {
   * {
