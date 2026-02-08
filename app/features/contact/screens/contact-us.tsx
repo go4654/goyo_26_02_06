@@ -210,9 +210,9 @@ export async function action({ request }: Route.ActionArgs) {
 
   // 관리자에게 문의 정보가 포함된 이메일 전송
   const { error } = await resendClient.emails.send({
-    from: "Supaplate <hello@supaplate.com>",
+    from: "Goyo <hello@goyo.com>",
     to: [process.env.ADMIN_EMAIL!],
-    subject: "Supaplate에서 새로운 문의가 도착했습니다",
+    subject: "Goyo에서 새로운 문의가 도착했습니다",
     html: `
       <p><b>이름:</b> ${name}</p>
       <p><b>이메일:</b> ${email}</p>

@@ -173,7 +173,7 @@ export async function action({ request }: Route.ActionArgs) {
 export default function Join({ actionData }: Route.ComponentProps) {
   // 성공적인 제출 후 재설정을 위한 폼 요소 참조
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   // 등록이 성공하면 폼 재설정
   useEffect(() => {
     if (actionData && "success" in actionData && actionData.success) {
@@ -207,7 +207,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 name="name"
                 required
                 type="text"
-                placeholder="Nico"
+                placeholder="이름을 입력해주세요."
               />
               {actionData &&
               "fieldErrors" in actionData &&

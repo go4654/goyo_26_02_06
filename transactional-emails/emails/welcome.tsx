@@ -16,17 +16,19 @@ export default function Welcome({ profile }: { profile: string }) {
       <Html>
         <Head />
         <Body className="bg-white font-sans">
-          <Preview>Supaplate에 오신 것을 환영합니다</Preview>
+          <Preview>Goyo에 오신 것을 환영합니다</Preview>
           <Container className="mx-auto max-w-[560px] py-5 pb-12">
             <Heading className="pt-4 text-center text-2xl leading-tight font-normal tracking-[-0.5px] text-black">
-              Supaplate에 오신 것을 환영합니다
+              Goyo에 오신 것을 환영합니다
             </Heading>
             <Section>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
-                이 이메일은 Supaplate에 가입한 모든 사용자에게 자동으로 전송되는 이메일입니다.
+                이 이메일은 Goyo에 가입한 모든 사용자에게 자동으로 전송되는
+                이메일입니다.
               </Text>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
-                이 이메일을 전송하기 위해 Supabase Queues, Supabase CRON Jobs 및 Resend를 사용했습니다.
+                이 이메일을 전송하기 위해 Goyo Queues, Goyo CRON Jobs 및
+                Resend를 사용했습니다.
               </Text>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
                 가입한 사용자의 프로필입니다:
@@ -43,7 +45,7 @@ export default function Welcome({ profile }: { profile: string }) {
                 감사합니다,
               </Text>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
-                pncoding 팀
+                Goyo 팀
               </Text>
             </Section>
           </Container>

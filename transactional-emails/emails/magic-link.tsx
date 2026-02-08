@@ -17,10 +17,10 @@ export default function MagicLink() {
       <Html>
         <Head />
         <Body className="bg-white font-sans">
-          <Preview>Supaplate Magic Link</Preview>
+          <Preview>Goyo Magic Link</Preview>
           <Container className="mx-auto max-w-[560px] py-5 pb-12">
             <Heading className="pt-4 text-center text-2xl leading-tight font-normal tracking-[-0.5px] text-black">
-              Supaplate Magic Link
+              Goyo Magic Link
             </Heading>
             <Section>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
@@ -35,7 +35,8 @@ export default function MagicLink() {
             </Section>
             <Section>
               <Text className="mt-10 mb-4 text-[15px] leading-relaxed text-black">
-                또는 일회용 비밀번호를 요청하셨다면 아래 코드를 복사하여 웹사이트에 붙여넣으세요.
+                또는 일회용 비밀번호를 요청하셨다면 아래 코드를 복사하여
+                웹사이트에 붙여넣으세요.
               </Text>
               <div className="flex justify-center">
                 <code className="mx-auto inline-block rounded bg-[#dfe1e4] px-1 py-2 text-center font-mono text-[21px] font-bold tracking-[-0.3px] text-black uppercase">
@@ -49,7 +50,7 @@ export default function MagicLink() {
                 감사합니다,
               </Text>
               <Text className="mb-4 text-[15px] leading-relaxed text-black">
-                pncoding 팀
+                Goyo 팀
               </Text>
             </Section>
           </Container>
