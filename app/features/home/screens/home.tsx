@@ -4,15 +4,17 @@
  */
 import type { Route } from "./+types/home";
 
-import { MoveRight } from "lucide-react";
+import { MoveRight, Plus } from "lucide-react";
 import { Link } from "react-router";
 
 import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 
-import { CATEGORY_DATA } from "../constants/home-data";
+import HomeMoreBtn from "../components/home-more-btn";
+import { CATEGORY_DATA, CLASS_DATA } from "../constants/home-data";
+import RecentLogs from "./sections/RecentLogs";
 import Section1 from "./sections/section_1";
-import Section2 from "./sections/section_2";
+import SkillCategories from "./sections/skill-categories";
 
 /**
  * Meta function for setting page metadata
@@ -55,7 +57,9 @@ export default function Home() {
       <Section1 />
 
       <Container>
-        <Section2 />
+        <SkillCategories />
+
+        <RecentLogs />
       </Container>
     </>
   );

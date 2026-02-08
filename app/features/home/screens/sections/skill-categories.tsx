@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { CATEGORY_DATA } from "../../constants/home-data";
 
-export default function Section2() {
+export default function SkillCategories() {
   return (
     <section className="py-40">
       <div className="mb-12 flex items-end justify-between">
