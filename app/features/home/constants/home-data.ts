@@ -106,3 +106,34 @@ export const CLASS_DATA = [
       "정적인 디자인에 생명력을 불어넣는 과정입니다. 웹 표준을 준수하며 브라우저에서 생생하게 작동하는 인터페이스를 구현합니다.",
   },
 ];
+
+export const GALLERY_DATA = [
+  {
+    id: 0,
+    title: "Some Web site Renewal Deisgn",
+    link: "/gallery/0",
+    image: "/img/gallery_portfolio_01.png",
+    date: "26/09/11",
+  },
+  {
+    id: 1,
+    title: "Some Web site Renewal Deisgn",
+    link: "/gallery/1",
+    image: "/img/gallery_portfolio_01.png",
+    date: "26/09/11",
+  },
+  {
+    id: 2,
+    title: "Some Web site Renewal Deisgn",
+    link: "/gallery/2",
+    image: "/img/gallery_portfolio_01.png",
+    date: "26/09/11",
+  },
+  {
+    id: 3,
+    title: "Some Web site Renewal Deisgn",
+    link: "/gallery/3",
+    image: "/img/gallery_portfolio_01.png",
+    date: "26/09/11",
+  },
+];

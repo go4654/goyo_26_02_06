@@ -1,29 +1,19 @@
 import { MoveRight } from "lucide-react";
 import { Link } from "react-router";
 
+import SectionTitle from "../../components/section-title";
 import { CATEGORY_DATA } from "../../constants/home-data";
 
 export default function SkillCategories() {
   return (
     <section className="py-40">
-      <div className="mb-12 flex items-end justify-between">
-        <h2 className="text-h3">Skill Categories</h2>
-
-        <div className="bg-text-2 h-[1px] w-[60%] opacity-30"></div>
-
-        <Link
-          to={"/class"}
-          className="text-h6 text-text-2 hover:text-primary flex items-center gap-2 transition-colors"
-        >
-          View More <MoveRight className="mt-1" />
-        </Link>
-      </div>
+      <SectionTitle title="Skill Categories" link="/class" />
 
       <div className="grid grid-cols-3 gap-6">
         {CATEGORY_DATA.map((data) => (
           <Link
             to={data.link}
-            className="group space-between hover:text-primary flex flex-col items-start gap-6 transition-colors"
+            className="group space-between hover:text-secondary flex flex-col items-start gap-6 transition-colors"
             key={data.id}
           >
             <div className="w-full overflow-hidden bg-gray-400 md:block md:max-h-[480px]">

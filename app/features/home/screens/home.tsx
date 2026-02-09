@@ -11,7 +11,13 @@ import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 
 import HomeMoreBtn from "../components/home-more-btn";
-import { CATEGORY_DATA, CLASS_DATA } from "../constants/home-data";
+import SectionTitle from "../components/section-title";
+import {
+  CATEGORY_DATA,
+  CLASS_DATA,
+  GALLERY_DATA,
+} from "../constants/home-data";
+import Gallery from "./sections/Gallery";
 import RecentLogs from "./sections/RecentLogs";
 import Section1 from "./sections/section_1";
 import SkillCategories from "./sections/skill-categories";
@@ -60,6 +66,8 @@ export default function Home() {
         <SkillCategories />
 
         <RecentLogs />
+
+        <Gallery />
       </Container>
     </>
   );
