@@ -16,14 +16,23 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
+  // ============================================================================
+  // 정적 파일 라우트
+  // ============================================================================
   route("/robots.txt", "core/screens/robots.ts"),
   route("/sitemap.xml", "core/screens/sitemap.ts"),
+
+  // ============================================================================
+  // 디버그 라우트 (프로덕션에서는 삭제해야 합니다)
+  // ============================================================================
   ...prefix("/debug", [
-    // 프로덕션에서는 삭제해야 합니다.
     route("/sentry", "debug/sentry.tsx"),
     route("/analytics", "debug/analytics.tsx"),
   ]),
-  // API 라우트. 액션과 로더를 내보내지만 UI는 없는 라우트입니다.
+
+  // ============================================================================
+  // API 라우트 (액션과 로더를 내보내지만 UI는 없는 라우트)
+  // ============================================================================
   ...prefix("/api", [
     ...prefix("/settings", [
       route("/theme", "features/settings/api/set-theme.tsx"),
@@ -44,12 +53,28 @@ export default [
     ...prefix("/blog", [route("/og", "features/blog/api/og.tsx")]),
   ]),
 
+  // ============================================================================
+  // 네비게이션 레이아웃 (모든 공개 페이지에 네비게이션 바 포함)
+  // ============================================================================
   layout("core/layouts/navigation.layout.tsx", [
+    // 기본 라우트
     route("/auth/confirm", "features/auth/screens/confirm.tsx"),
     index("features/home/screens/home.tsx"),
     route("/error", "core/screens/error.tsx"),
+
+    // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
+    ...prefix("/class", [
+      index("features/class/screens/class.tsx"),
+    ]),
+    ...prefix("/gallery", [
+      index("features/gallery/screens/gallery.tsx"),
+    ]),
+    ...prefix("/news", [
+      index("features/news/screens/news.tsx"),
+    ]),
+
+    // 공개 레이아웃 (인증되지 않은 사용자만 접근 가능, 로그인 시 대시보드로 리다이렉트)
     layout("core/layouts/public.layout.tsx", [
-      // 인증되지 않은 사용자에게만 표시되어야 하는 라우트입니다.
       route("/login", "features/auth/screens/login.tsx"),
       route("/join", "features/auth/screens/join.tsx"),
       ...prefix("/auth", [
@@ -72,6 +97,15 @@ export default [
         ]),
       ]),
     ]),
+
+    // 인증이 필요한 상세 페이지들 (로그인하지 않은 사용자는 /login으로 리다이렉트)
+    layout("core/layouts/private.layout.tsx", { id: "private-content" }, [
+      route("/class/:slug", "features/class/screens/class-detail.tsx"),
+      route("/gallery/:slug", "features/gallery/screens/gallery-detail.tsx"),
+      route("/news/:slug", "features/news/screens/news-detail.tsx"),
+    ]),
+
+    // 인증이 필요한 인증 관련 라우트
     layout("core/layouts/private.layout.tsx", { id: "private-auth" }, [
       ...prefix("/auth", [
         route(
@@ -80,12 +114,16 @@ export default [
         ),
         route("/email-verified", "features/auth/screens/email-verified.tsx"),
       ]),
-      // 인증된 사용자에게만 표시되어야 하는 라우트입니다.
       route("/logout", "features/auth/screens/logout.tsx"),
     ]),
+
+    // 공개 접근 가능한 기타 라우트
     route("/contact", "features/contact/screens/contact-us.tsx"),
+
+    // 결제 관련 라우트
     ...prefix("/payments", [
       route("/checkout", "features/payments/screens/checkout.tsx"),
+      // 결제 성공/실패 페이지는 인증 필요
       layout("core/layouts/private.layout.tsx", { id: "private-payments" }, [
         route("/success", "features/payments/screens/success.tsx"),
         route("/failure", "features/payments/screens/failure.tsx"),
@@ -93,6 +131,9 @@ export default [
     ]),
   ]),
 
+  // ============================================================================
+  // 대시보드 레이아웃 (인증 필요, 대시보드 전용 레이아웃 포함)
+  // ============================================================================
   layout("core/layouts/private.layout.tsx", { id: "private-dashboard" }, [
     layout("features/users/layouts/dashboard.layout.tsx", [
       ...prefix("/dashboard", [
@@ -103,7 +144,14 @@ export default [
     ]),
   ]),
 
+  // ============================================================================
+  // 법적 문서 라우트 (공개 접근 가능)
+  // ============================================================================
   ...prefix("/legal", [route("/:slug", "features/legal/screens/policy.tsx")]),
+
+  // ============================================================================
+  // 블로그 레이아웃 (공개 접근 가능, 블로그 전용 레이아웃 포함)
+  // ============================================================================
   layout("features/blog/layouts/blog.layout.tsx", [
     ...prefix("/blog", [
       index("features/blog/screens/posts.tsx"),
