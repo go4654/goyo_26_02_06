@@ -5,8 +5,11 @@
 import type { Route } from "./+types/home";
 
 import { MoveRight, Plus } from "lucide-react";
+import { useScroll } from "motion/react";
+import { useRef } from "react";
 import { Link } from "react-router";
 
+import { TextReveal } from "~/core/components/ui/text-reveal";
 import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 
@@ -19,6 +22,7 @@ import {
 } from "../constants/home-data";
 import Gallery from "./sections/Gallery";
 import RecentLogs from "./sections/RecentLogs";
+import LogEverythingText from "./sections/logeverything-text";
 import Section1 from "./sections/section_1";
 import SkillCategories from "./sections/skill-categories";
 
@@ -58,16 +62,25 @@ export async function loader({ request }: Route.LoaderArgs) {
  * @returns JSX element representing the home page
  */
 export default function Home() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"], // 섹션 시작부터 끝까지 꽉 차게!
+  });
   return (
     <>
       <Section1 />
 
       <Container>
         <SkillCategories />
-
         <RecentLogs />
-
         <Gallery />
+
+        <LogEverythingText />
+
+        <section className="h-screen w-full">
+          <h3 className="text-h1">TEST TEXT</h3>
+        </section>
       </Container>
     </>
   );
