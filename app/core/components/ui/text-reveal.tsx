@@ -23,7 +23,7 @@ export const TextReveal: FC<TextRevealProps> = ({
       {/* 내부의 sticky와 h-[200vh]를 제거했습니다. */}
       <span
         className={
-          "xl:text-h1 flex flex-wrap p-5 text-2xl font-bold text-black/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl dark:text-white/40"
+          "xl:text-h1 text-h5 flex flex-wrap p-5 font-bold tracking-tight text-black/20 md:p-8 md:text-3xl lg:p-10 lg:text-4xl xl:tracking-tighter dark:text-white/40"
         }
       >
         {words.map((word, i) => {

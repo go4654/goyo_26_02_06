@@ -49,11 +49,6 @@ export async function loader({ request }: Route.LoaderArgs) {
  * @returns JSX element representing the home page
  */
 export default function Home() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"], // 섹션 시작부터 끝까지 꽉 차게!
-  });
   return (
     <>
       <Section1 />

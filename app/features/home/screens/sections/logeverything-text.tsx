@@ -12,7 +12,7 @@ export default function LogEverythingText() {
   return (
     <section ref={sectionRef} className="relative h-[450vh] w-full">
       {/* 2. 화면 상단에 고정될 컨테이너 (h-screen + sticky) */}
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
+      <div className="sticky top-0 flex h-[80vh] items-center justify-center overflow-hidden xl:h-screen">
         {/* 3. 실제 텍스트가 드러나는 영역 */}
         <div className="mx-auto text-center md:w-[800px]">
           <TextReveal

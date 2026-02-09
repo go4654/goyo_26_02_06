@@ -6,14 +6,14 @@ import { CATEGORY_DATA } from "../../constants/home-data";
 
 export default function SkillCategories() {
   return (
-    <section className="py-40">
+    <section className="py-20 md:py-40">
       <SectionTitle title="Skill Categories" link="/class" />
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="gird-cols-1 grid gap-10 md:grid-cols-3">
         {CATEGORY_DATA.map((data) => (
           <Link
             to={data.link}
-            className="group space-between hover:text-secondary flex flex-col items-start gap-6 transition-colors"
+            className="group space-between hover:text-secondary flex flex-col items-start gap-2 transition-colors md:gap-6"
             key={data.id}
           >
             <div className="w-full overflow-hidden bg-gray-400 md:block md:max-h-[480px]">
@@ -24,13 +24,13 @@ export default function SkillCategories() {
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <h3 className="text-h4">{data.name}</h3>
+            <div className="flex flex-col gap-1 xl:gap-2">
+              <h3 className="text-small-title xl:text-h4">{data.name}</h3>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {data.skills.map((skill) => (
                   <div
-                    className="text-small border-text-3 text-text-3 rounded-full border px-2"
+                    className="border-text-3 text-text-3 rounded-full border px-2 py-1 text-xs"
                     key={skill.id}
                   >
                     {skill.name}

@@ -238,39 +238,61 @@ export function NavigationBar({
   return (
     <nav
       className={
-        "justify-betweenpx-5 fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center shadow-xs transition-opacity md:px-[120px]"
+        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between px-5 xl:px-[120px]"
       }
     >
-      <div className="md:max-w-[1680px]items-center mx-auto flex h-full w-full justify-between py-3">
-        {/* Application logo/title with link to home */}
+      <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1680px]">
+        {/* 로고 */}
         <Link to="/" className="mt-1">
-          <img src={LOGO_URL} alt="Goyo" className="w-[110px]" />
+          <img src={LOGO_URL} alt="Goyo" className="w-[80px] xl:w-[110px]" />
         </Link>
 
-        {/* Desktop navigation menu (hidden on mobile) */}
-        <div className="hidden h-full items-center gap-5 md:flex">
-          {/* 메인 내비게이션 */}
+        {/* 메인 내비게이션 */}
+        <ul className="text-small-title mt-2 hidden items-center gap-18 md:flex">
+          <li className="group relative">
+            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-200 group-hover:scale-100"></div>
+            <Link to="/class" className="hover:text-primary">
+              CLASS
+            </Link>
+          </li>
 
-          {/* Conditional rendering based on authentication state */}
+          <li className="group relative">
+            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-300 group-hover:scale-100"></div>
+            <Link to="/gallery" className="hover:text-primary">
+              GALLERY
+            </Link>
+          </li>
+
+          <li className="group relative">
+            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-300 group-hover:scale-100"></div>
+            <Link to="/news" className="hover:text-primary">
+              NEWS
+            </Link>
+          </li>
+        </ul>
+
+        {/* 데스크탑 유저 메뉴 */}
+        <div className="hidden h-full items-center gap-5 md:flex">
+          {/* 인증 상태에 따른 조건 렌더링 */}
           {loading ? (
-            // Loading state with skeleton placeholder
+            // 로딩 상태 스켈레톤 플레이스홀더
             <div className="flex items-center">
               <div className="bg-muted-foreground/20 size-8 animate-pulse rounded-lg" />
             </div>
           ) : (
             <>
               {name ? (
-                // Authenticated state with user menu
+                // 인증 상태 유저 메뉴
                 <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
               ) : (
-                // Unauthenticated state with auth buttons
+                // 비인증 상태 인증 버튼
                 <AuthButtons />
               )}
             </>
           )}
         </div>
 
-        {/* Mobile menu trigger (hidden on desktop) */}
+        {/* 모바일 메뉴 트리거 (데스크탑에서 숨겨짐) */}
         <SheetTrigger className="size-6 md:hidden">
           <MenuIcon />
         </SheetTrigger>
