@@ -302,10 +302,13 @@ export function NavigationBar({
               <Link to="/">Home</Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="#">준비중입니다.</Link>
+              <Link to="/class">CLASS</Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="#">준비중입니다.</Link>
+              <Link to="/gallery">GALLERY</Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link to="/news">NEWS</Link>
             </SheetClose>
           </SheetHeader>
           {loading ? (
