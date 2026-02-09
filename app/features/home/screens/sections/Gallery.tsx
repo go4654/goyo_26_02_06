@@ -19,11 +19,11 @@ export default function Gallery() {
               />
             </div>
 
-            <div className="mt-2 flex justify-between">
-              <h3 className="text-small-title group-hover:text-secondary">
+            <div className="mt-2 flex items-start justify-between">
+              <h3 className="text-h6 group-hover:text-secondary max-w-[70%] leading-7">
                 {data.title}
               </h3>
-              <p className="text-caption text-text-3">{data.date}</p>
+              <p className="text-small text-text-3">{data.date}</p>
             </div>
           </Link>
         ))}

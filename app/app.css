@@ -61,6 +61,7 @@
 html,
 body {
   @apply dark:bg-background bg-white;
+  word-break: keep-all;
 }
 
 /* 컬러 가이드

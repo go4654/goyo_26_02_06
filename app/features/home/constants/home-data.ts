@@ -113,27 +113,53 @@ export const GALLERY_DATA = [
     title: "Some Web site Renewal Deisgn",
     link: "/gallery/0",
     image: "/img/gallery_portfolio_01.png",
-    date: "26/09/11",
+    date: "26. 02. 03",
   },
   {
     id: 1,
     title: "Some Web site Renewal Deisgn",
     link: "/gallery/1",
     image: "/img/gallery_portfolio_01.png",
-    date: "26/09/11",
+    date: "26. 02. 03",
   },
   {
     id: 2,
     title: "Some Web site Renewal Deisgn",
     link: "/gallery/2",
     image: "/img/gallery_portfolio_01.png",
-    date: "26/09/11",
+    date: "26. 02. 03",
   },
   {
     id: 3,
     title: "Some Web site Renewal Deisgn",
     link: "/gallery/3",
     image: "/img/gallery_portfolio_01.png",
-    date: "26/09/11",
+    date: "26. 02. 03",
+  },
+];
+
+export const NEWS_DATA = [
+  {
+    id: 0,
+    title:
+      "[안내] somn. 0.5 업데이트 : 더 직관적인 기록을 위한 로그 아카이브 기능 추가",
+    link: "/news/0",
+    image: "/img/gallery_portfolio_01.png",
+    date: "2026. 02. 03",
+  },
+  {
+    id: 1,
+    title: "[자료] 실무에서 바로 쓰는 피그마 오토 레이아웃 치트시트 배포",
+    link: "/news/1",
+    image: "/img/gallery_portfolio_01.png",
+    date: "2026. 02. 03",
+  },
+  {
+    id: 2,
+    title:
+      "[이벤트]'배움이 결과로' - 2월 신규 수강생 대상 1:1 커리어 코드 리뷰 이벤트",
+    link: "/news/2",
+    image: "/img/gallery_portfolio_01.png",
+    date: "2026. 02. 03",
   },
 ];
