@@ -28,14 +28,17 @@ export default function Footer() {
   return (
     <footer className="mt-auto pt-14 pb-5 dark:bg-[#0F1117]">
       <div className="mx-auto flex h-full w-full flex-col items-center justify-center md:max-w-[1680px]">
-        <div className="grid w-full grid-cols-3 items-center">
+        <div className="grid w-full grid-cols-1 items-center xl:grid-cols-3">
           {/* 로고 */}
-          <Link to="/" className="flex justify-start">
+          <Link
+            to="/"
+            className="mb-6 flex justify-center xl:mb-0 xl:justify-start"
+          >
             <img src={LOGO_URL} alt="logo" className="w-[110px]" />
           </Link>
 
           {/* 네비게이션 */}
-          <ul className="flex items-center justify-center gap-10">
+          <ul className="text-small flex items-center justify-center gap-10 xl:justify-start xl:text-base">
             <li>
               <Link to="/" className="hover:text-text-2">
                 HOME
@@ -57,7 +60,7 @@ export default function Footer() {
           </ul>
 
           {/* 이용약관 */}
-          <div className="text-text-2 flex justify-end gap-5 md:text-sm">
+          <div className="text-text-2 mt-10 flex justify-center gap-5 text-sm xl:mt-0 xl:justify-end">
             <Link to="/legal/privacy-policy" viewTransition>
               개인정보처리방침
             </Link>
@@ -68,7 +71,7 @@ export default function Footer() {
         </div>
 
         {/* 카피라이트 */}
-        <div className="text-text-2 order-2 mt-20 text-sm md:order-none">
+        <div className="text-text-2 order-2 mt-5 text-sm md:order-none xl:mt-20">
           <p>
             &copy; {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME}.
             All rights reserved.
