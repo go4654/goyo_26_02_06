@@ -11,7 +11,7 @@ import {
   Pencil,
   Trash,
 } from "lucide-react";
-import { Form, useNavigate } from "react-router";
+import { Form, Link, useNavigate } from "react-router";
 
 import Tags from "~/core/components/tags";
 import {
@@ -49,12 +49,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
         <div className="text-small-title text-text-3 flex items-center gap-2">
           <span>2026.02.10</span>
           <span className="text-text-3/50">•</span>
-          <div className="flex items-center gap-2">
+          <div className="flex cursor-pointer items-center gap-2">
             <Heart />
             <span>121</span>
           </div>
           <span className="text-text-3/50">•</span>
-          <div className="flex items-center gap-2">
+          <div className="flex cursor-pointer items-center gap-2">
             <Bookmark />
             <span>54</span>
           </div>
@@ -88,28 +88,56 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 
       <Separator className="mt-26 mb-6" />
 
-      {/* 목록으로가기, 좋아요, 북마크 버튼 */}
-      <div className="flex items-center justify-between">
-        {/* 목록으로가기 */}
-        <div
-          className="text-small-title text-text-2 hover:text-primary flex cursor-pointer items-center gap-2"
-          onClick={() => navigate(-1)}
-        >
-          <MoveLeft className="size-4" />
-          <span>목록으로 가기</span>
+      <div className="flex w-full flex-col items-center justify-between">
+        {/* 목록으로가기, 좋아요, 북마크 버튼 */}
+        <div className="flex w-full items-center justify-between">
+          {/* 목록으로가기 */}
+          <div
+            className="text-small-title text-text-2 hover:text-primary flex cursor-pointer items-center gap-2"
+            onClick={() => navigate(-1)}
+          >
+            <MoveLeft className="size-4" />
+            <span>목록으로 가기</span>
+          </div>
+
+          {/* 좋아요, 북마크 버튼 */}
+          <div className="text-small-title text-text-3 flex items-center gap-2">
+            <div className="flex cursor-pointer items-center gap-2">
+              <Heart />
+              <span>121</span>
+            </div>
+            <span className="text-text-3/50">•</span>
+            <div className="flex cursor-pointer items-center gap-2">
+              <Bookmark />
+              <span>54</span>
+            </div>
+          </div>
         </div>
 
-        {/* 좋아요, 북마크 버튼 */}
-        <div className="text-small-title text-text-3 flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <Heart />
-            <span>121</span>
-          </div>
-          <span className="text-text-3/50">•</span>
-          <div className="flex items-center gap-2">
-            <Bookmark />
-            <span>54</span>
-          </div>
+        <div className="mt-10 flex w-[220px] items-center justify-between">
+          <Link to="/class/1" className="group flex items-center gap-2">
+            <div className="border-text-2 flex items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
+              <MoveLeft
+                className="text-text-2 ml-1 size-5 transition-all duration-300 group-hover:text-white"
+                strokeWidth={1}
+              />
+            </div>
+            <span className="text-small-title text-text-2 transition-all duration-300 group-hover:text-white">
+              PREV
+            </span>
+          </Link>
+
+          <Link to="/class/2" className="group flex items-center gap-2">
+            <span className="text-small-title text-text-2 transition-all duration-300 group-hover:text-white">
+              NEXT
+            </span>
+            <div className="border-text-2 flex items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
+              <MoveRight
+                className="text-text-2 ml-1 size-5 transition-all duration-300 group-hover:text-white"
+                strokeWidth={1}
+              />
+            </div>
+          </Link>
         </div>
       </div>
 
