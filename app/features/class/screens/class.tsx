@@ -3,6 +3,7 @@ import type { Route } from "./+types/class";
 import { SearchIcon } from "lucide-react";
 import { Form, Link } from "react-router";
 
+import Tags from "~/core/components/tags";
 import { Input } from "~/core/components/ui/input";
 import {
   InputGroup,
@@ -130,20 +131,11 @@ export default function Class({ loaderData }: Route.ComponentProps) {
 
                 {/* 타이틀 영역 */}
                 <div className="flex flex-col gap-1 xl:gap-2">
-                  <h3 className="xl:text-small-title mt-2 line-clamp-1 text-base font-medium xl:text-[20px]">
+                  <h3 className="xl:text-small-title mt-2 line-clamp-1 text-base font-medium xl:mt-0 xl:text-[20px]">
                     {lecture.title}
                   </h3>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    {lecture.tags.map((tag, index) => (
-                      <div
-                        className="border-text-3 text-text-3 rounded-full border px-2 py-1 text-xs"
-                        key={index}
-                      >
-                        {tag}
-                      </div>
-                    ))}
-                  </div>
+                  <Tags tags={lecture.tags} />
                 </div>
               </Link>
             ))}
