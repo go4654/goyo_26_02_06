@@ -238,17 +238,17 @@ export function NavigationBar({
   return (
     <nav
       className={
-        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between px-5 xl:px-[120px]"
+        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full max-w-[1680px] items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm"
       }
     >
       <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1680px]">
         {/* 로고 */}
         <Link to="/" className="mt-1">
-          <img src={LOGO_URL} alt="Goyo" className="w-[80px] xl:w-[110px]" />
+          <img src={LOGO_URL} alt="Goyo" className="w-[70px] xl:w-[90px]" />
         </Link>
 
         {/* 메인 내비게이션 */}
-        <ul className="text-small-title mt-2 hidden items-center gap-18 md:flex">
+        <ul className="text-small-title mt-1 hidden items-center gap-18 md:flex">
           <li className="group relative">
             <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-200 group-hover:scale-100"></div>
             <Link to="/class" className="hover:text-primary">

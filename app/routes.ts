@@ -66,9 +66,6 @@ export default [
     ...prefix("/class", [
       index("features/class/screens/class.tsx"),
     ]),
-    ...prefix("/gallery", [
-      index("features/gallery/screens/gallery.tsx"),
-    ]),
     ...prefix("/news", [
       index("features/news/screens/news.tsx"),
     ]),
@@ -101,7 +98,10 @@ export default [
     // 인증이 필요한 상세 페이지들 (로그인하지 않은 사용자는 /login으로 리다이렉트)
     layout("core/layouts/private.layout.tsx", { id: "private-content" }, [
       route("/class/:slug", "features/class/screens/class-detail.tsx"),
-      route("/gallery/:slug", "features/gallery/screens/gallery-detail.tsx"),
+      ...prefix("/gallery", [
+        index("features/gallery/screens/gallery.tsx"),
+        route("/:slug", "features/gallery/screens/gallery-detail.tsx"),
+      ]),
       route("/news/:slug", "features/news/screens/news-detail.tsx"),
     ]),
 
