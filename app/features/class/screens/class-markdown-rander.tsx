@@ -1,7 +1,7 @@
 import { getMDXComponent } from "mdx-bundler/client";
 import { useMemo } from "react";
 
-import { ThreeColumns } from "../components/mdx/three-columns";
+import { ThreeColumns } from "../components/three-columns";
 
 /**
  * MDXRenderer
@@ -71,6 +71,17 @@ export default function MDXRenderer({ code }: { code: string }) {
               className="text-small-title text-text-2 mt-4 leading-relaxed font-medium"
               {...props}
             />
+          ),
+
+          pre: (props) => (
+            <pre
+              className="my-8 overflow-x-auto rounded-xl border border-white/10 bg-[#0F172A] p-5 text-sm text-white"
+              {...props}
+            />
+          ),
+
+          code: (props) => (
+            <code className="font-mono text-[14px]" {...props} />
           ),
 
           /** 리스트 (불릿 목록) */
