@@ -123,8 +123,10 @@ export function CommentItem({
     setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
   };
 
-  const avatarSizeClass = isReply ? "h-8 w-8" : "h-10 w-10";
-  const containerGapClass = isReply ? "gap-4" : "gap-6";
+  const avatarSizeClass = isReply
+    ? "w-6 h-6 xl:h-8 xl:w-8"
+    : "h-8 w-8 xl:h-10 xl:w-10";
+  const containerGapClass = isReply ? "gap-2 xl:gap-4" : "gap-2 xl:gap-6";
 
   return (
     <div className={`flex items-start ${containerGapClass}`}>
@@ -141,9 +143,11 @@ export function CommentItem({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* 유저 이름 */}
-            <span className="text-text-2">{comment.userName}</span>
+            <span className="text-text-2 text-sm xl:text-base">
+              {comment.userName}
+            </span>
             {/* 댓글 작성 시간 */}
-            <span className="text-text-3/50 text-sm">
+            <span className="text-text-3/50 text-sm xl:text-base">
               {formatRelativeDate(comment.createdAt)}
             </span>
           </div>

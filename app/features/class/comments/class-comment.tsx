@@ -18,7 +18,8 @@ export default function ClassComment() {
           </div>
 
           <div className="text-text-3 flex cursor-pointer items-center gap-2 text-base">
-            <span>최신순</span> <ArrowUpDown className="size-4" />
+            <span className="text-sm xl:text-base">최신순</span>{" "}
+            <ArrowUpDown className="size-4 xl:size-5" />
           </div>
         </div>
 

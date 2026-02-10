@@ -45,21 +45,21 @@ export default function MDXRenderer({ code }: { code: string }) {
           /** 대제목 (##) */
           h1: (props) => (
             <h1
-              className="text-h3 xl:text-h2 font-bold tracking-tight"
+              className="text-h4 xl:text-h2 font-bold tracking-tight"
               {...props}
             />
           ),
 
           /** 섹션 제목 (###) */
-          h2: (props) => <h2 className="text-h4 xl:text-h3 mt-18" {...props} />,
+          h2: (props) => <h2 className="text-h5 xl:text-h3 mt-18" {...props} />,
 
           /** 타이틀 문단 */
-          h3: (props) => (
-            <h3
-              className="text-h5 text-text-2 mt-12 font-semibold"
-              {...props}
-            />
-          ),
+          // h3: (props) => (
+          //   <h3
+          //     className="text-h5 text-text-2 mt-12 font-semibold"
+          //     {...props}
+          //   />
+          // ),
 
           h4: (props) => (
             <h4 className="text-h6 text-text-3 mt-12" {...props} />
@@ -68,7 +68,7 @@ export default function MDXRenderer({ code }: { code: string }) {
           /** 일반 본문 텍스트 */
           p: (props) => (
             <p
-              className="text-small-title text-text-2 mt-4 leading-relaxed font-medium"
+              className="text-text-2 mt-4 text-base leading-relaxed font-medium"
               {...props}
             />
           ),

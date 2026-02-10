@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "~/core/components/ui/button";
 import { Textarea } from "~/core/components/ui/textarea";
 
-import { commentSchema, type CommentFormValues } from "./comment-item";
+import { type CommentFormValues, commentSchema } from "./comment-item";
 
 interface ReplyFormProps {
   parentId: number;
@@ -35,7 +35,7 @@ export function ReplyForm({ parentId, onSubmitted }: ReplyFormProps) {
   };
 
   return (
-    <form className="mt-4 flex flex-col gap-2 pl-12" onSubmit={handleSubmit}>
+    <form className="mt-4 flex flex-col gap-2" onSubmit={handleSubmit}>
       <Textarea
         value={value}
         onChange={(event) => setValue(event.target.value)}

@@ -11,7 +11,7 @@ export const DESIGN_MOCKUP_SOURCE = `
 
 
 
-<br/><br/>
+<br/>
 
 ## 02.폰트 위계의 3가지 핵심 축
 
@@ -31,7 +31,7 @@ export const DESIGN_MOCKUP_SOURCE = `
 
 
 
-<br/><br/>
+<br/>
 ## 03.제목은 웅장하게, 본문은 편안하게
 
 가장 흔한 실수는 제목과 본문의 크기 차이를 너무 적게 두는 것입니다. 예를 들어 제목이 24px인데 본문이 16px라면, 유저는 이 두 정보의 중요도 차이를 직관적으로 느끼지 못합니다.
@@ -44,7 +44,7 @@ export const DESIGN_MOCKUP_SOURCE = `
 
 
 
-<br/><br/>
+<br/>
 ## GOYO.’s <span className="text-primary">Tip</span>
 
 실무에서 실패 없는 '황금 비율'을 알려드릴게요. **메인 제목이 48px라면, 소제목은 24px, 본문은 16px**로 설정해 보세요. (딱 2:1:0.6 비율이죠!) 
@@ -55,7 +55,7 @@ export const DESIGN_MOCKUP_SOURCE = `
 
 
 
-<br/><br/>
+<br/>
 ## 04.지금 바로 피그마에서 적용해 보세요
 
 이론을 아는 것과 실제로 구현하는 것은 별개의 문제입니다. 지금 작업 중인 시안을 열어보세요. 그리고 가장 중요한 정보 딱 하나만 남기고 나머지는 모두 크기를 줄이거나 색상을 연하게 바꿔보세요. 그 과정이 바로 '위계 잡기'의 시작입니다.
@@ -78,7 +78,7 @@ export const DEV_MOCKUP_SOURCE = `
 **서버와 화면 사이의 역할 분담을 설계하는 방법**을 이해하는 과정입니다.  
 이걸 알면 프로젝트 구조가 훨씬 깔끔해집니다.
 
-<br/><br/>
+<br/>
 
 ## 02. React Router 데이터 구조의 3가지 핵심 축
 
@@ -96,7 +96,7 @@ export const DEV_MOCKUP_SOURCE = `
   </ThreeColumns.Item>
 </ThreeColumns>
 
-<br/><br/>
+<br/>
 
 ## 03. Loader에서 데이터를 가져오는 기본 구조
 
@@ -127,7 +127,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 이 구조가 익숙해지는 순간,  
 데이터 흐름이 훨씬 직관적으로 느껴지기 시작합니다.
 
-<br/><br/>
+<br/>
 
 ## GOYO.’s <span className="text-primary">Dev Tip</span>
 
@@ -137,7 +137,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 특히 협업을 할 때, 누군가는 데이터 로직을, 누군가는 UI를 맡아도  
 충돌 없이 개발을 이어갈 수 있는 구조가 만들어집니다.
 
-<br/><br/>
+<br/>
 
 ## 04. Action으로 상태를 변경하는 구조
 
@@ -165,7 +165,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 UI는 단순하지만, 데이터 변경은 서버에서 안전하게 처리되는 구조죠.
 
-<br/><br/>
+<br/>
 
 ## 05. 이제 여러분의 프로젝트에 적용해 보세요
 
