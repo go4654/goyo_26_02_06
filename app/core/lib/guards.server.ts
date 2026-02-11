@@ -1,38 +1,31 @@
 /**
- * Authentication and Request Guards Module
- * 
- * This module provides utility functions for protecting routes and API endpoints
- * by enforcing authentication and HTTP method requirements. These guards are designed
- * to be used in React Router loaders and actions to ensure proper access control
- * and request validation.
- * 
- * The module includes:
- * - Authentication guard to ensure a user is logged in
- * - HTTP method guard to ensure requests use the correct HTTP method
+ * 인증 및 요청 가드 모듈
+ * * 이 모듈은 인증 및 HTTP 메서드 요구 사항을 강제하여 라우트와 API 엔드포인트를
+ * 보호하는 유틸리티 함수를 제공합니다. 이 가드들은 React Router의 loader와 action에서
+ * 적절한 액세스 제어 및 요청 유효성 검사를 보장하기 위해 사용되도록 설계되었습니다.
+ * * 모듈 포함 내용:
+ * - 사용자의 로그인 여부를 확인하는 인증 가드
+ * - 요청이 올바른 HTTP 메서드를 사용하는지 확인하는 메서드 가드
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { data } from "react-router";
 
 /**
- * Require user authentication for a route or action
- * 
- * This function checks if a user is currently authenticated by querying the Supabase
- * client. If no user is found, it throws a 401 Unauthorized response, which will be
- * handled by React Router's error boundary system.
- * 
- * @example
- * // In a loader or action function
+ * 라우트나 action에 대해 사용자 인증 요구
+ * * 이 함수는 Supabase 클라이언트를 조회하여 현재 사용자가 인증되었는지 확인합니다.
+ * 사용자를 찾을 수 없는 경우 401 Unauthorized 응답을 throw하며, 이는
+ * React Router의 에러 경계(error boundary) 시스템에서 처리됩니다.
+ * * @example
+ * // loader 또는 action 함수에서 사용 예시
  * export async function loader({ request }: LoaderArgs) {
- *   const [client] = makeServerClient(request);
- *   await requireAuthentication(client);
- *   
- *   // Continue with authenticated logic...
- *   return json({ ... });
+ * const [client] = makeServerClient(request);
+ * await requireAuthentication(client);
+ * * // 인증된 로직 계속 진행...
+ * return json({ ... });
  * }
- * 
- * @param client - The Supabase client instance to use for authentication check
- * @throws {Response} 401 Unauthorized if no user is authenticated
+ * * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
+ * @throws {Response} 사용자가 인증되지 않은 경우 401 Unauthorized 발생
  */
 export async function requireAuthentication(client: SupabaseClient) {
   const {
@@ -44,24 +37,20 @@ export async function requireAuthentication(client: SupabaseClient) {
 }
 
 /**
- * Require a specific HTTP method for a route action
- * 
- * This function returns a middleware that checks if the incoming request uses
- * the specified HTTP method. If not, it throws a 405 Method Not Allowed response.
- * This is useful for ensuring that endpoints only accept the intended HTTP methods.
- * 
- * @example
- * // In an action function
+ * 라우트 action에 대해 특정 HTTP 메서드 요구
+ * * 이 함수는 들어오는 요청이 지정된 HTTP 메서드를 사용하는지 확인하는 미들웨어를 반환합니다.
+ * 일치하지 않는 경우 405 Method Not Allowed 응답을 throw합니다.
+ * 이는 엔드포인트가 의도한 HTTP 메서드만 수락하도록 보장하는 데 유용합니다.
+ * * @example
+ * // action 함수에서 사용 예시
  * export async function action({ request }: ActionArgs) {
- *   requireMethod('POST')(request);
- *   
- *   // Continue with POST-specific logic...
- *   return json({ ... });
+ * requireMethod('POST')(request);
+ * * // POST 전용 로직 계속 진행...
+ * return json({ ... });
  * }
- * 
- * @param method - The required HTTP method (e.g., 'GET', 'POST', 'PUT', 'DELETE')
- * @returns A function that validates the request method
- * @throws {Response} 405 Method Not Allowed if the request uses an incorrect method
+ * * @param method - 요구되는 HTTP 메서드 (예: 'GET', 'POST', 'PUT', 'DELETE')
+ * @returns 요청 메서드를 검증하는 함수
+ * @throws {Response} 요청이 잘못된 메서드를 사용하는 경우 405 Method Not Allowed 발생
  */
 export function requireMethod(method: string) {
   return (request: Request) => {

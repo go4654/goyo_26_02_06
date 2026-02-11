@@ -38,7 +38,7 @@ export default function Footer() {
           </Link>
 
           {/* 네비게이션 */}
-          <ul className="text-small flex items-center justify-center gap-10 xl:justify-start xl:text-base">
+          <ul className="text-small flex items-center justify-center gap-10 xl:text-base">
             <li>
               <Link to="/" className="hover:text-text-2">
                 HOME

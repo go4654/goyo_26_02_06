@@ -3,17 +3,17 @@ import type { Route } from "../screens/+types/class-detail";
 import { bundleMDX } from "mdx-bundler";
 import rehypePrettyCode from "rehype-pretty-code";
 
+import { requireAuthentication } from "~/core/lib/guards.server";
+import makeServerClient from "~/core/lib/supa-client.server";
+
 import {
   DESIGN_MOCKUP_SOURCE,
   DEV_MOCKUP_SOURCE,
 } from "../constants/class-detail-mockup";
 
 export async function classDetailLoader({ request }: Route.LoaderArgs) {
-  //   const [client] = makeServerClient(request);
-
-  //   const {
-  //     data: { user },
-  //   } = await client.auth.getUser();
+  const [client] = makeServerClient(request);
+  await requireAuthentication(client);
 
   // 디자인 기록 목업
   // const source = DESIGN_MOCKUP_SOURCE;
