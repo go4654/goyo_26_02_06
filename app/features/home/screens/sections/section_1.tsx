@@ -32,7 +32,7 @@ export default function Section1() {
           <p className="text-text-body md:text-h6 text-text-2 mt-4 mb-14">
             조용히 쌓인 기록이, 가장 단단한 성장을 만듭니다.
           </p>
-          <HomeMoreBtn text="기록 보러가기" />
+          <HomeMoreBtn text="기록 보러가기" to="/class" />
         </div>
 
         {/* 아래 검은 그라데이션 */}

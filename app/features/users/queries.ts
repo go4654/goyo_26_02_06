@@ -16,5 +16,6 @@ export async function getUserProfile(
   if (error) {
     throw error;
   }
+
   return data;
 }

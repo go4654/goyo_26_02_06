@@ -12,7 +12,7 @@ export default function RecentLogs() {
         <h2 className="text-h3 xl:text-h2 mb-8 leading-14 tracking-tight xl:mb-24 xl:leading-20">
           <span className="text-primary">GOYO.</span> <br /> Recent Logs
         </h2>
-        <HomeMoreBtn text="로그 보러가기" />
+        <HomeMoreBtn text="로그 보러가기" to="/class" />
       </div>
 
       {/* 왼쪽 로그 리스트 컨텐츠 */}

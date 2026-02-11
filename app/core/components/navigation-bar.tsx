@@ -94,32 +94,34 @@ function UserMenu({
           <span className="truncate font-semibold">{name}</span>
           <span className="truncate text-xs">{email}</span>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
 
-        <DropdownMenuGroup>
-          {/* 관리자 대시보드 링크 (관리자만 표시) */}
-          {isAdmin && (
-            <DropdownMenuItem asChild>
-              <SheetClose asChild>
-                <Link
-                  to="/admin"
-                  viewTransition
-                  className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
-                >
-                  <HomeIcon className="size-4" />
-                  대시보드
-                </Link>
-              </SheetClose>
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuGroup>
+            <DropdownMenuGroup>
+              {/* 관리자 대시보드 링크 (관리자만 표시) */}
+              <DropdownMenuItem asChild>
+                <SheetClose asChild>
+                  <Link
+                    to="/admin"
+                    viewTransition
+                    className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
+                  >
+                    <HomeIcon className="size-4" />
+                    대시보드
+                  </Link>
+                </SheetClose>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
           <SheetClose asChild>
             <Link
-              to="/user/profile"
+              to={`/user/${name}`}
               viewTransition
               className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
             >
@@ -169,7 +171,7 @@ function AuthButtons() {
       <Button variant="ghost" asChild>
         <SheetClose asChild>
           <Link to="/login" viewTransition>
-            Sign in
+            로그인
           </Link>
         </SheetClose>
       </Button>
@@ -178,7 +180,7 @@ function AuthButtons() {
       <Button variant="default" asChild>
         <SheetClose asChild>
           <Link to="/join" viewTransition>
-            Sign up
+            회원가입
           </Link>
         </SheetClose>
       </Button>

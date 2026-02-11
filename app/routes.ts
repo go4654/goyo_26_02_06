@@ -102,6 +102,7 @@ export default [
         route("/:slug", "features/gallery/screens/gallery-detail.tsx"),
       ]),
       route("/news/:slug", "features/news/screens/news-detail.tsx"),
+      route("/user/:slug", "features/users/screens/profile.tsx"),
       route("/user/profile", "features/users/screens/account.tsx"),
     ]),
 

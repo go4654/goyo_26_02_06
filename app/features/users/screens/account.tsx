@@ -13,7 +13,7 @@ import EditProfileForm from "../components/forms/edit-profile-form";
 import { getUserProfile } from "../queries";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `Account | ${import.meta.env.VITE_APP_NAME}` }];
+  return [{ title: `프로필 수정 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -36,7 +36,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
     (identity) => identity.provider === "email",
   );
   return (
-    <div className="flex w-full flex-col items-center gap-10 pt-0 pb-8">
+    <div className="flex w-full flex-col items-center gap-10 pt-24 pb-8 xl:py-40">
       <Suspense
         fallback={
           <div className="bg-card animate-fast-pulse h-60 w-full max-w-screen-md rounded-xl border shadow-sm" />
@@ -45,7 +45,9 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         <Await
           resolve={profile}
           errorElement={
-            <div className="text-red-500">Could not load profile</div>
+            <div className="text-red-500">
+              프로필을 불러오는데 실패했습니다.
+            </div>
           }
         >
           {(profile) => {
@@ -72,14 +74,16 @@ export default function Account({ loaderData }: Route.ComponentProps) {
         <Await
           resolve={identities}
           errorElement={
-            <div className="text-red-500">Could not load social accounts</div>
+            <div className="text-red-500">
+              소셜 계정을 불러오는데 실패했습니다.
+            </div>
           }
         >
           {({ data, error }) => {
             if (!data) {
               return (
                 <div className="text-red-500">
-                  <span>Could not load social accounts</span>
+                  <span>소셜 계정을 불러오는데 실패했습니다.</span>
                   <span className="text-xs">Code: {error.code}</span>
                   <span className="text-xs">Message: {error.message}</span>
                 </div>

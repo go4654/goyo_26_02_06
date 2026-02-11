@@ -3,7 +3,6 @@ import type { Route } from "./+types/class";
 import { SearchIcon } from "lucide-react";
 import { Form, Link } from "react-router";
 
-import Tags from "~/core/components/tags";
 import { Input } from "~/core/components/ui/input";
 import {
   InputGroup,
@@ -11,6 +10,7 @@ import {
   InputGroupInput,
 } from "~/core/components/ui/input-group";
 import Container from "~/core/layouts/container";
+import LectureCard from "~/features/class/components/lecture-card";
 import {
   type ClassLecture,
   getLecturesByCategory,
@@ -115,29 +115,7 @@ export default function Class({ loaderData }: Route.ComponentProps) {
         {lectures.length > 0 ? (
           <div className="mt-12 grid grid-cols-2 gap-2 gap-y-10 xl:mt-[120px] xl:grid-cols-4 xl:gap-6 xl:gap-y-16">
             {lectures.map((lecture: ClassLecture) => (
-              <Link
-                to={`/class/${lecture.slug}`}
-                className="group space-between hover:text-secondary flex flex-col items-start gap-2 transition-colors xl:h-[350px] xl:max-h-[350px] xl:gap-4"
-                key={lecture.id}
-              >
-                {/* img 영역 */}
-                <div className="h-full max-h-[350px] w-full overflow-hidden rounded-xl bg-gray-400 md:block md:max-h-[480px] xl:rounded-[20px]">
-                  <img
-                    src={lecture.imageUrl}
-                    alt={lecture.title}
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.1]"
-                  />
-                </div>
-
-                {/* 타이틀 영역 */}
-                <div className="flex flex-col gap-1 xl:gap-2">
-                  <h3 className="xl:text-small-title mt-2 line-clamp-1 text-base font-medium xl:mt-0 xl:text-[20px]">
-                    {lecture.title}
-                  </h3>
-
-                  <Tags tags={lecture.tags} />
-                </div>
-              </Link>
+              <LectureCard key={lecture.id} lecture={lecture} />
             ))}
           </div>
         ) : (
