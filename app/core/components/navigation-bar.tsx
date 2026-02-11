@@ -33,6 +33,7 @@ import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -69,10 +70,12 @@ function UserMenu({
   name,
   email,
   avatarUrl,
+  isAdmin,
 }: {
   name: string;
   email?: string;
   avatarUrl?: string | null;
+  isAdmin?: boolean;
 }) {
   return (
     <DropdownMenu>
@@ -93,21 +96,35 @@ function UserMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
+        <DropdownMenuGroup>
+          {/* 관리자 대시보드 링크 (관리자만 표시) */}
+          {isAdmin && (
+            <DropdownMenuItem asChild>
+              <SheetClose asChild>
+                <Link
+                  to="/admin"
+                  viewTransition
+                  className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
+                >
+                  <HomeIcon className="size-4" />
+                  대시보드
+                </Link>
+              </SheetClose>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem asChild>
           <SheetClose asChild>
-            <Link to="/user/profile" viewTransition>
+            <Link
+              to="/user/profile"
+              viewTransition
+              className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
+            >
               <UserIcon className="size-4" />
               프로필
-            </Link>
-          </SheetClose>
-        </DropdownMenuItem>
-
-        {/* 관리자 대시보드 링크 */}
-        <DropdownMenuItem asChild>
-          <SheetClose asChild>
-            <Link to="/admin" viewTransition>
-              <HomeIcon className="size-4" />
-              대시보드
             </Link>
           </SheetClose>
         </DropdownMenuItem>
@@ -115,7 +132,11 @@ function UserMenu({
         {/* 로그아웃 링크 */}
         <DropdownMenuItem asChild>
           <SheetClose asChild>
-            <Link to="/logout" viewTransition>
+            <Link
+              to="/logout"
+              viewTransition
+              className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
+            >
               <LogOutIcon className="size-4" />
               로그아웃
             </Link>
@@ -192,7 +213,11 @@ function Actions() {
           {/* Sentry monitoring link */}
           <DropdownMenuItem asChild>
             <SheetClose asChild>
-              <Link to="/debug/sentry" viewTransition>
+              <Link
+                to="/debug/sentry"
+                viewTransition
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
                 Sentry
               </Link>
             </SheetClose>
@@ -200,7 +225,11 @@ function Actions() {
           {/* Google Analytics link */}
           <DropdownMenuItem asChild>
             <SheetClose asChild>
-              <Link to="/debug/analytics" viewTransition>
+              <Link
+                to="/debug/analytics"
+                viewTransition
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
                 Google Tag
               </Link>
             </SheetClose>
@@ -243,11 +272,13 @@ export function NavigationBar({
   name,
   email,
   avatarUrl,
+  isAdmin,
   loading,
 }: {
   name?: string;
   email?: string;
   avatarUrl?: string | null;
+  isAdmin?: boolean;
   loading: boolean;
 }) {
   return (
@@ -298,7 +329,12 @@ export function NavigationBar({
             <>
               {name ? (
                 // 인증 상태 유저 메뉴
-                <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
+                <UserMenu
+                  name={name}
+                  email={email}
+                  avatarUrl={avatarUrl}
+                  isAdmin={isAdmin}
+                />
               ) : (
                 // 비인증 상태 인증 버튼
                 <AuthButtons />
@@ -314,16 +350,36 @@ export function NavigationBar({
         <SheetContent>
           <SheetHeader>
             <SheetClose asChild>
-              <Link to="/">Home</Link>
+              <Link
+                to="/"
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
+                Home
+              </Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/class">CLASS</Link>
+              <Link
+                to="/class"
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
+                CLASS
+              </Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/gallery">GALLERY</Link>
+              <Link
+                to="/gallery"
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
+                GALLERY
+              </Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/news">NEWS</Link>
+              <Link
+                to="/news"
+                className="hover:text-success focus:text-success cursor-pointer"
+              >
+                NEWS
+              </Link>
             </SheetClose>
           </SheetHeader>
           {loading ? (
@@ -338,7 +394,12 @@ export function NavigationBar({
                     <Actions />
                   </div>
                   <div className="flex justify-end">
-                    <UserMenu name={name} email={email} avatarUrl={avatarUrl} />
+                    <UserMenu
+                      name={name}
+                      email={email}
+                      avatarUrl={avatarUrl}
+                      isAdmin={isAdmin}
+                    />
                   </div>
                 </div>
               ) : (

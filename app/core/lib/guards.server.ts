@@ -5,6 +5,8 @@
  * 적절한 액세스 제어 및 요청 유효성 검사를 보장하기 위해 사용되도록 설계되었습니다.
  * * 모듈 포함 내용:
  * - 사용자의 로그인 여부를 확인하는 인증 가드
+ * - 사용자 인증 상태 및 관리자 권한을 안전하게 조회하는 함수
+ * - 관리자 권한을 요구하는 가드
  * - 요청이 올바른 HTTP 메서드를 사용하는지 확인하는 메서드 가드
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -107,6 +109,55 @@ export async function requireAdmin(client: SupabaseClient): Promise<User> {
 
   // user 객체 반환하여 중복 getUser() 호출 방지
   return user;
+}
+
+/**
+ * 사용자 인증 상태 및 관리자 권한 조회
+ *
+ * 이 함수는 현재 사용자의 인증 상태와 관리자 권한을 안전하게 조회합니다.
+ * 에러를 throw하지 않고 안전하게 처리하여, navigation bar와 같은 UI 컴포넌트에서
+ * 사용할 수 있도록 설계되었습니다.
+ *
+ * 보안 강화: user_metadata 대신 데이터베이스의 profiles 테이블에서 role을 조회하여
+ * 클라이언트가 수정할 수 없는 서버 사이드 검증을 수행합니다.
+ *
+ * 에러 처리: 프로필 조회 실패 시 일반 사용자로 처리하여 UI가 깨지지 않도록 합니다.
+ *
+ * @example
+ * // loader 함수에서 사용 예시
+ * export async function loader({ request }: LoaderArgs) {
+ *   const [client] = makeServerClient(request);
+ *   const userPromise = getUserRole(client);
+ *   return { userPromise };
+ * }
+ *
+ * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
+ * @returns 사용자 객체와 관리자 여부를 포함한 Promise
+ */
+export async function getUserRole(
+  client: SupabaseClient,
+): Promise<{ user: User | null; isAdmin: boolean }> {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  if (!user) {
+    return { user: null, isAdmin: false };
+  }
+
+  // 데이터베이스에서 사용자 프로필의 role 조회 (user_metadata보다 안전)
+  // 자신의 프로필은 항상 조회 가능해야 하므로 RLS 정책이 허용해야 함
+  const { data: profile, error } = await client
+    .from("profiles")
+    .select("role")
+    .eq("profile_id", user.id)
+    .single();
+
+  // 에러가 발생하거나 프로필이 없는 경우 일반 사용자로 처리
+  // 에러를 throw하지 않고 안전하게 처리하여 UI가 깨지지 않도록 함
+  const isAdmin = !error && profile?.role === "admin";
+
+  return { user, isAdmin };
 }
 
 /**

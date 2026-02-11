@@ -5,11 +5,12 @@ import { Await, Outlet } from "react-router";
 
 import Footer from "../components/footer";
 import { NavigationBar } from "../components/navigation-bar";
+import { getUserRole } from "../lib/guards.server";
 import makeServerClient from "../lib/supa-client.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const [client] = makeServerClient(request);
-  const userPromise = client.auth.getUser();
+  const userPromise = getUserRole(client);
   return { userPromise };
 }
 
@@ -19,7 +20,7 @@ export default function NavigationLayout({ loaderData }: Route.ComponentProps) {
     <div className="flex min-h-screen flex-col justify-between">
       <Suspense fallback={<NavigationBar loading={true} />}>
         <Await resolve={userPromise}>
-          {({ data: { user } }) =>
+          {({ user, isAdmin }) =>
             user === null ? (
               <NavigationBar loading={false} />
             ) : (
@@ -27,6 +28,7 @@ export default function NavigationLayout({ loaderData }: Route.ComponentProps) {
                 name={user.user_metadata.name || "Anonymous"}
                 email={user.email}
                 avatarUrl={user.user_metadata.avatar_url}
+                isAdmin={isAdmin}
                 loading={false}
               />
             )
