@@ -49,6 +49,9 @@ export default [
         "features/users/api/disconnect-provider.tsx",
       ),
     ]),
+    ...prefix("/admin", [
+      route("/users", "features/admin/api/manage-users.tsx"),
+    ]),
     ...prefix("/cron", [route("/mailer", "features/cron/api/mailer.tsx")]),
     ...prefix("/blog", [route("/og", "features/blog/api/og.tsx")]),
   ]),
@@ -63,12 +66,8 @@ export default [
     route("/error", "core/screens/error.tsx"),
 
     // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
-    ...prefix("/class", [
-      index("features/class/screens/class.tsx"),
-    ]),
-    ...prefix("/news", [
-      index("features/news/screens/news.tsx"),
-    ]),
+    ...prefix("/class", [index("features/class/screens/class.tsx")]),
+    ...prefix("/news", [index("features/news/screens/news.tsx")]),
 
     // 공개 레이아웃 (인증되지 않은 사용자만 접근 가능, 로그인 시 대시보드로 리다이렉트)
     layout("core/layouts/public.layout.tsx", [
@@ -103,6 +102,7 @@ export default [
         route("/:slug", "features/gallery/screens/gallery-detail.tsx"),
       ]),
       route("/news/:slug", "features/news/screens/news-detail.tsx"),
+      route("/user/profile", "features/users/screens/account.tsx"),
     ]),
 
     // 인증이 필요한 인증 관련 라우트
@@ -132,15 +132,14 @@ export default [
   ]),
 
   // ============================================================================
-  // 대시보드 레이아웃 (인증 필요, 대시보드 전용 레이아웃 포함)
+  // 관리자 대시보드 레이아웃 (관리자 전용, CMS)
   // ============================================================================
-  layout("core/layouts/private.layout.tsx", { id: "private-dashboard" }, [
-    layout("features/users/layouts/dashboard.layout.tsx", [
-      ...prefix("/dashboard", [
-        index("features/users/screens/dashboard.tsx"),
+  layout("core/layouts/private.layout.tsx", { id: "private-admin" }, [
+    layout("features/admin/layouts/admin.layout.tsx", [
+      ...prefix("/admin", [
+        index("features/admin/screens/admin-dashboard.tsx"),
         route("/payments", "features/payments/screens/payments.tsx"),
       ]),
-      route("/account/edit", "features/users/screens/account.tsx"),
     ]),
   ]),
 

@@ -260,8 +260,8 @@ export default function App() {
         // 인증 실패 시 에러 페이지로 리다이렉트
         navigate(`/error?${searchParams.toString()}`);
       } else if (code) {
-        // 인증 성공 시 대시보드로 리다이렉트
-        navigate(`/dashboard/account`);
+        // 인증 성공 시 프로필 페이지로 리다이렉트
+        navigate(`/user/profile`);
       }
     }
   }, [searchParams]);

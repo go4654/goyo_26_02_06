@@ -8,6 +8,7 @@
  * - 요청이 올바른 HTTP 메서드를 사용하는지 확인하는 메서드 가드
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 
 import { data } from "react-router";
 
@@ -34,6 +35,78 @@ export async function requireAuthentication(client: SupabaseClient) {
   if (!user) {
     throw data(null, { status: 401 });
   }
+}
+
+/**
+ * 라우트나 action에 대해 관리자 권한 요구
+ *
+ * 이 함수는 Supabase 클라이언트를 조회하여 현재 사용자가 관리자인지 확인합니다.
+ * 사용자가 인증되지 않았거나 관리자가 아닌 경우 403 Forbidden 응답을 throw합니다.
+ *
+ * 보안 강화: user_metadata 대신 데이터베이스의 profiles 테이블에서 role을 조회하여
+ * 클라이언트가 수정할 수 없는 서버 사이드 검증을 수행합니다.
+ *
+ * 성능 최적화: user 객체를 반환하여 중복 getUser() 호출을 방지합니다.
+ *
+ * @example
+ * // loader 또는 action 함수에서 사용 예시
+ * export async function loader({ request }: LoaderArgs) {
+ *   const [client] = makeServerClient(request);
+ *   const user = await requireAdmin(client);
+ *
+ *   // 관리자 전용 로직 계속 진행...
+ *   return json({ user, ... });
+ * }
+ *
+ * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
+ * @returns 인증된 관리자 사용자 객체
+ * @throws {Response} 사용자가 인증되지 않았거나 관리자가 아닌 경우 403 Forbidden 발생
+ */
+export async function requireAdmin(client: SupabaseClient): Promise<User> {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  
+  if (!user) {
+    throw data(null, { status: 401 });
+  }
+
+  // 데이터베이스에서 사용자 프로필의 role 조회 (user_metadata보다 안전)
+  // 자신의 프로필은 항상 조회 가능해야 하므로 RLS 정책이 허용해야 함
+  const { data: profile, error } = await client
+    .from("profiles")
+    .select("role")
+    .eq("profile_id", user.id)
+    .single();
+
+  if (error) {
+    // 프로필 조회 실패 시 권한 없음으로 처리
+    throw data(
+      { error: "프로필을 조회할 수 없습니다. 관리자에게 문의하세요." },
+      { status: 403 },
+    );
+  }
+
+  if (!profile) {
+    // 프로필이 없는 경우
+    throw data(
+      { error: "프로필이 존재하지 않습니다." },
+      { status: 403 },
+    );
+  }
+
+  // 관리자 권한 체크 (데이터베이스의 role이 'admin'인지 확인)
+  const isAdmin = profile.role === "admin";
+  
+  if (!isAdmin) {
+    throw data(
+      { error: "관리자 권한이 필요합니다." },
+      { status: 403 },
+    );
+  }
+
+  // user 객체 반환하여 중복 getUser() 호출 방지
+  return user;
 }
 
 /**

@@ -94,13 +94,13 @@ export default function SidebarUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link to="/account/edit" viewTransition>
+                <Link to="/user/profile" viewTransition>
                   <UserCircle2Icon />
                   Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/dashboard/payments">
+                <Link to="/admin/payments">
                   <CreditCard />
                   Payments
                 </Link>

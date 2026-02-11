@@ -32,31 +32,67 @@ export const profiles = pgTable(
     name: text().notNull(),
     avatar_url: text(),
     marketing_consent: boolean("marketing_consent").notNull().default(false),
+    // User role: 'user' (default) or 'admin'
+    role: text("role").notNull().default("user"),
     // Adds created_at and updated_at timestamp columns
     ...timestamps,
   },
   (table) => [
     // RLS Policy: Users can only update their own profile
+    // OR admins can update any profile
     pgPolicy("edit-profile-policy", {
       for: "update",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`${authUid} = ${table.profile_id}`,
-      using: sql`${authUid} = ${table.profile_id}`,
+      withCheck: sql`
+        ${authUid} = ${table.profile_id} 
+        OR EXISTS (
+          SELECT 1 FROM ${table} p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+      using: sql`
+        ${authUid} = ${table.profile_id} 
+        OR EXISTS (
+          SELECT 1 FROM ${table} p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
     }),
     // RLS Policy: Users can only delete their own profile
+    // OR admins can delete any profile
     pgPolicy("delete-profile-policy", {
       for: "delete",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`${authUid} = ${table.profile_id}`,
+      using: sql`
+        ${authUid} = ${table.profile_id} 
+        OR EXISTS (
+          SELECT 1 FROM ${table} p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
     }),
-    // RLS Policy: Users can only view their own profile
+    // RLS Policy: Users can view their own profile OR admins can view any profile
+    // 자신의 프로필 조회는 항상 허용 (순환 참조 방지)
     pgPolicy("select-profile-policy", {
       for: "select",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`${authUid} = ${table.profile_id}`,
+      using: sql`
+        ${authUid} = ${table.profile_id} 
+        OR (
+          ${table.profile_id} != ${authUid}
+          AND EXISTS (
+            SELECT 1 FROM ${table} p
+            WHERE p.profile_id = ${authUid}
+            AND p.role = 'admin'
+          )
+        )
+      `,
     }),
   ],
 );

@@ -1,5 +1,8 @@
 import type { Route } from "./+types/news-detail";
 
+import { Heart, MoveLeft, MoveRight } from "lucide-react";
+import { Link, useNavigate } from "react-router";
+
 import { Separator } from "~/core/components/ui/separator";
 
 import { NEWS_DETAIL_DATA } from "../constants/new-mockup";
@@ -14,8 +17,9 @@ export const loader = newsDetailLoader;
 export const action = newsDetailAction;
 
 export default function NewsDetail({ loaderData }: Route.ComponentProps) {
+  const navigate = useNavigate();
   return (
-    <div className="mx-auto max-w-[800px] py-24 xl:py-40">
+    <div className="mx-auto max-w-[800px] px-5 py-24 xl:py-40">
       {/* 타이틀 영역 */}
       <div className="flex flex-col items-start gap-5">
         <div className="">
@@ -36,9 +40,51 @@ export default function NewsDetail({ loaderData }: Route.ComponentProps) {
 
       {/* dangerouslySetInnerHTML를 사용할 때는 반드시 prose 클래스로 스타일을 잡아줍니다. */}
       <div
-        className="/* 1. 기본 레이아웃 & 폰트 세팅 */ prose prose-neutral xl:prose-lg /* 2. 본문 텍스트: 가독성을 위해 자간과 색상 미세 조정 */ prose-p:leading-9 prose-p:text-neutral-700 prose-p:tracking-tight /* 3. 제목(H3): 더 굵고 확실한 존재감 + 하단 보더 */ prose-h3:mt-16 prose-h3:pb-4 prose-h3:border-b prose-h3:border-neutral-100 prose-h3:text-3xl prose-h3:font-extrabold prose-h3:text-neutral-900 /* 4. 인용구(Blockquote): 세련된 박스 형태 + 큰 따옴표 효과 */ prose-blockquote:not-italic prose-blockquote:border-l-4 prose-blockquote:border-secondary prose-blockquote:bg-neutral-50 prose-blockquote:rounded-r-2xl prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:text-neutral-700 prose-blockquote:font-medium prose-blockquote:shadow-sm /* 5. 강조(Strong): 색상만 바꾸지 말고 배경색 살짝 깔기 */ prose-strong:text-secondary prose-strong:font-bold prose-strong:bg-secondary/5 prose-strong:px-1 prose-strong:rounded-sm /* 6. 이미지 & 리스트: 디테일 마감 */ prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-12 prose-li:text-neutral-600 prose-ol:font-semibold /* 7. 링크(Anchor): 서비스 아이덴티티 반영 */ prose-a:text-secondary prose-a:no-underline hover:prose-a:underline max-w-none"
+        className="prose prose-neutral xl:prose-lg prose-p:leading-9 prose-p:text-neutral-700 prose-p:tracking-tight prose-h3:mt-16 prose-h3:pb-4 prose-h3:border-b prose-h3:border-neutral-100 prose-h3:text-3xl prose-h3:font-extrabold prose-h3:text-neutral-900 prose-blockquote:not-italic prose-blockquote:border-l-4 prose-blockquote:border-secondary prose-blockquote:bg-neutral-50 prose-blockquote:rounded-r-2xl prose-blockquote:py-6 prose-blockquote:px-8 prose-blockquote:text-neutral-700 prose-blockquote:font-medium prose-blockquote:shadow-sm prose-strong:text-secondary prose-strong:font-bold prose-strong:bg-secondary/5 prose-strong:px-1 prose-strong:rounded-sm prose-img:rounded-3xl prose-img:shadow-xl prose-img:my-12 prose-li:text-neutral-600 prose-ol:font-semibold prose-a:text-secondary prose-a:no-underline hover:prose-a:underline max-w-none"
         dangerouslySetInnerHTML={{ __html: NEWS_DETAIL_DATA.content }}
       />
+
+      <Separator className="mt-26 mb-6" />
+
+      {/* 목록으로가기, 좋아요, 북마크 버튼 */}
+      <div className="flex w-full flex-col items-center justify-between">
+        <div className="flex w-full items-center justify-between">
+          {/* 목록으로가기 */}
+          <div
+            className="xl:text-small-title text-text-2 hover:text-primary flex cursor-pointer items-center gap-2 text-sm"
+            onClick={() => navigate(-1)}
+          >
+            <MoveLeft className="size-4" />
+            <span>목록으로 가기</span>
+          </div>
+        </div>
+
+        <div className="mt-10 flex w-[180px] items-center justify-between xl:w-[220px]">
+          <Link to="/news/1" className="group flex items-center gap-2">
+            <div className="border-text-2 flex h-[30px] w-[30px] items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
+              <MoveLeft
+                className="text-text-2 ml-1 size-4 transition-all duration-300 group-hover:text-white xl:size-5"
+                strokeWidth={1}
+              />
+            </div>
+            <span className="text-small-title text-text-2 text-sm transition-all duration-300 group-hover:text-white xl:text-base">
+              PREV
+            </span>
+          </Link>
+
+          <Link to="/news/2" className="group flex items-center gap-2">
+            <span className="text-small-title text-text-2 xl:text-bas e text-sm transition-all duration-300 group-hover:text-white">
+              NEXT
+            </span>
+            <div className="border-text-2 flex h-[30px] w-[30px] items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
+              <MoveRight
+                className="text-text-2 ml-1 size-4 transition-all duration-300 group-hover:text-white xl:size-5"
+                strokeWidth={1}
+              />
+            </div>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

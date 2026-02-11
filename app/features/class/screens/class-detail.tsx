@@ -65,8 +65,8 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 
       <Separator className="mt-26 mb-6" />
 
+      {/* 목록으로가기, 좋아요, 북마크 버튼 */}
       <div className="flex w-full flex-col items-center justify-between">
-        {/* 목록으로가기, 좋아요, 북마크 버튼 */}
         <div className="flex w-full items-center justify-between">
           {/* 목록으로가기 */}
           <div

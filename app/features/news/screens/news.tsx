@@ -35,7 +35,7 @@ export default function News() {
           What's <span className="text-primary">NEWS.</span>
         </h1>
 
-        <div>
+        <div className="text-text-2 text-small font-extralight">
           <span>총 게시물 </span>
           <span className="text-primary">100</span>
           <span>개</span>
@@ -43,21 +43,21 @@ export default function News() {
       </div>
 
       {/* 뉴스 목록 */}
-      <div className="xl:mt-20">
+      <div className="mt-10 xl:mt-20">
         {NEWS_MOCK_DATA.map((data) => (
           <Link
             key={data.id}
             to={`/news/${data.id}`}
-            className="border-text-3/25 flex items-center gap-20 border-t py-8 last:border-b"
+            className="border-text-3/25 flex items-center gap-6 border-t py-8 last:border-b xl:gap-20"
           >
             {/* 날짜 */}
-            <p className="text-text-2 text-[24px] font-extralight xl:text-[32px]">
+            <p className="text-text-2 text-small font-extralight xl:text-[32px]">
               {data.date}
             </p>
 
             {/* 뉴스 카테고리 및 제목 */}
             <div>
-              <span className="text-secondary xl:text-small-title xl:text-base">
+              <span className="text-secondary text-small xl:text-small-title xl:text-base">
                 {data.category}
               </span>
               <h3 className="xl:text-h5 font-medium">{data.title}</h3>
@@ -68,7 +68,7 @@ export default function News() {
 
       {/* 페이지네이션 */}
       <PaginationUI
-        className="xl:mt-20"
+        className="mt-10 xl:mt-20"
         page={page}
         totalPages={totalPages}
         onPageChange={onClick}

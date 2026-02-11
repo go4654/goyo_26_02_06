@@ -16,7 +16,13 @@
  * - Authenticated state with user profile information
  * - Unauthenticated state with sign in/sign up buttons
  */
-import { CogIcon, HomeIcon, LogOutIcon, MenuIcon } from "lucide-react";
+import {
+  CogIcon,
+  HomeIcon,
+  LogOutIcon,
+  MenuIcon,
+  UserIcon,
+} from "lucide-react";
 import { Link } from "react-router";
 
 import { LOGO_URL } from "../constant/imgUrls";
@@ -70,7 +76,7 @@ function UserMenu({
 }) {
   return (
     <DropdownMenu>
-      {/* Avatar as the dropdown trigger */}
+      {/* 아바타 드롭다운 트리거 */}
       <DropdownMenuTrigger asChild>
         <Avatar className="size-8 cursor-pointer rounded-lg">
           <AvatarImage src={avatarUrl ?? undefined} />
@@ -78,31 +84,40 @@ function UserMenu({
         </Avatar>
       </DropdownMenuTrigger>
 
-      {/* Dropdown content with user info and actions */}
+      {/* 드롭다운 컨텐츠 유저 정보 및 액션 */}
       <DropdownMenuContent className="w-56">
-        {/* User information display */}
+        {/* 유저 정보 표시 */}
         <DropdownMenuLabel className="grid flex-1 text-left text-sm leading-tight">
           <span className="truncate font-semibold">{name}</span>
           <span className="truncate text-xs">{email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {/* Dashboard link */}
         <DropdownMenuItem asChild>
           <SheetClose asChild>
-            <Link to="/dashboard" viewTransition>
-              <HomeIcon className="size-4" />
-              Dashboard
+            <Link to="/user/profile" viewTransition>
+              <UserIcon className="size-4" />
+              프로필
             </Link>
           </SheetClose>
         </DropdownMenuItem>
 
-        {/* Logout link */}
+        {/* 관리자 대시보드 링크 */}
+        <DropdownMenuItem asChild>
+          <SheetClose asChild>
+            <Link to="/admin" viewTransition>
+              <HomeIcon className="size-4" />
+              대시보드
+            </Link>
+          </SheetClose>
+        </DropdownMenuItem>
+
+        {/* 로그아웃 링크 */}
         <DropdownMenuItem asChild>
           <SheetClose asChild>
             <Link to="/logout" viewTransition>
               <LogOutIcon className="size-4" />
-              Log out
+              로그아웃
             </Link>
           </SheetClose>
         </DropdownMenuItem>
@@ -238,10 +253,10 @@ export function NavigationBar({
   return (
     <nav
       className={
-        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full max-w-[1680px] items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm"
+        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm"
       }
     >
-      <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1680px]">
+      <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1640px]">
         {/* 로고 */}
         <Link to="/" className="mt-1">
           <img src={LOGO_URL} alt="Goyo" className="w-[70px] xl:w-[90px]" />
