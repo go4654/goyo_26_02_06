@@ -1,0 +1,92 @@
+export const NEWS_MOCK_DATA = [
+  {
+    id: 1,
+    date: "26.02.10",
+    category: "NOTICE",
+    title: "GOYO 서비스 정식 런칭 안내",
+  },
+  {
+    id: 2,
+    date: "26.02.08",
+    category: "CLASS",
+    title: "상반기 웹 디자인 실무 클래스 수강생 모집",
+  },
+  {
+    id: 3,
+    date: "26.02.04",
+    category: "NOTICE",
+    title: "서버 점검 및 시스템 고도화 작업 안내",
+  },
+  {
+    id: 4,
+    date: "26.01.28",
+    category: "SHOP",
+    title: "신규 전자책 '디자이너를 위한 워크플로우' 출시",
+  },
+  {
+    id: 5,
+    date: "26.01.25",
+    category: "EVENT",
+    title: "오픈 기념 갤러리 베스트 포트폴리오 투표 이벤트",
+  },
+  {
+    id: 6,
+    date: "26.01.20",
+    category: "NEWS",
+    title: "SoftHazel Studio 콜라보레이션 에셋 업데이트",
+  },
+  {
+    id: 7,
+    date: "26.01.15",
+    category: "NOTICE",
+    title: "로그인 유저 전용 프라이빗 갤러리 이용 가이드",
+  },
+  {
+    id: 8,
+    date: "26.01.10",
+    category: "CLASS",
+    title: "[마감임박] 기초 포토샵 & 피그마 융합 클래스",
+  },
+  {
+    id: 9,
+    date: "26.01.05",
+    category: "NEWS",
+    title: "신규 기능: 프로젝트 타임라인 추적 업데이트",
+  },
+  {
+    id: 10,
+    date: "25.12.30",
+    category: "NOTICE",
+    title: "연말 연휴 고객센터 운영 및 배송 휴무 안내",
+  },
+  {
+    id: 11,
+    date: "25.12.24",
+    category: "EVENT",
+    title: "크리스마스 한정 디자인 소스팩 무료 배포",
+  },
+  {
+    id: 12,
+    date: "25.12.20",
+    category: "SHOP",
+    title: "2026 다이어리 굿노트 템플릿 얼리버드 판매",
+  },
+  {
+    id: 13,
+    date: "25.12.15",
+    category: "CLASS",
+    title: "현직 시니어 디자이너와 함께하는 1:1 멘토링 프로그램",
+  },
+  {
+    id: 14,
+    date: "25.12.10",
+    category: "NEWS",
+    title: "고요한 기록의 조각: 갤러리 누적 게시물 1,000건 돌파",
+  },
+  {
+    id: 15,
+    date: "25.12.01",
+    category: "NOTICE",
+    title: "개인정보 처리방침 및 이용약관 개정 안내",
+  },
+];
