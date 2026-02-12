@@ -85,36 +85,30 @@ export default function SidebarUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link to="/user/profile" viewTransition>
                   <UserCircle2Icon />
-                  Account
+                  프로필
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/admin/payments">
                   <CreditCard />
-                  Payments
+                  결제 내역
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Bell />
-                Notifications
+                알림
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link to="/logout">
                 <LogOut />
-                Log out
+                로그아웃
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

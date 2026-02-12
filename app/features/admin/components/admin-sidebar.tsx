@@ -137,7 +137,7 @@ export default function AdminSidebar({
 
       <SidebarContent>
         <SidebarMain items={data.navMain} />
-        <SidebarProjects projects={data.projects} />
+        {/* <SidebarProjects projects={data.projects} /> */}
       </SidebarContent>
 
       <SidebarFooter>
