@@ -5,7 +5,6 @@
  * 페이지네이션, 필터링, 정렬 등의 기능을 포함합니다.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "database.types";
 
 /**
  * 클래스 목록 조회 파라미터
@@ -67,7 +66,7 @@ export interface ClassListItem {
  * @returns 클래스 목록 및 페이지네이션 정보
  */
 export async function getClasses(
-  client: SupabaseClient<Database>,
+  client: SupabaseClient,
   params: GetClassesParams = {},
 ): Promise<GetClassesResult> {
   const { category = null, page = 1, pageSize = 12, search = null } = params;
@@ -113,10 +112,155 @@ export async function getClasses(
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
-    classes: (data as ClassListItem[]) ?? [],
+    classes: (data as unknown as ClassListItem[]) ?? [],
     totalCount,
     totalPages,
     currentPage: page,
     pageSize,
   };
+}
+
+/**
+ * 클래스 상세 정보 타입
+ */
+export interface ClassDetail {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  slug: string;
+  thumbnail_image_url: string | null;
+  cover_image_urls: string[];
+  content_mdx: string;
+  view_count: number;
+  like_count: number;
+  save_count: number;
+  comment_count: number;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * 이전/다음 클래스 정보 타입
+ */
+export interface ClassNavigation {
+  prev: { id: string; slug: string; title: string } | null;
+  next: { id: string; slug: string; title: string } | null;
+}
+
+/**
+ * 클래스 상세 조회
+ *
+ * slug를 기반으로 클래스 상세 정보를 조회합니다.
+ * 공개된 클래스만 조회하며, RLS 정책에 따라 접근 권한이 자동으로 적용됩니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param slug - 조회할 클래스의 slug
+ * @returns 클래스 상세 정보
+ * @throws 클래스를 찾을 수 없는 경우 404 에러
+ */
+export async function getClassBySlug(
+  client: SupabaseClient,
+  slug: string,
+): Promise<ClassDetail> {
+  const { data, error } = await client
+    .from("classes")
+    .select(
+      "id, title, description, category, slug, thumbnail_image_url, cover_image_urls, content_mdx, view_count, like_count, save_count, comment_count, published_at, created_at, updated_at",
+    )
+    .eq("slug", slug)
+    .eq("is_deleted", false)
+    .eq("is_published", true)
+    .single();
+
+  if (error || !data) {
+    throw new Response("클래스를 찾을 수 없습니다.", { status: 404 });
+  }
+
+  return data as unknown as ClassDetail;
+}
+
+/**
+ * 이전/다음 클래스 조회
+ *
+ * 현재 클래스의 카테고리 내에서 이전/다음 클래스를 조회합니다.
+ * published_at 기준으로 정렬하여 이전/다음 항목을 찾습니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param currentSlug - 현재 클래스의 slug
+ * @param category - 현재 클래스의 카테고리
+ * @returns 이전/다음 클래스 정보
+ */
+export async function getClassNavigation(
+  client: SupabaseClient,
+  currentSlug: string,
+  category: string,
+): Promise<ClassNavigation> {
+  // 현재 클래스 정보 조회
+  const currentClass = await getClassBySlug(client, currentSlug);
+
+  // 이전 클래스 조회 (published_at이 현재보다 작은 것 중 가장 큰 것)
+  const { data: prevData } = await client
+    .from("classes")
+    .select("id, slug, title")
+    .eq("category", category)
+    .eq("is_deleted", false)
+    .eq("is_published", true)
+    .lt("published_at", currentClass.published_at || currentClass.created_at)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  // 다음 클래스 조회 (published_at이 현재보다 큰 것 중 가장 작은 것)
+  const { data: nextData } = await client
+    .from("classes")
+    .select("id, slug, title")
+    .eq("category", category)
+    .eq("is_deleted", false)
+    .eq("is_published", true)
+    .gt("published_at", currentClass.published_at || currentClass.created_at)
+    .order("published_at", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  return {
+    prev: prevData
+      ? {
+          id: prevData.id as string,
+          slug: prevData.slug as string,
+          title: prevData.title as string,
+        }
+      : null,
+    next: nextData
+      ? {
+          id: nextData.id as string,
+          slug: nextData.slug as string,
+          title: nextData.title as string,
+        }
+      : null,
+  };
+}
+
+/**
+ * 클래스 조회수 증가
+ *
+ * 클래스 상세 페이지 조회 시 조회 이벤트를 기록합니다.
+ * 트리거에 의해 자동으로 view_count가 증가합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param classId - 클래스 ID
+ * @param userId - 사용자 ID (로그인한 경우, null이면 anon)
+ */
+export async function incrementClassView(
+  client: SupabaseClient,
+  classId: string,
+  userId: string | null,
+): Promise<void> {
+  await client.from("class_view_events").insert({
+    class_id: classId,
+    user_id: userId,
+  });
 }
