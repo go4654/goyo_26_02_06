@@ -1,7 +1,7 @@
-import type { Route } from "./+types/settings";
+import type { Route } from "./+types/admin-gallery-new";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `설정 | ${import.meta.env.VITE_APP_NAME}` }];
+  return [{ title: `갤러리 추가 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
 export function loader() {
@@ -12,10 +12,10 @@ export function action() {
   return {};
 }
 
-export default function Settings() {
+export default function AdminGalleryNew() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <h1 className="text-h5">설정 페이지 입니다</h1>
+      <h1 className="text-h5">00페이지</h1>
     </div>
   );
 }

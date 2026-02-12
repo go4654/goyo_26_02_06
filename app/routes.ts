@@ -140,6 +140,8 @@ export default [
     ...prefix("/admin", [
       index("features/admin/screens/admin-dashboard.tsx"),
       route("/payments", "features/payments/screens/payments.tsx"),
+
+      // 클래스 관리
       ...prefix("/classes", [
         index("features/admin/screens/classes/admin-classes.tsx"),
         route("/new", "features/admin/screens/classes/admin-classes-new.tsx"),
@@ -148,10 +150,29 @@ export default [
           "features/admin/screens/classes/admin-classes-edit.tsx",
         ),
       ]),
-      route("/gallery", "features/admin/screens/galleries/galleries.tsx"),
-      route("/news", "features/admin/screens/news/news.tsx"),
-      route("/users", "features/admin/screens/users/users.tsx"),
-      route("/settings", "features/admin/screens/settings/settings.tsx"),
+
+      // 갤러리 관리
+      ...prefix("/gallery", [
+        index("features/admin/screens/galleries/galleries.tsx"),
+        route("/new", "features/admin/screens/galleries/admin-gallery-new.tsx"),
+        route(
+          "/:slug",
+          "features/admin/screens/galleries/admin-gallery-edit.tsx",
+        ),
+      ]),
+
+      // 뉴스 관리
+      ...prefix("/news", [
+        index("features/admin/screens/news/news.tsx"),
+        route("/new", "features/admin/screens/news/admin-news-new.tsx"),
+        route("/:slug", "features/admin/screens/news/admin-news-edit.tsx"),
+      ]),
+
+      // 사용자 관리
+      route("/users", "features/admin/screens/users/admin-users.tsx"),
+
+      // 설정 관리
+      route("/settings", "features/admin/screens/settings/admin-settings.tsx"),
     ]),
   ]),
 
