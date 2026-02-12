@@ -46,3 +46,5 @@ Key Conventions
 - `json` does not exists anymore. Return plain objects i.e `export function loader({ request }: Route.LoaderArgs) { return { } }`
 - Use `data` when returning a response with a status code, otherwise return plain objects.
 - 항상 한국어로 답변해 줘
+- 항상 주석은 한글 주석으로 작성
+- 파일 작업중 영어 주석이 있으면 한글 주석으로 변경
