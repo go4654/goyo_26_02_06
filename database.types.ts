@@ -14,6 +14,279 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_comments: {
+        Row: {
+          class_id: string
+          content: string
+          created_at: string
+          id: string
+          is_deleted: boolean
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_comments_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_comments_parent_fk"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "class_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_comments_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      class_likes: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_likes_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      class_saves: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_saves_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_saves_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      class_view_events: {
+        Row: {
+          anon_id: string | null
+          class_id: string
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          anon_id?: string | null
+          class_id: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          anon_id?: string | null
+          class_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_view_events_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          author_id: string
+          category: string
+          comment_count: number
+          content_mdx: string
+          cover_image_urls: string[]
+          created_at: string
+          description: string | null
+          id: string
+          is_deleted: boolean
+          is_published: boolean
+          like_count: number
+          published_at: string | null
+          save_count: number
+          slug: string
+          thumbnail_image_url: string | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id: string
+          category: string
+          comment_count?: number
+          content_mdx: string
+          cover_image_urls?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_published?: boolean
+          like_count?: number
+          published_at?: string | null
+          save_count?: number
+          slug: string
+          thumbnail_image_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          comment_count?: number
+          content_mdx?: string
+          cover_image_urls?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_deleted?: boolean
+          is_published?: boolean
+          like_count?: number
+          published_at?: string | null
+          save_count?: number
+          slug?: string
+          thumbnail_image_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      comment_likes: {
+        Row: {
+          comment_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comment_likes_comment_id_class_comments_id_fk"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "class_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comment_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           approved_at: string
@@ -112,6 +385,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_slug: { Args: { input_text: string }; Returns: string }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
     }
