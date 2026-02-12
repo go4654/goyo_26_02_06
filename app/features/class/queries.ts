@@ -264,3 +264,143 @@ export async function incrementClassView(
     user_id: userId,
   });
 }
+
+/**
+ * 프로필 정보를 포함한 댓글 데이터
+ */
+export interface CommentWithProfile {
+  id: string;
+  class_id: string;
+  user_id: string;
+  parent_id: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  profile: {
+    profile_id: string;
+    name: string;
+    avatar_url: string | null;
+  } | null;
+  likes_count: number;
+  is_liked?: boolean;
+}
+
+/**
+ * 클래스 댓글 목록 조회
+ *
+ * 특정 클래스의 모든 댓글을 조회합니다.
+ * 프로필 정보와 좋아요 수를 함께 조회합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param classId - 클래스 ID
+ * @param userId - 현재 사용자 ID (좋아요 여부 확인용, 선택)
+ * @returns 댓글 목록 (프로필 정보 포함)
+ */
+export async function getClassComments(
+  client: SupabaseClient,
+  classId: string,
+  userId?: string | null,
+): Promise<CommentWithProfile[]> {
+  // 댓글 조회 (최신순 정렬)
+  const { data: commentsData, error: commentsError } = await client
+    .from("class_comments")
+    .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+    .eq("class_id", classId)
+    .eq("is_deleted", false)
+    .order("created_at", { ascending: false });
+
+  if (commentsError) {
+    throw new Error(`댓글 조회 실패: ${commentsError.message}`);
+  }
+
+  if (!commentsData || commentsData.length === 0) {
+    return [];
+  }
+
+  // 고유한 사용자 ID 목록 추출
+  const userIds = [
+    ...new Set(commentsData.map((comment) => comment.user_id as string)),
+  ];
+
+  // 프로필 정보 일괄 조회
+  const { data: profilesData } = await client
+    .from("profiles")
+    .select("profile_id, name, avatar_url")
+    .in("profile_id", userIds);
+
+  // 프로필 맵 생성 (빠른 조회를 위해)
+  const profileMap = new Map(
+    (profilesData || []).map((profile) => [
+      profile.profile_id as string,
+      {
+        profile_id: profile.profile_id as string,
+        name: profile.name as string,
+        avatar_url: profile.avatar_url as string | null,
+      },
+    ]),
+  );
+
+  // 댓글 ID 목록 추출
+  const commentIds = commentsData.map((comment) => comment.id as string);
+
+  // 댓글 좋아요 수 조회
+  const { data: likesData } = await client
+    .from("comment_likes")
+    .select("comment_id")
+    .in("comment_id", commentIds);
+
+  // 댓글별 좋아요 수 맵 생성
+  const likesCountMap = new Map<string, number>();
+  (likesData || []).forEach((like) => {
+    const commentId = like.comment_id as string;
+    likesCountMap.set(commentId, (likesCountMap.get(commentId) || 0) + 1);
+  });
+
+  // 현재 사용자가 좋아요를 누른 댓글 목록 조회
+  const userLikes = userId
+    ? await getUserCommentLikes(client, commentIds, userId)
+    : new Set<string>();
+
+  // 데이터 변환 및 타입 캐스팅
+  return commentsData.map((item) => ({
+    id: item.id as string,
+    class_id: item.class_id as string,
+    user_id: item.user_id as string,
+    parent_id: (item.parent_id as string | null) || null,
+    content: item.content as string,
+    created_at: item.created_at as string,
+    updated_at: item.updated_at as string,
+    profile: profileMap.get(item.user_id as string) || null,
+    likes_count: likesCountMap.get(item.id as string) || 0,
+    is_liked: userLikes.has(item.id as string),
+  })) as CommentWithProfile[];
+}
+
+
+/**
+ * 사용자가 좋아요를 누른 댓글 목록 조회
+ *
+ * 특정 클래스의 댓글 중 사용자가 좋아요를 누른 댓글 ID 목록을 반환합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param commentIds - 댓글 ID 목록
+ * @param userId - 사용자 ID
+ * @returns 좋아요를 누른 댓글 ID 목록
+ */
+export async function getUserCommentLikes(
+  client: SupabaseClient,
+  commentIds: string[],
+  userId: string | null,
+): Promise<Set<string>> {
+  if (!userId || commentIds.length === 0) {
+    return new Set();
+  }
+
+  const { data } = await client
+    .from("comment_likes")
+    .select("comment_id")
+    .in("comment_id", commentIds)
+    .eq("user_id", userId);
+
+  return new Set((data || []).map((like) => like.comment_id as string));
+}

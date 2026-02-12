@@ -7,7 +7,8 @@ import {
   Trash,
 } from "lucide-react";
 import { DateTime } from "luxon";
-import { type ReactNode, useState } from "react";
+import { useEffect, type ReactNode, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 import { z } from "zod";
 
 import {
@@ -33,16 +34,21 @@ import {
 } from "~/core/components/ui/dropdown-menu";
 import { Textarea } from "~/core/components/ui/textarea";
 
+/**
+ * 댓글 데이터 타입
+ * 실제 데이터베이스 구조에 맞춘 타입
+ */
 export interface CommentData {
-  id: number;
-  parentId?: number;
+  id: string;
+  parentId?: string | null;
   content: string;
   createdAt: string;
   updatedAt: string;
-  userId: number;
+  userId: string;
   userName: string;
-  userProfileImage: string;
+  userProfileImage: string | null;
   likes: number;
+  isLiked?: boolean; // 현재 사용자가 좋아요를 눌렀는지 여부
 }
 
 interface CommentItemProps {
@@ -53,6 +59,12 @@ interface CommentItemProps {
   replyCount?: number;
   isRepliesExpanded?: boolean;
   onToggleReplies?: () => void;
+  /** 클래스 ID (수정/삭제 액션용) */
+  classId?: string;
+  /** 현재 사용자 ID (본인 댓글 확인용) */
+  currentUserId?: string | null;
+  /** 관리자 여부 */
+  isAdmin?: boolean;
 }
 
 export const commentSchema = z.object({
@@ -65,18 +77,43 @@ export const commentSchema = z.object({
 
 export type CommentFormValues = z.infer<typeof commentSchema>;
 
+/**
+ * ISO 날짜를 한국 시간으로 변환하여 상대 시간 표시
+ * Luxon을 사용하여 한국 시간대(Asia/Seoul)로 변환
+ * 
+ * DB에서 가져온 시간은 UTC일 수 있으므로, UTC로 파싱한 후 한국 시간대로 변환합니다.
+ */
 function formatRelativeDate(isoDate: string) {
-  const date = DateTime.fromISO(isoDate);
+  // UTC로 파싱한 후 한국 시간대로 변환 (DB 시간이 UTC로 저장되어 있을 수 있음)
+  let date = DateTime.fromISO(isoDate, { zone: "utc" });
+  
+  // UTC 파싱 실패 시 기본 파싱 시도
+  if (!date.isValid) {
+    date = DateTime.fromISO(isoDate);
+  }
+  
+  // 한국 시간대로 변환
+  date = date.setZone("Asia/Seoul");
+  
   if (!date.isValid) return isoDate;
 
-  const now = DateTime.now();
-  const diff = now.diff(date, ["days", "hours"]).toObject();
+  const now = DateTime.now().setZone("Asia/Seoul");
+  const diff = now.diff(date, ["days", "hours", "minutes", "seconds"]).toObject();
 
   const days = diff.days ?? 0;
   const hours = diff.hours ?? 0;
+  const minutes = diff.minutes ?? 0;
+  const seconds = diff.seconds ?? 0;
 
   if (days < 1) {
-    if (hours < 1) return "방금 전";
+    if (hours < 1) {
+      if (minutes < 1) {
+        // 1분 미만은 "방금 전"으로 표시
+        if (seconds < 10) return "방금 전";
+        return `${Math.floor(seconds)}초 전`;
+      }
+      return `${Math.floor(minutes)}분 전`;
+    }
     return `${Math.floor(hours)}시간 전`;
   }
 
@@ -84,7 +121,8 @@ function formatRelativeDate(isoDate: string) {
     return `${Math.floor(days)}일 전`;
   }
 
-  return date.toFormat("yyyy.MM.dd");
+  // 7일 이상 지난 경우 한국 시간으로 날짜 표시
+  return date.toFormat("yyyy.MM.dd HH:mm");
 }
 
 export function CommentItem({
@@ -95,13 +133,23 @@ export function CommentItem({
   replyCount,
   isRepliesExpanded,
   onToggleReplies,
+  classId,
+  currentUserId,
+  isAdmin = false,
 }: CommentItemProps) {
   const [value, setValue] = useState(comment.content);
   const [draft, setDraft] = useState(comment.content);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [likeCount, setLikeCount] = useState(comment.likes ?? 0);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(comment.isLiked ?? false);
+  const fetcher = useFetcher();
+  const likeFetcher = useFetcher<{ success: boolean; isLiked: boolean }>();
+  const prevFetcherState = useRef(fetcher.state);
+
+  // 본인 댓글 또는 관리자 여부 확인 (수정/삭제 권한)
+  const isOwnComment = currentUserId === comment.userId;
+  const canModify = isOwnComment || isAdmin;
 
   const handleEditClick = () => {
     setDraft(value);
@@ -114,13 +162,89 @@ export function CommentItem({
   };
 
   const handleEditSave = () => {
-    setValue(draft);
-    setIsEditing(false);
+    if (!classId) return;
+
+    // 서버 액션으로 댓글 수정
+    fetcher.submit(
+      {
+        action: "update",
+        commentId: comment.id,
+        classId,
+        content: draft,
+      },
+      { method: "post" },
+    );
   };
 
+  // 수정 제출 후 편집 모드 닫기 (redirect 시 submitting → loading → idle 이므로 둘 다 처리)
+  useEffect(() => {
+    const prev = prevFetcherState.current;
+    prevFetcherState.current = fetcher.state;
+
+    const justFinished =
+      (prev === "submitting" || prev === "loading") && fetcher.state === "idle";
+    if (!justFinished) return;
+
+    const hasError = fetcher.data && (fetcher.data as { error?: string }).error;
+    if (!hasError) {
+      setValue(draft);
+      setIsEditing(false);
+    }
+  }, [fetcher.state, fetcher.data, draft]);
+
   const handleLikeClick = () => {
-    setLiked((prev) => !prev);
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+    if (!classId || !currentUserId) return;
+
+    // 낙관적 업데이트 (즉시 UI 반영)
+    const newLiked = !liked;
+    setLiked(newLiked);
+    setLikeCount((prev) => (newLiked ? prev + 1 : prev - 1));
+
+    // 서버 액션으로 좋아요 토글
+    likeFetcher.submit(
+      {
+        action: "toggleLike",
+        commentId: comment.id,
+        classId,
+      },
+      { method: "post" },
+    );
+  };
+
+  // 좋아요 액션 결과 처리 (서버 응답과 동기화)
+  useEffect(() => {
+    const data = likeFetcher.data;
+    if (
+      likeFetcher.state === "idle" &&
+      data &&
+      data.success &&
+      typeof data.isLiked === "boolean"
+    ) {
+      const newIsLiked = data.isLiked;
+      setLiked(newIsLiked);
+      setLikeCount((prev) => {
+        if (liked !== newIsLiked) {
+          return newIsLiked ? prev + 1 : prev - 1;
+        }
+        return prev;
+      });
+    }
+  }, [likeFetcher.state, likeFetcher.data, liked]);
+
+  const handleDelete = () => {
+    if (!classId) return;
+
+    // 서버 액션으로 댓글 삭제
+    fetcher.submit(
+      {
+        action: "delete",
+        commentId: comment.id,
+        classId,
+      },
+      { method: "post" },
+    );
+
+    setIsDeleteOpen(false);
   };
 
   const avatarSizeClass = isReply
@@ -132,7 +256,7 @@ export function CommentItem({
     <div className={`flex items-start ${containerGapClass}`}>
       {/* 아바타 */}
       <Avatar className={avatarSizeClass}>
-        <AvatarImage src={comment.userProfileImage} />
+        <AvatarImage src={comment.userProfileImage ?? undefined} />
         <AvatarFallback className="text-sm">
           {comment.userName.slice(0, 2).toUpperCase()}
         </AvatarFallback>
@@ -152,24 +276,29 @@ export function CommentItem({
             </span>
           </div>
 
-          {/* TODO: 본인 댓글일 때만 노출 */}
-          <DropdownMenu>
+          {/* 본인 댓글이거나 관리자일 때 수정/삭제 메뉴 표시 */}
+          {canModify && (
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="text-text-2 cursor-pointer">
                 <EllipsisVertical size={16} />
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-2">
-              <DropdownMenuItem
-                className="mb-2 flex cursor-pointer items-center gap-2"
-                onSelect={(event) => {
-                  event.preventDefault();
-                  handleEditClick();
-                }}
-              >
-                <Pencil className="text-text-2 size-4" /> <span> 수정</span>
-              </DropdownMenuItem>
+              {/* 본인 댓글만 수정 가능 */}
+              {isOwnComment && (
+                <DropdownMenuItem
+                  className="mb-2 flex cursor-pointer items-center gap-2"
+                  onSelect={(event) => {
+                    event.preventDefault();
+                    handleEditClick();
+                  }}
+                >
+                  <Pencil className="text-text-2 size-4" /> <span> 수정</span>
+                </DropdownMenuItem>
+              )}
 
+              {/* 본인 댓글 또는 관리자는 삭제 가능 */}
               <DropdownMenuItem
                 className="flex cursor-pointer items-center gap-2"
                 onSelect={(event) => {
@@ -182,6 +311,7 @@ export function CommentItem({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          )}
         </div>
 
         {/* 수정 폼 또는 댓글 내용 */}
@@ -191,6 +321,7 @@ export function CommentItem({
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               className="min-h-[120px]"
+              disabled={fetcher.state === "submitting"}
             />
             <div className="flex justify-end gap-2">
               <Button
@@ -198,11 +329,17 @@ export function CommentItem({
                 variant="outline"
                 size="sm"
                 onClick={handleEditCancel}
+                disabled={fetcher.state === "submitting"}
               >
                 취소
               </Button>
-              <Button type="button" size="sm" onClick={handleEditSave}>
-                저장
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleEditSave}
+                disabled={fetcher.state === "submitting" || !draft.trim()}
+              >
+                {fetcher.state === "submitting" ? "저장 중..." : "저장"}
               </Button>
             </div>
           </div>
@@ -277,12 +414,10 @@ export function CommentItem({
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() => {
-                    // TODO: 서버 연동 시 실제 삭제 처리
-                    setIsEditing(false);
-                  }}
+                  onClick={handleDelete}
+                  disabled={fetcher.state === "submitting"}
                 >
-                  삭제
+                  {fetcher.state === "submitting" ? "삭제 중..." : "삭제"}
                 </Button>
               </DialogClose>
             </DialogFooter>

@@ -1,0 +1,2 @@
+ALTER POLICY "update-class-comments" ON "class_comments" TO authenticated USING ("class_comments"."user_id" = (select auth.uid()) OR public.is_admin()) WITH CHECK ("class_comments"."user_id" = (select auth.uid()) OR public.is_admin());--> statement-breakpoint
+ALTER POLICY "delete-class-comments" ON "class_comments" TO authenticated USING ("class_comments"."user_id" = (select auth.uid()) OR public.is_admin());

@@ -7,6 +7,7 @@ import Tags from "~/core/components/tags";
 import { Separator } from "~/core/components/ui/separator";
 
 import ClassComment from "../comments/class-comment";
+import { classCommentAction } from "../server/class-comment.action";
 import { classDetailLoader } from "../server/class-detail.loader";
 import MDXRenderer from "./class-markdown-rander";
 
@@ -28,10 +29,11 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = classDetailLoader;
+export const action = classCommentAction;
 
 export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
-  const { class: classData, code, navigation } = loaderData;
+  const { class: classData, code, navigation, currentUserId, isAdmin } = loaderData;
 
   // 날짜 포맷팅 (published_at 우선, 없으면 created_at 사용)
   const displayDate = formatDate(classData.published_at || classData.created_at);
@@ -71,7 +73,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* 썸네일 영역 */}
-      {classData.thumbnail_image_url && (
+      {classData.thumbnail_image_url && classData.thumbnail_image_url.trim() !== "" && (
         <div className="mt-12">
           <img
             src={classData.thumbnail_image_url}
@@ -158,7 +160,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
         )}
       </div>
 
-      <ClassComment />
+      <ClassComment
+        classId={classData.id}
+        comments={loaderData.comments}
+        currentUserId={currentUserId}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

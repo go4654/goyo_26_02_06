@@ -406,22 +406,8 @@ export const classComments = pgTable(
       for: "update",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-          ${t.user_id} = ${authUid}
-          OR EXISTS (
-            SELECT 1 FROM profiles p
-            WHERE p.profile_id = ${authUid}
-            AND p.role = 'admin'
-          )
-        `,
-      withCheck: sql`
-          ${t.user_id} = ${authUid}
-          OR EXISTS (
-            SELECT 1 FROM profiles p
-            WHERE p.profile_id = ${authUid}
-            AND p.role = 'admin'
-          )
-        `,
+      using: sql`${t.user_id} = ${authUid} OR public.is_admin()`,
+      withCheck: sql`${t.user_id} = ${authUid} OR public.is_admin()`,
     }),
 
     // =========================
@@ -431,14 +417,8 @@ export const classComments = pgTable(
       for: "delete",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-          ${t.user_id} = ${authUid}
-          OR EXISTS (
-            SELECT 1 FROM profiles p
-            WHERE p.profile_id = ${authUid}
-            AND p.role = 'admin'
-          )
-        `,
+      // hard delete: 작성자/관리자/부모댓글 작성자까지 허용 (대댓글 CASCADE 삭제 대응)
+      using: sql`public.can_delete_class_comment(${t.id})`,
     }),
   ],
 );

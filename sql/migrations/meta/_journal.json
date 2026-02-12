@@ -36,6 +36,20 @@
       "when": 1770914268807,
       "tag": "0004_tired_blockbuster",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1770918797076,
+      "tag": "0005_bouncy_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1770919302954,
+      "tag": "0006_flippant_devos",
+      "breakpoints": true
     }
   ]
 }
