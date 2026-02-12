@@ -81,7 +81,7 @@ function UserMenu({
     <DropdownMenu>
       {/* 아바타 드롭다운 트리거 */}
       <DropdownMenuTrigger asChild>
-        <Avatar className="size-8 cursor-pointer rounded-lg">
+        <Avatar className="size-8 cursor-pointer rounded-full">
           <AvatarImage src={avatarUrl ?? undefined} />
           <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
         </Avatar>
@@ -94,27 +94,6 @@ function UserMenu({
           <span className="truncate font-semibold">{name}</span>
           <span className="truncate text-xs">{email}</span>
         </DropdownMenuLabel>
-        {isAdmin && (
-          <>
-            <DropdownMenuSeparator />
-
-            <DropdownMenuGroup>
-              {/* 관리자 대시보드 링크 (관리자만 표시) */}
-              <DropdownMenuItem asChild>
-                <SheetClose asChild>
-                  <Link
-                    to="/admin"
-                    viewTransition
-                    className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
-                  >
-                    <HomeIcon className="size-4" />
-                    대시보드
-                  </Link>
-                </SheetClose>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </>
-        )}
 
         <DropdownMenuSeparator />
 
@@ -144,6 +123,28 @@ function UserMenu({
             </Link>
           </SheetClose>
         </DropdownMenuItem>
+
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              {/* 관리자 대시보드 링크 (관리자만 표시) */}
+              <DropdownMenuItem asChild>
+                <SheetClose asChild>
+                  <Link
+                    to="/admin"
+                    viewTransition
+                    className="hover:text-success focus:text-success flex cursor-pointer items-center gap-2"
+                  >
+                    <HomeIcon className="size-4" />
+                    대시보드
+                  </Link>
+                </SheetClose>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -204,7 +205,7 @@ function AuthButtons() {
 function Actions() {
   return (
     <>
-      {/* Settings/debug dropdown menu */}
+      {/* 세팅/디버그 드롭다운 메뉴 */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
           <Button variant="ghost" size="icon">
@@ -212,7 +213,7 @@ function Actions() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {/* Sentry monitoring link */}
+          {/* Sentry 모니터링 링크 */}
           <DropdownMenuItem asChild>
             <SheetClose asChild>
               <Link
@@ -224,7 +225,7 @@ function Actions() {
               </Link>
             </SheetClose>
           </DropdownMenuItem>
-          {/* Google Analytics link */}
+          {/* Google Analytics 링크 */}
           <DropdownMenuItem asChild>
             <SheetClose asChild>
               <Link
@@ -239,11 +240,8 @@ function Actions() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Theme switcher component (light/dark mode) */}
-      <ThemeSwitcher />
-
-      {/* Language switcher component */}
-      <LangSwitcher />
+      {/* 테마 스위처 컴포넌트 (라이트/다크 모드) */}
+      {/* <ThemeSwitcher /> */}
     </>
   );
 }
@@ -350,11 +348,11 @@ export function NavigationBar({
           <MenuIcon />
         </SheetTrigger>
         <SheetContent>
-          <SheetHeader>
+          <SheetHeader className="text-h4 mt-20 flex flex-col gap-10">
             <SheetClose asChild>
               <Link
                 to="/"
-                className="hover:text-success focus:text-success cursor-pointer"
+                className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 Home
               </Link>
@@ -362,7 +360,7 @@ export function NavigationBar({
             <SheetClose asChild>
               <Link
                 to="/class"
-                className="hover:text-success focus:text-success cursor-pointer"
+                className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 CLASS
               </Link>
@@ -370,7 +368,7 @@ export function NavigationBar({
             <SheetClose asChild>
               <Link
                 to="/gallery"
-                className="hover:text-success focus:text-success cursor-pointer"
+                className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 GALLERY
               </Link>
@@ -378,7 +376,7 @@ export function NavigationBar({
             <SheetClose asChild>
               <Link
                 to="/news"
-                className="hover:text-success focus:text-success cursor-pointer"
+                className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 NEWS
               </Link>
@@ -393,7 +391,8 @@ export function NavigationBar({
               {name ? (
                 <div className="grid grid-cols-3">
                   <div className="col-span-2 flex w-full justify-between">
-                    <Actions />
+                    {/* 인증 상태 세팅/디버그 드롭다운 메뉴 */}
+                    {isAdmin && <Actions />}
                   </div>
                   <div className="flex justify-end">
                     <UserMenu
@@ -407,6 +406,7 @@ export function NavigationBar({
               ) : (
                 <div className="flex flex-col gap-5">
                   <div className="grid grid-cols-2 gap-2">
+                    {/* 비인증 상태 인증 버튼 */}
                     <AuthButtons />
                   </div>
                 </div>
