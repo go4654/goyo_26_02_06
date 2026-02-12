@@ -60,7 +60,7 @@ export default function UserGraph() {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="text-text-2 flex gap-2 leading-none font-medium">
+        <div className="text-text-2 flex gap-2 text-[12px] leading-none font-medium xl:text-sm">
           최근 학습 흐름이 증가하고 있습니다.{" "}
           <TrendingUp className="text-success h-4 w-4" />
         </div>
