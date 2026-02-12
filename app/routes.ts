@@ -169,7 +169,10 @@ export default [
       ]),
 
       // 사용자 관리
-      route("/users", "features/admin/screens/users/admin-users.tsx"),
+      ...prefix("/users", [
+        index("features/admin/screens/users/admin-users.tsx"),
+        route("/:slug", "features/admin/screens/users/admin-users-edit.tsx"),
+      ]),
 
       // 설정 관리
       route("/settings", "features/admin/screens/settings/admin-settings.tsx"),

@@ -44,6 +44,12 @@ interface AdminDataTableProps<TData> {
   onDeleteSelected?: (selectedRows: TData[]) => void | Promise<void>;
   /** 행 클릭 콜백 (행 데이터를 반환) */
   onRowClick?: (row: TData) => void;
+  /** 커스텀 액션 버튼 설정 (선택된 행에 대한 액션) */
+  customAction?: {
+    label: string;
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost";
+    onClick: (selectedRows: TData[]) => void | Promise<void>;
+  };
 }
 
 /**
@@ -74,6 +80,7 @@ export default function AdminDataTable<TData>({
   emptyMessage = "결과가 없습니다.",
   onDeleteSelected,
   onRowClick,
+  customAction,
 }: AdminDataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnSizing, setColumnSizing] = React.useState({});
@@ -278,7 +285,26 @@ export default function AdminDataTable<TData>({
               <span className="text-text-3 text-sm">
                 {table.getFilteredSelectedRowModel().rows.length}개 선택됨
               </span>
-              {onDeleteSelected && (
+              {/* 커스텀 액션 버튼 (우선순위) */}
+              {customAction && (
+                <Button
+                  type="button"
+                  variant={customAction.variant || "default"}
+                  size="sm"
+                  onClick={async () => {
+                    const selectedRows = table
+                      .getFilteredSelectedRowModel()
+                      .rows.map((row) => row.original);
+                    await customAction.onClick(selectedRows);
+                    // 액션 후 선택 해제
+                    setRowSelection({});
+                  }}
+                >
+                  {customAction.label}
+                </Button>
+              )}
+              {/* 기본 삭제 버튼 (커스텀 액션이 없을 때만 표시) */}
+              {onDeleteSelected && !customAction && (
                 <Button
                   type="button"
                   variant="destructive"
