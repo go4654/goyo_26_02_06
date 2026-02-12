@@ -36,8 +36,13 @@ export default function Gallery() {
         </li>
       </ul>
 
+      <div className="text-text-2/80 pt-14 pb-4 text-sm">
+        이 작업물들은 학생들의 포트폴리오로, 교육적 목적으로 제작되었으며 상업적
+        이득을 취하지 않습니다
+      </div>
+
       {/* 갤러리 목록 */}
-      <div className="mt-16 grid grid-cols-2 gap-2 gap-y-16 xl:grid-cols-4 xl:gap-6">
+      <div className="grid grid-cols-2 gap-2 gap-y-10 xl:grid-cols-4 xl:gap-6 xl:gap-y-16">
         {/* 갤러리 컨텐츠 */}
         {GALLERY_LIST_MOCKUP.map((data) => (
           <Link to={`/gallery/${data.id}`} key={data.id}>
