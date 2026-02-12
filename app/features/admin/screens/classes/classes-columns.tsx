@@ -39,6 +39,7 @@ const selectColumn: ColumnDef<AdminClassRow> = {
     />
   ),
   enableResizing: false, // 체크박스 컬럼은 리사이징 비활성화
+  enableSorting: false, // 체크박스 컬럼은 정렬 비활성화
   size: 50,
   minSize: 50,
   maxSize: 50,
@@ -87,6 +88,7 @@ const actionColumn: ColumnDef<AdminClassRow> = {
     );
   },
   enableResizing: false, // 액션 컬럼은 리사이징 비활성화
+  enableSorting: false, // 액션 컬럼은 정렬 비활성화
   size: 60,
   minSize: 60,
   maxSize: 60,

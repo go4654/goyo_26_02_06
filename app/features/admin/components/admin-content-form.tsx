@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Button } from "~/core/components/ui/button";
+import { Checkbox } from "~/core/components/ui/checkbox";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
 import { Textarea } from "~/core/components/ui/textarea";
@@ -15,6 +16,7 @@ export interface ContentFormData {
   description: string;
   tags: string; // 쉼표로 구분된 태그 문자열 (예: "design, uxui")
   content: string; // MDX 코드
+  isVisible: boolean; // 공개 여부
 }
 
 /**
@@ -44,6 +46,7 @@ interface AdminContentFormProps {
  * - 설명: 콘텐츠에 대한 간단한 설명
  * - 태그: 쉼표로 구분된 태그들 (예: "design, uxui")
  * - 콘텐츠: MDX 형식의 본문 내용
+ * - 공개 여부: 체크박스로 공개/비공개 설정
  *
  * @example
  * ```tsx
@@ -68,6 +71,7 @@ export default function AdminContentForm({
     description: initialData.description || "",
     tags: initialData.tags || "",
     content: initialData.content || "",
+    isVisible: initialData.isVisible ?? true, // 기본값: 공개
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ContentFormData, string>>>({});
@@ -177,6 +181,26 @@ export default function AdminContentForm({
         {errors.content && (
           <p className="text-destructive text-sm">{errors.content}</p>
         )}
+      </div>
+
+      {/* 공개 여부 */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="isVisible"
+          checked={formData.isVisible}
+          onCheckedChange={(checked) =>
+            updateField("isVisible", checked === true)
+          }
+        />
+        <Label
+          htmlFor="isVisible"
+          className="text-sm font-normal cursor-pointer"
+        >
+          공개 여부
+        </Label>
+        <p className="text-text-3 text-xs">
+          체크 시 공개, 해제 시 비공개로 설정됩니다.
+        </p>
       </div>
 
       {/* 액션 버튼 */}

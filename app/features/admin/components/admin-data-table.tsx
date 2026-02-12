@@ -166,19 +166,29 @@ export default function AdminDataTable<TData>({
                     >
                       {header.isPlaceholder ? null : (
                         <div className="flex h-full items-center justify-between">
-                          {/* 정렬 버튼 */}
-                          <button
-                            type="button"
-                            className="inline-flex flex-1 items-center gap-2"
-                            onClick={header.column.getToggleSortingHandler()}
-                          >
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                            {header.column.getIsSorted() === "asc" ? " ↑" : ""}
-                            {header.column.getIsSorted() === "desc" ? " ↓" : ""}
-                          </button>
+                          {/* 정렬 가능한 컬럼만 정렬 버튼 렌더링 */}
+                          {header.column.getCanSort() ? (
+                            <button
+                              type="button"
+                              className="inline-flex flex-1 items-center gap-2"
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                              {header.column.getIsSorted() === "asc" ? " ↑" : ""}
+                              {header.column.getIsSorted() === "desc" ? " ↓" : ""}
+                            </button>
+                          ) : (
+                            // 정렬 불가능한 컬럼(체크박스, 액션)은 버튼 없이 렌더링
+                            <div className="flex flex-1 items-center">
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </div>
+                          )}
 
                           {/* 리사이즈 핸들 - 항상 보이는 경계선 + 호버 시 강조 */}
                           {canResize && !isLastColumn && (

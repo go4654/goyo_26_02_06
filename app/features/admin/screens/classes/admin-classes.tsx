@@ -1,4 +1,4 @@
-import type { Route } from "./+types/classes";
+import type { Route } from "./+types/admin-classes";
 
 import { Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router";
