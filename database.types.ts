@@ -68,7 +68,11 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          blocked_reason: string | null
           created_at: string
+          gallery_access: boolean
+          is_blocked: boolean
+          last_active_at: string | null
           marketing_consent: boolean
           name: string
           profile_id: string
@@ -77,7 +81,11 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          blocked_reason?: string | null
           created_at?: string
+          gallery_access?: boolean
+          is_blocked?: boolean
+          last_active_at?: string | null
           marketing_consent?: boolean
           name: string
           profile_id: string
@@ -86,7 +94,11 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          blocked_reason?: string | null
           created_at?: string
+          gallery_access?: boolean
+          is_blocked?: boolean
+          last_active_at?: string | null
           marketing_consent?: boolean
           name?: string
           profile_id?: string

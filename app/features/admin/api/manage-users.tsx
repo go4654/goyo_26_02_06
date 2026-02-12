@@ -59,6 +59,7 @@ export async function action({ request }: Route.ActionArgs) {
   const operation = formData.get("operation")?.toString() || "list";
 
   // List all users (for admin dashboard)
+  // 보안: requireAdmin으로 보호되므로 모든 필드(민감 필드 포함) 조회 가능
   if (operation === "list") {
     const { data: profiles, error } = await client
       .from("profiles")
@@ -73,6 +74,8 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   // Update user role or profile
+  // 보안: requireAdmin으로 보호되므로 민감 필드(role, gallery_access, is_blocked 등) 수정 가능
+  // updateUserSchema에서 허용된 필드만 업데이트됨
   if (operation === "update") {
     const result = updateUserSchema.safeParse(Object.fromEntries(formData));
 
@@ -85,6 +88,7 @@ export async function action({ request }: Route.ActionArgs) {
 
     const { userId, ...updates } = result.data;
 
+    // 보안: 스키마 검증을 통해 허용된 필드만 업데이트됨
     const { error } = await client
       .from("profiles")
       .update(updates)

@@ -64,6 +64,7 @@ export default [
     route("/auth/confirm", "features/auth/screens/confirm.tsx"),
     index("features/home/screens/home.tsx"),
     route("/error", "core/screens/error.tsx"),
+    route("/blocked", "core/screens/blocked.tsx"),
 
     // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
     ...prefix("/class", [index("features/class/screens/class.tsx")]),

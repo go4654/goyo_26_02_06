@@ -18,13 +18,16 @@ export async function profileLoader({ request, params }: Route.LoaderArgs) {
     throw redirect("/login");
   }
 
-  // slug가 현재 사용자의 ID와 일치하는지 확인
-  // slug는 user.id (UUID)와 비교해야 함
+  // 보안: slug가 현재 사용자의 ID와 일치하는지 확인
+  // 다른 사용자의 프로필 접근 시도 차단
+  // getUserProfile 함수 내부에서도 이중 검증 수행
   if (params.slug !== user.user_metadata.name) {
     // 본인의 프로필이 아니면 본인 프로필로 리다이렉트
     throw redirect("/");
   }
 
+  // getUserProfile 함수가 내부적으로 userId 검증을 수행하므로
+  // 다른 사용자의 프로필 조회 시도는 자동으로 차단됨
   const profile = await getUserProfile(client, { userId: user.id });
 
   if (!profile) {

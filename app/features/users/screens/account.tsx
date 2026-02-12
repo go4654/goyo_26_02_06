@@ -1,7 +1,7 @@
 import type { Route } from "./+types/account";
 
 import { Suspense } from "react";
-import { Await } from "react-router";
+import { Await, redirect } from "react-router";
 
 import makeServerClient from "~/core/lib/supa-client.server";
 
@@ -21,8 +21,18 @@ export async function loader({ request }: Route.LoaderArgs) {
   const {
     data: { user },
   } = await client.auth.getUser();
+
+  // 보안: 인증되지 않은 사용자는 접근 불가
+  if (!user) {
+    throw redirect("/login");
+  }
+
   const identities = client.auth.getUserIdentities();
-  const profile = getUserProfile(client, { userId: user!.id });
+  
+  // getUserProfile 함수가 내부적으로 userId 검증을 수행하므로
+  // 다른 사용자의 프로필 조회 시도는 자동으로 차단됨
+  const profile = getUserProfile(client, { userId: user.id });
+  
   return {
     user,
     identities,

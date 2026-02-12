@@ -17,6 +17,9 @@ import type { Route } from "./+types/edit-profile";
 import { data } from "react-router";
 import { z } from "zod";
 
+import {
+  requireNotBlocked,
+} from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 import { getUserProfile } from "../queries";
@@ -75,6 +78,9 @@ export async function action({ request }: Route.ActionArgs) {
   if (!user) {
     return data(null, { status: 401 }); // Unauthorized
   }
+
+  // 보안: 차단된 유저는 프로필 수정 불가
+  await requireNotBlocked(client);
   
   // Extract and validate form data
   const formData = await request.formData();
@@ -121,12 +127,15 @@ export async function action({ request }: Route.ActionArgs) {
   }
   
   // Update profile information in the profiles table
+  // 보안: 일반 유저는 민감 필드(role, gallery_access, is_blocked, blocked_reason)를 수정할 수 없음
+  // RLS 정책과 함께 이중 방어선으로 작동
   const { error: updateProfileError } = await client
     .from("profiles")
     .update({
       name: validData.name,
       marketing_consent: validData.marketingConsent,
       avatar_url: avatarUrl,
+      // 명시적으로 제외: role, gallery_access, is_blocked, blocked_reason
     })
     .eq("profile_id", user.id);
     

@@ -16,6 +16,7 @@ import type { Route } from "./+types/complete";
 import { data, redirect } from "react-router";
 import { z } from "zod";
 
+import { checkUserBlocked } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 /**
@@ -98,6 +99,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   // 세션 교환 실패 시 에러 반환
   if (error) {
     return data({ error: error.message }, { status: 400 });
+  }
+
+  // 보안: 차단된 유저는 차단 안내 페이지로 리다이렉트
+  const { isBlocked, blockedReason } = await checkUserBlocked(client);
+  if (isBlocked) {
+    return redirect(
+      `/blocked?reason=${encodeURIComponent(blockedReason || "")}`,
+      { headers },
+    );
   }
 
   // 헤더에 인증 쿠키와 함께 홈 페이지로 리다이렉트

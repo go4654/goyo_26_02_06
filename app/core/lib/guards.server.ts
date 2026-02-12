@@ -12,7 +12,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "@supabase/supabase-js";
 
-import { data } from "react-router";
+import { data, redirect } from "react-router";
 
 /**
  * 라우트나 action에 대해 사용자 인증 요구
@@ -146,6 +146,91 @@ export async function getUserRole(
   const isAdmin = !error && profile?.role === "admin";
 
   return { user, isAdmin };
+}
+
+/**
+ * 차단된 유저 체크 및 차단 페이지로 리다이렉트
+ *
+ * 이 함수는 현재 사용자가 차단되었는지 확인합니다.
+ * 차단된 유저인 경우 차단 안내 페이지로 리다이렉트합니다.
+ *
+ * 보안: 서버 사이드에서 데이터베이스의 profiles 테이블에서 is_blocked를 조회하여
+ * 클라이언트가 수정할 수 없는 검증을 수행합니다.
+ *
+ * @example
+ * // action 함수에서 사용 예시
+ * export async function action({ request }: ActionArgs) {
+ *   const [client] = makeServerClient(request);
+ *   await requireNotBlocked(client);
+ *   // 차단되지 않은 유저만 이 지점에 도달
+ *   return { success: true };
+ * }
+ *
+ * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
+ * @throws {Response} 사용자가 차단된 경우 차단 안내 페이지로 리다이렉트
+ */
+export async function requireNotBlocked(client: SupabaseClient) {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  if (!user) {
+    throw data(null, { status: 401 });
+  }
+
+  // 데이터베이스에서 사용자 프로필의 is_blocked 조회
+  const { data: profile, error } = await client
+    .from("profiles")
+    .select("is_blocked, blocked_reason")
+    .eq("profile_id", user.id)
+    .single();
+
+  // 프로필 조회 실패 시 차단되지 않은 것으로 간주 (에러 처리)
+  if (error || !profile) {
+    return;
+  }
+
+  // 차단된 유저인 경우 차단 안내 페이지로 리다이렉트
+  if (profile.is_blocked) {
+    throw redirect(`/blocked?reason=${encodeURIComponent(profile.blocked_reason || "")}`);
+  }
+}
+
+/**
+ * 사용자가 차단되었는지 확인 (리다이렉트 없이)
+ *
+ * 이 함수는 현재 사용자가 차단되었는지 확인하지만 리다이렉트하지 않습니다.
+ * 차단 상태를 확인만 하고 싶을 때 사용합니다.
+ *
+ * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
+ * @returns 차단 여부와 차단 사유를 포함한 객체
+ */
+export async function checkUserBlocked(
+  client: SupabaseClient,
+): Promise<{ isBlocked: boolean; blockedReason: string | null }> {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+
+  if (!user) {
+    return { isBlocked: false, blockedReason: null };
+  }
+
+  // 데이터베이스에서 사용자 프로필의 is_blocked 조회
+  const { data: profile, error } = await client
+    .from("profiles")
+    .select("is_blocked, blocked_reason")
+    .eq("profile_id", user.id)
+    .single();
+
+  if (error || !profile) {
+    return { isBlocked: false, blockedReason: null };
+  }
+
+  return {
+    isBlocked: profile.is_blocked,
+    blockedReason: profile.blocked_reason,
+  };
 }
 
 /**

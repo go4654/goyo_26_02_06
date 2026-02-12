@@ -28,6 +28,7 @@ import {
 } from "~/core/components/ui/card";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
+import { checkUserBlocked } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 import FormErrors from "../../../core/components/form-error";
@@ -101,6 +102,15 @@ export async function action({ request }: Route.ActionArgs) {
   // 인증 실패 시 에러 반환
   if (signInError) {
     return data({ error: signInError.message }, { status: 400 });
+  }
+
+  // 보안: 차단된 유저는 차단 안내 페이지로 리다이렉트
+  const { isBlocked, blockedReason } = await checkUserBlocked(client);
+  if (isBlocked) {
+    return redirect(
+      `/blocked?reason=${encodeURIComponent(blockedReason || "")}`,
+      { headers },
+    );
   }
 
   // 헤더에 인증 쿠키와 함께 홈 페이지로 리다이렉트
