@@ -134,13 +134,12 @@ export default [
 
   // ============================================================================
   // 관리자 대시보드 레이아웃 (관리자 전용, CMS)
+  // 비로그인/비관리자 접근 시 404 처리 (admin.layout loader에서 requireAdmin이 404 throw)
   // ============================================================================
-  layout("core/layouts/private.layout.tsx", { id: "private-admin" }, [
-    layout("features/admin/layouts/admin.layout.tsx", [
-      ...prefix("/admin", [
-        index("features/admin/screens/admin-dashboard.tsx"),
-        route("/payments", "features/payments/screens/payments.tsx"),
-      ]),
+  layout("features/admin/layouts/admin.layout.tsx", [
+    ...prefix("/admin", [
+      index("features/admin/screens/admin-dashboard.tsx"),
+      route("/payments", "features/payments/screens/payments.tsx"),
     ]),
   ]),
 

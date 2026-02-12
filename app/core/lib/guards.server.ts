@@ -43,7 +43,8 @@ export async function requireAuthentication(client: SupabaseClient) {
  * 라우트나 action에 대해 관리자 권한 요구
  *
  * 이 함수는 Supabase 클라이언트를 조회하여 현재 사용자가 관리자인지 확인합니다.
- * 사용자가 인증되지 않았거나 관리자가 아닌 경우 403 Forbidden 응답을 throw합니다.
+ * 사용자가 인증되지 않았거나 관리자가 아닌 경우 404 Not Found를 throw하여
+ * 관리자 페이지 존재 여부를 노출하지 않습니다.
  *
  * 보안 강화: user_metadata 대신 데이터베이스의 profiles 테이블에서 role을 조회하여
  * 클라이언트가 수정할 수 없는 서버 사이드 검증을 수행합니다.
@@ -62,15 +63,16 @@ export async function requireAuthentication(client: SupabaseClient) {
  *
  * @param client - 인증 확인에 사용할 Supabase 클라이언트 인스턴스
  * @returns 인증된 관리자 사용자 객체
- * @throws {Response} 사용자가 인증되지 않았거나 관리자가 아닌 경우 403 Forbidden 발생
+ * @throws {Response} 사용자가 인증되지 않았거나 관리자가 아닌 경우 404 Not Found 발생
  */
 export async function requireAdmin(client: SupabaseClient): Promise<User> {
   const {
     data: { user },
   } = await client.auth.getUser();
-  
+
+  // 로그인하지 않았거나 관리자가 아니면 404로 처리 (관리자 페이지 존재 여부 노출 방지)
   if (!user) {
-    throw data(null, { status: 401 });
+    throw data(null, { status: 404 });
   }
 
   // 데이터베이스에서 사용자 프로필의 role 조회 (user_metadata보다 안전)
@@ -81,30 +83,16 @@ export async function requireAdmin(client: SupabaseClient): Promise<User> {
     .eq("profile_id", user.id)
     .single();
 
-  if (error) {
-    // 프로필 조회 실패 시 권한 없음으로 처리
-    throw data(
-      { error: "프로필을 조회할 수 없습니다. 관리자에게 문의하세요." },
-      { status: 403 },
-    );
-  }
-
-  if (!profile) {
-    // 프로필이 없는 경우
-    throw data(
-      { error: "프로필이 존재하지 않습니다." },
-      { status: 403 },
-    );
+  if (error || !profile) {
+    // 프로필 조회 실패 또는 없음 → 404
+    throw data(null, { status: 404 });
   }
 
   // 관리자 권한 체크 (데이터베이스의 role이 'admin'인지 확인)
   const isAdmin = profile.role === "admin";
-  
+
   if (!isAdmin) {
-    throw data(
-      { error: "관리자 권한이 필요합니다." },
-      { status: 403 },
-    );
+    throw data(null, { status: 404 });
   }
 
   // user 객체 반환하여 중복 getUser() 호출 방지
