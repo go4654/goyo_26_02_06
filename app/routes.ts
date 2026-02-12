@@ -140,6 +140,15 @@ export default [
     ...prefix("/admin", [
       index("features/admin/screens/admin-dashboard.tsx"),
       route("/payments", "features/payments/screens/payments.tsx"),
+      ...prefix("/classes", [
+        index("features/admin/screens/classes/classes.tsx"),
+        route("/new", "features/admin/screens/classes/classes-new.tsx"),
+        route("/:slug", "features/admin/screens/classes/classes-detail.tsx"),
+      ]),
+      route("/gallery", "features/admin/screens/galleries/galleries.tsx"),
+      route("/news", "features/admin/screens/news/news.tsx"),
+      route("/users", "features/admin/screens/users/users.tsx"),
+      route("/settings", "features/admin/screens/settings/settings.tsx"),
     ]),
   ]),
 

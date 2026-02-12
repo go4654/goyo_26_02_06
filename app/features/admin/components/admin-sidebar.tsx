@@ -8,6 +8,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import { Separator } from "~/core/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -15,20 +16,20 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "~/core/components/ui/sidebar";
-
+import { LOGO_URL } from "~/core/constant/imgUrls";
 import SidebarMain from "~/features/users/components/sidebar-main";
 import SidebarProjects from "~/features/users/components/sidebar-projects";
 import TeamSwitcher from "~/features/users/components/sidebar-team-switcher";
 import SidebarUser from "~/features/users/components/sidebar-user";
 
 const data = {
-  teams: [
-    {
-      name: "관리자 CMS",
-      logo: LayoutDashboardIcon,
-      plan: "Admin",
-    },
-  ],
+  // teams: [
+  //   {
+  //     name: "관리자 CMS",
+  //     logo: LayoutDashboardIcon,
+  //     plan: "Admin",
+  //   },
+  // ],
   navMain: [
     {
       title: "대시보드",
@@ -89,10 +90,10 @@ const data = {
           title: "사이트 설정",
           url: "/admin/settings",
         },
-        {
-          title: "통합",
-          url: "/admin/integrations",
-        },
+        // {
+        //   title: "통합",
+        //   url: "/admin/integrations",
+        // },
       ],
     },
   ],
@@ -128,12 +129,17 @@ export default function AdminSidebar({
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="pb-3">
+          <img src={LOGO_URL} alt="logo" width={100} height={100} />
+        </div>
+        <Separator />
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarMain items={data.navMain} />
         <SidebarProjects projects={data.projects} />
       </SidebarContent>
+
       <SidebarFooter>
         <SidebarUser
           user={{

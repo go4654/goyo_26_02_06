@@ -42,6 +42,8 @@ interface AdminDataTableProps<TData> {
   emptyMessage?: string;
   /** 선택된 행 삭제 콜백 */
   onDeleteSelected?: (selectedRows: TData[]) => void | Promise<void>;
+  /** 행 클릭 콜백 (행 데이터를 반환) */
+  onRowClick?: (row: TData) => void;
 }
 
 /**
@@ -71,6 +73,7 @@ export default function AdminDataTable<TData>({
   onRowSelectionChange,
   emptyMessage = "결과가 없습니다.",
   onDeleteSelected,
+  onRowClick,
 }: AdminDataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnSizing, setColumnSizing] = React.useState({});
@@ -208,8 +211,24 @@ export default function AdminDataTable<TData>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className="border-white/10"
+                  className={`border-white/10 ${
+                    onRowClick ? "cursor-pointer hover:bg-white/5" : ""
+                  }`}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={(e) => {
+                    // 체크박스나 버튼 클릭 시에는 행 클릭 이벤트 발생하지 않도록
+                    const target = e.target as HTMLElement;
+                    if (
+                      target.closest("button") ||
+                      target.closest("input[type='checkbox']") ||
+                      target.closest("[role='menuitem']")
+                    ) {
+                      return;
+                    }
+                    if (onRowClick) {
+                      onRowClick(row.original);
+                    }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

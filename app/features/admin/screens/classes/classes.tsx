@@ -1,7 +1,7 @@
 import type { Route } from "./+types/classes";
 
 import { Plus } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 
@@ -18,6 +18,8 @@ export const loader = classesLoader;
 export const action = classesAction;
 
 export default function Classes({ loaderData }: Route.ComponentProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-4 p-4 pt-0">
       <div className="mb-4 flex items-center justify-between">
@@ -52,6 +54,10 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
             // await deleteClasses(selectedRows.map((row) => row.id));
             alert("삭제 기능은 구현 예정입니다.");
           }
+        }}
+        onRowClick={(row) => {
+          // 클래스 상세 페이지로 이동
+          navigate(`/admin/classes/${row.id}`);
         }}
       />
     </div>
