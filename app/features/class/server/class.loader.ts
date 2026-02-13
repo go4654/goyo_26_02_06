@@ -2,10 +2,15 @@ import type { Route } from "../screens/+types/class";
 
 import { redirect } from "react-router";
 
+import { getUserRole } from "~/core/lib/guards.server";
 import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
-import { getClasses } from "../queries";
+import {
+  getClasses,
+  getUserLikedClasses,
+  getUserSavedClasses,
+} from "../queries";
 
 /**
  * 페이지당 표시할 클래스 수
@@ -51,6 +56,16 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
     search: search || null,
   });
 
+  // 현재 사용자 정보 조회
+  const { user } = await getUserRole(client);
+  const userId = user?.id || null;
+
+  // 사용자가 좋아요/저장한 클래스 ID 목록 조회
+  const [likedClasses, savedClasses] = await Promise.all([
+    getUserLikedClasses(client, userId),
+    getUserSavedClasses(client, userId),
+  ]);
+
   return {
     category,
     classes: result.classes,
@@ -61,5 +76,7 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
       pageSize: result.pageSize,
     },
     search: search || null,
+    likedClasses: Array.from(likedClasses),
+    savedClasses: Array.from(savedClasses),
   };
 };

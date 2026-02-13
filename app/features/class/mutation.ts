@@ -172,3 +172,121 @@ export async function toggleCommentLike(
     return true;
   }
 }
+
+/**
+ * 클래스 좋아요 토글
+ *
+ * 사용자가 클래스에 좋아요를 누르거나 취소합니다.
+ * 이미 좋아요를 누른 경우 좋아요를 취소하고,
+ * 좋아요를 누르지 않은 경우 좋아요를 추가합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param classId - 클래스 ID
+ * @param userId - 사용자 ID
+ * @returns 좋아요 추가 여부 (true: 추가, false: 취소)
+ */
+export async function toggleClassLike(
+  client: SupabaseClient,
+  classId: string,
+  userId: string,
+): Promise<boolean> {
+  // 기존 좋아요 확인
+  const { data: existingLike } = await client
+    .from("class_likes")
+    .select("id")
+    .eq("class_id", classId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingLike) {
+    // 좋아요 취소
+    const { error } = await client
+      .from("class_likes")
+      .delete()
+      .eq("class_id", classId)
+      .eq("user_id", userId);
+
+    if (error) {
+      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
+        console.error("[toggleClassLike] cancel error:", error.message, error.details);
+      }
+      throw new Error("좋아요 취소에 실패했습니다.");
+    }
+
+    return false;
+  } else {
+    // 좋아요 추가
+    const { error } = await client.from("class_likes").insert({
+      class_id: classId,
+      user_id: userId,
+    });
+
+    if (error) {
+      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
+        console.error("[toggleClassLike] add error:", error.message, error.details);
+      }
+      throw new Error("좋아요 등록에 실패했습니다.");
+    }
+
+    return true;
+  }
+}
+
+/**
+ * 클래스 저장 토글
+ *
+ * 사용자가 클래스를 저장하거나 저장 취소합니다.
+ * 이미 저장한 경우 저장을 취소하고,
+ * 저장하지 않은 경우 저장을 추가합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param classId - 클래스 ID
+ * @param userId - 사용자 ID
+ * @returns 저장 추가 여부 (true: 추가, false: 취소)
+ */
+export async function toggleClassSave(
+  client: SupabaseClient,
+  classId: string,
+  userId: string,
+): Promise<boolean> {
+  // 기존 저장 확인
+  const { data: existingSave } = await client
+    .from("class_saves")
+    .select("id")
+    .eq("class_id", classId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingSave) {
+    // 저장 취소
+    const { error } = await client
+      .from("class_saves")
+      .delete()
+      .eq("class_id", classId)
+      .eq("user_id", userId);
+
+    if (error) {
+      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
+        console.error("[toggleClassSave] cancel error:", error.message, error.details);
+      }
+      throw new Error("저장 취소에 실패했습니다.");
+    }
+
+    return false;
+  } else {
+    // 저장 추가
+    const { error } = await client.from("class_saves").insert({
+      class_id: classId,
+      user_id: userId,
+    });
+
+    if (error) {
+      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
+        console.error("[toggleClassSave] add error:", error.message, error.details);
+      }
+      throw new Error("저장 등록에 실패했습니다.");
+    }
+
+    return true;
+  }
+}

@@ -404,3 +404,53 @@ export async function getUserCommentLikes(
 
   return new Set((data || []).map((like) => like.comment_id as string));
 }
+
+/**
+ * 사용자가 좋아요를 누른 클래스 ID 목록 조회
+ *
+ * 현재 사용자가 좋아요를 누른 클래스 ID 목록을 반환합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param userId - 사용자 ID
+ * @returns 좋아요를 누른 클래스 ID 목록
+ */
+export async function getUserLikedClasses(
+  client: SupabaseClient,
+  userId: string | null,
+): Promise<Set<string>> {
+  if (!userId) {
+    return new Set();
+  }
+
+  const { data } = await client
+    .from("class_likes")
+    .select("class_id")
+    .eq("user_id", userId);
+
+  return new Set((data || []).map((like) => like.class_id as string));
+}
+
+/**
+ * 사용자가 저장한 클래스 ID 목록 조회
+ *
+ * 현재 사용자가 저장한 클래스 ID 목록을 반환합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param userId - 사용자 ID
+ * @returns 저장한 클래스 ID 목록
+ */
+export async function getUserSavedClasses(
+  client: SupabaseClient,
+  userId: string | null,
+): Promise<Set<string>> {
+  if (!userId) {
+    return new Set();
+  }
+
+  const { data } = await client
+    .from("class_saves")
+    .select("class_id")
+    .eq("user_id", userId);
+
+  return new Set((data || []).map((save) => save.class_id as string));
+}

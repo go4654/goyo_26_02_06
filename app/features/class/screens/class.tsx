@@ -14,6 +14,7 @@ import LectureCard from "~/features/class/components/lecture-card";
 import { type ClassListItem } from "~/features/class/queries";
 import { CATEGORY_DATA } from "~/features/home/constants/home-data";
 
+import { classAction } from "../server/class.action";
 import { classLoader } from "../server/class.loader";
 
 export const meta: Route.MetaFunction = () => {
@@ -21,6 +22,7 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = classLoader;
+export const action = classAction;
 
 // 카테고리 이름과 category 값 매핑
 const CATEGORY_MAP: Record<string, string> = {
@@ -38,8 +40,13 @@ const CATEGORY_MAP: Record<string, string> = {
 };
 
 export default function Class({ loaderData }: Route.ComponentProps) {
-  const { category, classes, pagination, search } = loaderData;
+  const { category, classes, pagination, search, likedClasses, savedClasses } =
+    loaderData;
   const [searchParams] = useSearchParams();
+
+  // Set으로 변환하여 빠른 조회 가능하도록 함
+  const likedClassesSet = new Set(likedClasses || []);
+  const savedClassesSet = new Set(savedClasses || []);
 
   /**
    * 페이지네이션 URL 생성 함수
@@ -138,6 +145,8 @@ export default function Class({ loaderData }: Route.ComponentProps) {
                     tags: [], // TODO: tags 필드가 스키마에 추가되면 연결
                     slug: classItem.slug,
                   }}
+                  initialLiked={likedClassesSet.has(classItem.id)}
+                  initialSaved={savedClassesSet.has(classItem.id)}
                 />
               ))}
             </div>

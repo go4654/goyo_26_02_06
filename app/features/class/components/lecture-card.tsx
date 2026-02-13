@@ -1,4 +1,6 @@
 import { Bookmark, Heart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 import { Link } from "react-router";
 
 import Tags from "~/core/components/tags";
@@ -7,10 +9,104 @@ import type { ClassLecture } from "~/features/class/constants/class-data";
 interface LectureCardProps {
   lecture: ClassLecture;
   to?: string;
+  initialLiked?: boolean;
+  initialSaved?: boolean;
 }
 
-export default function LectureCard({ lecture, to }: LectureCardProps) {
+export default function LectureCard({
+  lecture,
+  to,
+  initialLiked = false,
+  initialSaved = false,
+}: LectureCardProps) {
   const linkTo = to ?? `/class/${lecture.slug}`;
+  const likeFetcher = useFetcher();
+  const saveFetcher = useFetcher();
+  const [isLiked, setIsLiked] = useState(initialLiked);
+  const [isSaved, setIsSaved] = useState(initialSaved);
+  const prevLikeState = useRef(likeFetcher.state);
+  const prevSaveState = useRef(saveFetcher.state);
+
+  // 초기 상태가 변경되면 업데이트 (예: 페이지 새로고침 시)
+  useEffect(() => {
+    setIsLiked(initialLiked);
+  }, [initialLiked]);
+
+  useEffect(() => {
+    setIsSaved(initialSaved);
+  }, [initialSaved]);
+
+  // 좋아요 액션 결과 처리
+  useEffect(() => {
+    const prev = prevLikeState.current;
+    prevLikeState.current = likeFetcher.state;
+
+    const justFinished =
+      (prev === "submitting" || prev === "loading") &&
+      likeFetcher.state === "idle";
+    if (!justFinished) return;
+
+    const data = likeFetcher.data;
+    if (data && (data as { success?: boolean }).success) {
+      const result = data as { isLiked?: boolean };
+      if (typeof result.isLiked === "boolean") {
+        setIsLiked(result.isLiked);
+      }
+    }
+  }, [likeFetcher.state, likeFetcher.data]);
+
+  // 저장 액션 결과 처리
+  useEffect(() => {
+    const prev = prevSaveState.current;
+    prevSaveState.current = saveFetcher.state;
+
+    const justFinished =
+      (prev === "submitting" || prev === "loading") &&
+      saveFetcher.state === "idle";
+    if (!justFinished) return;
+
+    const data = saveFetcher.data;
+    if (data && (data as { success?: boolean }).success) {
+      const result = data as { isSaved?: boolean };
+      if (typeof result.isSaved === "boolean") {
+        setIsSaved(result.isSaved);
+      }
+    }
+  }, [saveFetcher.state, saveFetcher.data]);
+
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 낙관적 업데이트
+    setIsLiked(!isLiked);
+
+    // 서버 액션으로 좋아요 토글
+    likeFetcher.submit(
+      {
+        action: "toggleLike",
+        classId: lecture.id,
+      },
+      { method: "post" },
+    );
+  };
+
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 낙관적 업데이트
+    setIsSaved(!isSaved);
+
+    // 서버 액션으로 저장 토글
+    saveFetcher.submit(
+      {
+        action: "toggleSave",
+        classId: lecture.id,
+      },
+      { method: "post" },
+    );
+  };
 
   return (
     <Link
@@ -28,12 +124,28 @@ export default function LectureCard({ lecture, to }: LectureCardProps) {
         {/* 블랙 오버레이 좋아요, 북마크 버튼*/}
         <div className="absolute top-0 right-0 h-full w-full">
           <div className="absolute top-3 right-3 flex items-center gap-2">
-            <div className="hover:bg-primary rounded-full bg-gray-500/30 p-3 hover:text-white">
+            <button
+              type="button"
+              onClick={handleLikeClick}
+              className={`cursor-pointer rounded-full p-3 transition-colors ${
+                isLiked
+                  ? "bg-primary text-white"
+                  : "hover:bg-primary bg-gray-500/30 hover:text-white"
+              }`}
+            >
               <Heart className="size-4 xl:size-5" />
-            </div>
-            <div className="hover:bg-primary rounded-full bg-gray-500/30 p-3 hover:text-white">
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveClick}
+              className={`cursor-pointer rounded-full p-3 transition-colors ${
+                isSaved
+                  ? "bg-primary text-white"
+                  : "hover:bg-primary bg-gray-500/30 hover:text-white"
+              }`}
+            >
               <Bookmark className="size-4 xl:size-5" />
-            </div>
+            </button>
           </div>
         </div>
       </div>
