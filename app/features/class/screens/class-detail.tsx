@@ -115,7 +115,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   }, [saveFetcher.state, saveFetcher.data]);
 
   const handleLikeClick = () => {
-    // 서버 액션으로 좋아요 토글 (낙관적 업데이트 제거)
+    // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
+    const newLiked = !isLiked;
+    setIsLiked(newLiked);
+    setLikeCount((prev) => (newLiked ? prev + 1 : prev - 1));
+
+    // 서버 액션으로 좋아요 토글 (서버 응답으로 실제 값으로 교체됨)
     likeFetcher.submit(
       {
         action: "toggleClassLike",
@@ -126,7 +131,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   };
 
   const handleSaveClick = () => {
-    // 서버 액션으로 저장 토글 (낙관적 업데이트 제거)
+    // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
+    const newSaved = !isSaved;
+    setIsSaved(newSaved);
+    setSaveCount((prev) => (newSaved ? prev + 1 : prev - 1));
+
+    // 서버 액션으로 저장 토글 (서버 응답으로 실제 값으로 교체됨)
     saveFetcher.submit(
       {
         action: "toggleClassSave",

@@ -78,7 +78,10 @@ export default function LectureCard({
     e.preventDefault();
     e.stopPropagation();
 
-    // 서버 액션으로 좋아요 토글 (낙관적 업데이트 제거)
+    // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
+    setIsLiked(!isLiked);
+
+    // 서버 액션으로 좋아요 토글 (서버 응답으로 실제 값으로 교체됨)
     likeFetcher.submit(
       {
         action: "toggleLike",
@@ -92,7 +95,10 @@ export default function LectureCard({
     e.preventDefault();
     e.stopPropagation();
 
-    // 서버 액션으로 저장 토글 (낙관적 업데이트 제거)
+    // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
+    setIsSaved(!isSaved);
+
+    // 서버 액션으로 저장 토글 (서버 응답으로 실제 값으로 교체됨)
     saveFetcher.submit(
       {
         action: "toggleSave",
