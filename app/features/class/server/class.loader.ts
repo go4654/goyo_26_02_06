@@ -1,5 +1,6 @@
-import { redirect } from "react-router";
 import type { Route } from "../screens/+types/class";
+
+import { redirect } from "react-router";
 
 import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
@@ -14,7 +15,7 @@ const DEFAULT_PAGE_SIZE = 12;
 /**
  * 기본 카테고리 (카테고리가 없을 때 리다이렉트)
  */
-const DEFAULT_CATEGORY = "photoshop";
+const DEFAULT_CATEGORY = "figma";
 
 /**
  * 클래스 페이지 로더

@@ -71,7 +71,7 @@ export default function Class({ loaderData }: Route.ComponentProps) {
           <Form method="get" className="mt-4 w-full xl:mt-0 xl:w-[500px]">
             {/* 카테고리 파라미터 유지 (검색 시 페이지는 1로 리셋) */}
             <input type="hidden" name="category" value={category || ""} />
-            
+
             <InputGroup className="h-[40px] rounded-full px-2 xl:h-[50px]">
               <InputGroupInput
                 type="text"

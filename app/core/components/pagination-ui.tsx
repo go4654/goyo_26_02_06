@@ -32,22 +32,10 @@ export default function PaginationUI({
           {page > 1 && (
             <>
               <PaginationItem>
-                <PaginationPrevious
-                  to={getPageUrl(page - 1)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(page - 1);
-                  }}
-                />
+                <PaginationPrevious to={getPageUrl(page - 1)} />
               </PaginationItem>
               <PaginationItem>
-                <PaginationLink
-                  to={getPageUrl(page - 1)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(page - 1);
-                  }}
-                >
+                <PaginationLink to={getPageUrl(page - 1)}>
                   {page - 1}
                 </PaginationLink>
               </PaginationItem>
@@ -55,14 +43,7 @@ export default function PaginationUI({
           )}
 
           <PaginationItem>
-            <PaginationLink
-              to={getPageUrl(page)}
-              isActive
-              onClick={(e) => {
-                e.preventDefault();
-                onPageChange(page);
-              }}
-            >
+            <PaginationLink to={getPageUrl(page)} isActive>
               {page}
             </PaginationLink>
           </PaginationItem>
@@ -70,13 +51,7 @@ export default function PaginationUI({
           {page < totalPages && (
             <>
               <PaginationItem>
-                <PaginationLink
-                  to={getPageUrl(page + 1)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(page + 1);
-                  }}
-                >
+                <PaginationLink to={getPageUrl(page + 1)}>
                   {page + 1}
                 </PaginationLink>
               </PaginationItem>
@@ -86,13 +61,7 @@ export default function PaginationUI({
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationNext
-                  to={getPageUrl(page + 1)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onPageChange(page + 1);
-                  }}
-                />
+                <PaginationNext to={getPageUrl(page + 1)} />
               </PaginationItem>
             </>
           )}

@@ -7,19 +7,19 @@ export const CATEGORY_DATA = [
     skills: [
       {
         id: 1,
-        name: "Photo shop",
-      },
-      {
-        id: 2,
-        name: "Illustrator",
-      },
-      {
-        id: 3,
         name: "Figma",
       },
       {
-        id: 4,
+        id: 2,
         name: "UX UI",
+      },
+      {
+        id: 3,
+        name: "Photo shop",
+      },
+      {
+        id: 4,
+        name: "Illustrator",
       },
     ],
   },
