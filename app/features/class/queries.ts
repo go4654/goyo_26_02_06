@@ -310,10 +310,14 @@ export interface CommentWithProfile {
 }
 
 /**
- * 클래스 댓글 목록 조회
+ * 클래스 댓글 목록 조회 (최적화)
  *
  * 특정 클래스의 모든 댓글을 조회합니다.
  * 프로필 정보와 좋아요 수를 함께 조회합니다.
+ *
+ * 최적화:
+ * - 댓글, 프로필, 좋아요 수, 사용자 좋아요 상태를 병렬로 조회
+ * - 프로필은 일괄 조회 후 맵으로 매핑하여 효율성 유지
  *
  * @param client - Supabase 클라이언트 인스턴스
  * @param classId - 클래스 ID
@@ -346,15 +350,31 @@ export async function getClassComments(
     ...new Set(commentsData.map((comment) => comment.user_id as string)),
   ];
 
-  // 프로필 정보 일괄 조회
-  const { data: profilesData } = await client
-    .from("profiles")
-    .select("profile_id, name, avatar_url")
-    .in("profile_id", userIds);
+  // 댓글 ID 목록 추출
+  const commentIds = commentsData.map((comment) => comment.id as string);
+
+  // 프로필, 좋아요 수, 사용자 좋아요 상태를 병렬로 조회
+  const [profilesResult, likesDataResult, userLikesResult] =
+    await Promise.all([
+      // 프로필 정보 일괄 조회
+      client
+        .from("profiles")
+        .select("profile_id, name, avatar_url")
+        .in("profile_id", userIds),
+      // 댓글 좋아요 수 조회
+      client
+        .from("comment_likes")
+        .select("comment_id")
+        .in("comment_id", commentIds),
+      // 현재 사용자가 좋아요를 누른 댓글 목록 조회
+      userId
+        ? getUserCommentLikes(client, commentIds, userId)
+        : Promise.resolve(new Set<string>()),
+    ]);
 
   // 프로필 맵 생성 (빠른 조회를 위해)
   const profileMap = new Map(
-    (profilesData || []).map((profile) => [
+    (profilesResult.data || []).map((profile) => [
       profile.profile_id as string,
       {
         profile_id: profile.profile_id as string,
@@ -364,26 +384,14 @@ export async function getClassComments(
     ]),
   );
 
-  // 댓글 ID 목록 추출
-  const commentIds = commentsData.map((comment) => comment.id as string);
-
-  // 댓글 좋아요 수 조회
-  const { data: likesData } = await client
-    .from("comment_likes")
-    .select("comment_id")
-    .in("comment_id", commentIds);
-
   // 댓글별 좋아요 수 맵 생성
   const likesCountMap = new Map<string, number>();
-  (likesData || []).forEach((like) => {
+  (likesDataResult.data || []).forEach((like) => {
     const commentId = like.comment_id as string;
     likesCountMap.set(commentId, (likesCountMap.get(commentId) || 0) + 1);
   });
 
-  // 현재 사용자가 좋아요를 누른 댓글 목록 조회
-  const userLikes = userId
-    ? await getUserCommentLikes(client, commentIds, userId)
-    : new Set<string>();
+  const userLikes = userLikesResult;
 
   // 데이터 변환 및 타입 캐스팅
   return commentsData.map((item) => ({
@@ -430,13 +438,55 @@ export async function getUserCommentLikes(
 }
 
 /**
+ * 특정 클래스에 대한 사용자의 좋아요/저장 상태 확인
+ *
+ * 단일 클래스에 대한 사용자의 좋아요/저장 상태만 확인합니다.
+ * 전체 목록을 조회하지 않아 성능과 비용이 최적화됩니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param classId - 확인할 클래스 ID
+ * @param userId - 사용자 ID
+ * @returns 좋아요/저장 상태 객체
+ */
+export async function getUserClassStatus(
+  client: SupabaseClient,
+  classId: string,
+  userId: string | null,
+): Promise<{ isLiked: boolean; isSaved: boolean }> {
+  if (!userId) {
+    return { isLiked: false, isSaved: false };
+  }
+
+  // 병렬로 좋아요/저장 상태 확인
+  const [likedResult, savedResult] = await Promise.all([
+    client
+      .from("class_likes")
+      .select("id")
+      .eq("class_id", classId)
+      .eq("user_id", userId)
+      .maybeSingle(),
+    client
+      .from("class_saves")
+      .select("id")
+      .eq("class_id", classId)
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
+
+  return {
+    isLiked: !!likedResult.data,
+    isSaved: !!savedResult.data,
+  };
+}
+
+/**
  * 사용자가 좋아요를 누른 클래스 ID 목록 조회
  *
  * 현재 사용자가 좋아요를 누른 클래스 ID 목록을 반환합니다.
  *
  * @deprecated 이 함수는 더 이상 사용되지 않습니다.
  * getClasses() RPC 함수가 좋아요/저장 상태를 함께 반환합니다.
- * 다른 용도로 필요할 경우에만 사용하세요.
+ * 단일 클래스 확인은 getUserClassStatus()를 사용하세요.
  *
  * @param client - Supabase 클라이언트 인스턴스
  * @param userId - 사용자 ID
@@ -465,7 +515,7 @@ export async function getUserLikedClasses(
  *
  * @deprecated 이 함수는 더 이상 사용되지 않습니다.
  * getClasses() RPC 함수가 좋아요/저장 상태를 함께 반환합니다.
- * 다른 용도로 필요할 경우에만 사용하세요.
+ * 단일 클래스 확인은 getUserClassStatus()를 사용하세요.
  *
  * @param client - Supabase 클라이언트 인스턴스
  * @param userId - 사용자 ID

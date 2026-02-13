@@ -1,4 +1,4 @@
-import { Bookmark, Heart } from "lucide-react";
+import { Bookmark, Heart, Image } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
 import { Link } from "react-router";
@@ -115,11 +115,19 @@ export default function LectureCard({
     >
       {/* img 영역 */}
       <div className="group relative h-full max-h-[350px] w-full overflow-hidden rounded-xl bg-gray-400 md:block md:max-h-[480px] xl:rounded-[20px]">
-        <img
-          src={lecture.imageUrl}
-          alt={lecture.title}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.1]"
-        />
+        {lecture.imageUrl ? (
+          <img
+            src={lecture.imageUrl}
+            alt={lecture.title}
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.1]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gray-300 text-gray-500/50">
+            <span className="text-sm">
+              <Image className="size-4 xl:size-6" />
+            </span>
+          </div>
+        )}
 
         {/* 블랙 오버레이 좋아요, 북마크 버튼*/}
         <div className="absolute top-0 right-0 h-full w-full">

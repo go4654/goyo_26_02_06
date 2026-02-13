@@ -1,7 +1,7 @@
 export interface ClassLecture {
   id: string;
   title: string;
-  imageUrl: string;
+  imageUrl: string | null;
   category: string;
   tags: string[];
   slug: string;

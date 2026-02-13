@@ -1,6 +1,6 @@
--- RPC 함수 업데이트: get_classes_with_tags_and_user_status
--- 목적: classes.like_count/save_count(denormalized) 값이 stale할 수 있으므로
---       목록 조회 시 class_likes/class_saves를 COUNT 집계하여 정확한 카운트를 반환합니다.
+-- RPC 함수 최적화: get_classes_with_tags_and_user_status
+-- 목적: user_liked_classes와 user_saved_classes를 페이지에 포함된 클래스 ID로만 필터링하여
+--       불필요한 전체 조회를 방지하고 성능과 비용을 최적화합니다.
 
 CREATE OR REPLACE FUNCTION public.get_classes_with_tags_and_user_status(
   p_category TEXT DEFAULT NULL,
@@ -145,4 +145,3 @@ BEGIN
   FROM classes_with_tags cwt;
 END;
 $$;
-

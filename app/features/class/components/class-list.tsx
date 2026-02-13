@@ -116,7 +116,7 @@ export default function ClassList({
             lecture={{
               id: classItem.id,
               title: classItem.title,
-              imageUrl: classItem.thumbnail_image_url || "",
+              imageUrl: classItem.thumbnail_image_url || null,
               category: classItem.category,
               tags: classItem.tags || [],
               slug: classItem.slug,

@@ -147,16 +147,18 @@ BEGIN
       cc.save_count, cc.comment_count, cc.published_at, cc.created_at
   ),
   user_liked_classes AS (
-    -- 사용자가 좋아요한 클래스 ID 목록
-    SELECT COALESCE(array_agg(class_id), ARRAY[]::UUID[]) as class_ids
-    FROM public.class_likes
-    WHERE user_id = p_user_id
+    -- 사용자가 좋아요한 클래스 ID 목록 (페이지에 포함된 클래스만)
+    SELECT COALESCE(array_agg(cl.class_id), ARRAY[]::UUID[]) as class_ids
+    FROM public.class_likes cl
+    WHERE cl.user_id = p_user_id
+      AND cl.class_id IN (SELECT id FROM paginated_classes)
   ),
   user_saved_classes AS (
-    -- 사용자가 저장한 클래스 ID 목록
-    SELECT COALESCE(array_agg(class_id), ARRAY[]::UUID[]) as class_ids
-    FROM public.class_saves
-    WHERE user_id = p_user_id
+    -- 사용자가 저장한 클래스 ID 목록 (페이지에 포함된 클래스만)
+    SELECT COALESCE(array_agg(cs.class_id), ARRAY[]::UUID[]) as class_ids
+    FROM public.class_saves cs
+    WHERE cs.user_id = p_user_id
+      AND cs.class_id IN (SELECT id FROM paginated_classes)
   )
   SELECT 
     COALESCE(
