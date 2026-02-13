@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 
 import PaginationUI from "~/core/components/pagination-ui";
@@ -27,10 +28,45 @@ export default function ClassList({
   savedClasses,
 }: ClassListProps) {
   const [searchParams] = useSearchParams();
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const prevSearchRef = useRef<string | null>(null);
 
   // Set으로 변환하여 빠른 조회 가능하도록 함
   const likedClassesSet = new Set(likedClasses || []);
   const savedClassesSet = new Set(savedClasses || []);
+
+  // 검색 결과가 나왔을 때 부드럽게 스크롤
+  useEffect(() => {
+    // 검색어가 변경되었고, 검색 결과가 있는 경우에만 스크롤
+    const hasSearchChanged = prevSearchRef.current !== search;
+    const hasResults = classes && classes.length > 0;
+    const isInitialLoad = prevSearchRef.current === null && search === null;
+
+    // 초기 로드가 아니고, 검색어가 변경되었으며, 검색 결과가 있는 경우에만 스크롤
+    if (!isInitialLoad && hasSearchChanged && hasResults && resultsRef.current) {
+      // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 스크롤
+      const timeoutId = setTimeout(() => {
+        if (resultsRef.current) {
+          // 부드러운 스크롤 애니메이션
+          // 반응형을 고려하여 적절한 offset 적용
+          const element = resultsRef.current;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offset = window.innerWidth >= 1280 ? 120 : 80; // xl: 120px, 기본: 80px
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+          window.scrollTo({
+            top: Math.max(0, offsetPosition), // 음수 방지
+            behavior: "smooth",
+          });
+        }
+      }, 150);
+
+      return () => clearTimeout(timeoutId);
+    }
+
+    // 이전 검색어 업데이트
+    prevSearchRef.current = search;
+  }, [search, classes]);
 
   /**
    * 페이지네이션 URL 생성 함수
@@ -65,7 +101,10 @@ export default function ClassList({
 
   return (
     <>
-      <div className="mt-12 grid grid-cols-2 gap-2 gap-y-10 xl:mt-[120px] xl:grid-cols-4 xl:gap-6 xl:gap-y-16">
+      <div
+        ref={resultsRef}
+        className="mt-12 grid grid-cols-2 gap-2 gap-y-10 xl:mt-[120px] xl:grid-cols-4 xl:gap-6 xl:gap-y-16"
+      >
         {classes.map((classItem: ClassListItem) => (
           <LectureCard
             key={classItem.id}

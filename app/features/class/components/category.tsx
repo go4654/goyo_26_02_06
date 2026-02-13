@@ -17,7 +17,7 @@ const CATEGORY_MAP: Record<string, string> = {
   Typescript: "typescript",
 };
 
-export default function Category({ category }: { category: string }) {
+export default function Category({ category }: { category: string | null }) {
   return (
     <div className="mt-[55px]">
       {CATEGORY_DATA.map((categoryGroup) => (

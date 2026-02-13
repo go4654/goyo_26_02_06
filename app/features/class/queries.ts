@@ -85,14 +85,14 @@ export async function getClasses(
     .order("published_at", { ascending: false, nullsFirst: false })
     .order("created_at", { ascending: false });
 
-  // 카테고리 필터 적용
-  if (category) {
-    query = query.eq("category", category);
-  }
-
-  // 검색어 필터 적용 (제목 또는 설명에서 검색)
+  // 검색어가 있을 때는 카테고리 필터를 무시하고 전체 클래스에서 검색
+  // 검색어가 없을 때만 카테고리 필터 적용
   if (search) {
+    // 검색어 필터 적용 (제목 또는 설명에서 검색)
     query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+  } else if (category) {
+    // 검색어가 없을 때만 카테고리 필터 적용
+    query = query.eq("category", category);
   }
 
   // 페이지네이션 적용

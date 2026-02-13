@@ -50,6 +50,13 @@
       "when": 1770919302954,
       "tag": "0006_flippant_devos",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1770970492565,
+      "tag": "0007_organic_thor",
+      "breakpoints": true
     }
   ]
 }

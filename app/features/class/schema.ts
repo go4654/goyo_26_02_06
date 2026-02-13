@@ -531,3 +531,161 @@ export const classViewEvents = pgTable(
     }),
   ],
 );
+
+// =============================================
+// CLASS 태그 테이블
+// =============================================
+
+export const tags = pgTable(
+  "tags",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    name: text("name").notNull(), // 표시용
+    slug: text("slug").notNull().unique(), // URL용
+
+    usage_count: integer("usage_count").notNull().default(0), // 성능용 캐시
+
+    created_at: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("tags_name_unique").on(t.name),
+    index("tags_slug_idx").on(t.slug),
+
+    // 공개 조회 허용
+    pgPolicy("select-tags", {
+      for: "select",
+      to: "public",
+      as: "permissive",
+      using: sql`true`,
+    }),
+
+    // 관리자만 생성
+    pgPolicy("insert-tags-admin-only", {
+      for: "insert",
+      to: authenticatedRole,
+      as: "permissive",
+      withCheck: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+
+    // 관리자만 수정
+    pgPolicy("update-tags-admin-only", {
+      for: "update",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+      withCheck: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+
+    // 관리자만 삭제
+    pgPolicy("delete-tags-admin-only", {
+      for: "delete",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+  ],
+);
+
+// =============================================
+// CLASS에 연결된 태그 테이블
+// =============================================
+
+export const classTags = pgTable(
+  "class_tags",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    class_id: uuid("class_id")
+      .notNull()
+      .references(() => classes.id, { onDelete: "cascade" }),
+
+    tag_id: uuid("tag_id")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade" }),
+
+    created_at: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("class_tags_unique").on(t.class_id, t.tag_id),
+    index("class_tags_class_id_idx").on(t.class_id),
+    index("class_tags_tag_id_idx").on(t.tag_id),
+
+    // 공개 클래스에 연결된 태그는 조회 허용
+    pgPolicy("select-class-tags", {
+      for: "select",
+      to: "public",
+      as: "permissive",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM classes c
+          WHERE c.id = ${t.class_id}
+          AND c.is_deleted = false
+          AND (
+            c.is_published = true
+            OR EXISTS (
+              SELECT 1 FROM profiles p
+              WHERE p.profile_id = ${authUid}
+              AND p.role = 'admin'
+            )
+          )
+        )
+      `,
+    }),
+
+    // 연결은 관리자만
+    pgPolicy("insert-class-tags-admin", {
+      for: "insert",
+      to: authenticatedRole,
+      as: "permissive",
+      withCheck: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+
+    pgPolicy("delete-class-tags-admin", {
+      for: "delete",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+  ],
+);

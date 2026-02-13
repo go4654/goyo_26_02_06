@@ -40,8 +40,8 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
   const pageParam = url.searchParams.get("page");
   const search = url.searchParams.get("search");
 
-  // 카테고리가 없으면 기본 카테고리로 리다이렉트
-  if (!category) {
+  // 검색어가 없을 때만 카테고리가 필수 (검색어가 있으면 카테고리 무시)
+  if (!search && !category) {
     throw redirect(`/class?category=${DEFAULT_CATEGORY}`);
   }
 
@@ -49,8 +49,9 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
   const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
 
   // 클래스 목록 조회
+  // 검색어가 있으면 카테고리 필터를 무시하고 전체 클래스에서 검색
   const result = await getClasses(client, {
-    category,
+    category: search ? null : category, // 검색어가 있으면 카테고리 무시
     page,
     pageSize: DEFAULT_PAGE_SIZE,
     search: search || null,
