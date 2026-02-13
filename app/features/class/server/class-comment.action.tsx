@@ -8,6 +8,8 @@ import makeServerClient from "~/core/lib/supa-client.server";
 import {
   createComment,
   deleteComment,
+  toggleClassLike,
+  toggleClassSave,
   toggleCommentLike,
   updateComment,
 } from "../mutation";
@@ -15,7 +17,13 @@ import {
 /**
  * 댓글 액션 타입
  */
-type CommentAction = "create" | "update" | "delete" | "toggleLike";
+type CommentAction =
+  | "create"
+  | "update"
+  | "delete"
+  | "toggleLike"
+  | "toggleClassLike"
+  | "toggleClassSave";
 
 function getClassDetailRedirectPath(slug: string) {
   // Location 헤더는 ByteString(ASCII)이어야 하므로 path segment를 인코딩합니다.
@@ -128,6 +136,58 @@ export async function classCommentAction({
 
         // 좋아요는 페이지 리다이렉트 없이 결과만 반환 (UX 향상)
         return data({ success: true, isLiked }, { status: 200 });
+      }
+
+      case "toggleClassLike": {
+        if (!classId) {
+          return data({ error: "클래스 ID가 필요합니다." }, { status: 400 });
+        }
+
+        const isLiked = await toggleClassLike(client, classId, user.id);
+
+        // 업데이트된 좋아요 카운트 조회 (classes.like_count 트리거에 의존하지 않고 실제 레코드 수로 계산)
+        const { count: likeCount, error: likeCountError } = await client
+          .from("class_likes")
+          .select("id", { count: "exact", head: true })
+          .eq("class_id", classId);
+        if (likeCountError) {
+          throw likeCountError;
+        }
+
+        return data(
+          {
+            success: true,
+            isLiked,
+            likeCount: likeCount ?? 0,
+          },
+          { status: 200 },
+        );
+      }
+
+      case "toggleClassSave": {
+        if (!classId) {
+          return data({ error: "클래스 ID가 필요합니다." }, { status: 400 });
+        }
+
+        const isSaved = await toggleClassSave(client, classId, user.id);
+
+        // 업데이트된 저장 카운트 조회 (classes.save_count 트리거에 의존하지 않고 실제 레코드 수로 계산)
+        const { count: saveCount, error: saveCountError } = await client
+          .from("class_saves")
+          .select("id", { count: "exact", head: true })
+          .eq("class_id", classId);
+        if (saveCountError) {
+          throw saveCountError;
+        }
+
+        return data(
+          {
+            success: true,
+            isSaved,
+            saveCount: saveCount ?? 0,
+          },
+          { status: 200 },
+        );
       }
 
       default:

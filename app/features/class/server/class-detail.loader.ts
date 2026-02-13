@@ -10,6 +10,8 @@ import {
   getClassBySlug,
   getClassComments,
   getClassNavigation,
+  getUserLikedClasses,
+  getUserSavedClasses,
   incrementClassView,
 } from "../queries";
 
@@ -42,6 +44,37 @@ export async function classDetailLoader({
   // 현재 사용자 정보 및 관리자 권한 조회
   const { user, isAdmin } = await getUserRole(client);
   const userId = user?.id || null;
+
+  // 좋아요/저장 카운트는 denormalized 컬럼(classes.like_count/save_count)에만 의존하면
+  // 트리거 미적용/비활성 상태에서 값이 갱신되지 않을 수 있으므로, 실제 레코드 수로 계산합니다.
+  // (상세 페이지는 단건이므로 성능 영향이 거의 없습니다.)
+  let classDetailWithCounts = classDetail;
+  try {
+    const [
+      { count: likeCount, error: likeCountError },
+      { count: saveCount, error: saveCountError },
+    ] = await Promise.all([
+      client
+        .from("class_likes")
+        .select("id", { count: "exact", head: true })
+        .eq("class_id", classDetail.id),
+      client
+        .from("class_saves")
+        .select("id", { count: "exact", head: true })
+        .eq("class_id", classDetail.id),
+    ]);
+
+    if (likeCountError) throw likeCountError;
+    if (saveCountError) throw saveCountError;
+
+    classDetailWithCounts = {
+      ...classDetail,
+      like_count: likeCount ?? 0,
+      save_count: saveCount ?? 0,
+    };
+  } catch (error) {
+    console.error("좋아요/저장 카운트 계산 실패:", error);
+  }
 
   // 조회수 증가 (트리거에 의해 자동으로 view_count 증가)
   // 에러가 발생해도 페이지는 표시되도록 try-catch 처리
@@ -78,12 +111,20 @@ export async function classDetailLoader({
   // 현재 사용자 ID 및 관리자 권한 (댓글 수정/삭제 권한 확인용)
   const currentUserId = user?.id || null;
 
+  // 사용자가 좋아요/저장한 클래스 ID 목록 조회
+  const [likedClasses, savedClasses] = await Promise.all([
+    getUserLikedClasses(client, userId),
+    getUserSavedClasses(client, userId),
+  ]);
+
   return {
-    class: classDetail,
+    class: classDetailWithCounts,
     code,
     navigation,
     comments,
     currentUserId,
     isAdmin,
+    isLiked: likedClasses.has(classDetail.id),
+    isSaved: savedClasses.has(classDetail.id),
   };
 }

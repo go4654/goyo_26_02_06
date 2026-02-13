@@ -53,70 +53,94 @@ export interface ClassListItem {
   comment_count: number;
   published_at: string | null;
   created_at: string;
+  tags: string[];
 }
 
 /**
- * 클래스 목록 조회
+ * 클래스 목록 조회 (RPC 함수 사용)
  *
  * 공개된 클래스만 조회하며, RLS 정책에 따라 접근 권한이 자동으로 적용됩니다.
  * 페이지네이션, 카테고리 필터링, 검색 기능을 지원합니다.
+ * 태그와 사용자 상태(좋아요/저장)를 함께 반환합니다.
+ *
+ * 성능 최적화: 단일 RPC 함수 호출로 모든 데이터 조회 (5개 쿼리 → 1개 쿼리)
  *
  * @param client - Supabase 클라이언트 인스턴스
  * @param params - 조회 파라미터
- * @returns 클래스 목록 및 페이지네이션 정보
+ * @param userId - 사용자 ID (좋아요/저장 상태 조회용, 선택사항)
+ * @returns 클래스 목록, 페이지네이션 정보, 사용자 상태
  */
 export async function getClasses(
   client: SupabaseClient,
   params: GetClassesParams = {},
-): Promise<GetClassesResult> {
+  userId?: string | null,
+): Promise<GetClassesResult & { likedClasses: string[]; savedClasses: string[] }> {
   const { category = null, page = 1, pageSize = 12, search = null } = params;
 
-  // 기본 쿼리 빌더 생성
-  let query = client
-    .from("classes")
-    .select(
-      "id, title, description, category, slug, thumbnail_image_url, view_count, like_count, save_count, comment_count, published_at, created_at",
-      {
-        count: "exact",
-      },
-    )
-    .eq("is_deleted", false)
-    .eq("is_published", true)
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false });
-
-  // 검색어가 있을 때는 카테고리 필터를 무시하고 전체 클래스에서 검색
-  // 검색어가 없을 때만 카테고리 필터 적용
-  if (search) {
-    // 검색어 필터 적용 (제목 또는 설명에서 검색)
-    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
-  } else if (category) {
-    // 검색어가 없을 때만 카테고리 필터 적용
-    query = query.eq("category", category);
-  }
-
-  // 페이지네이션 적용
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-  query = query.range(from, to);
-
-  // 쿼리 실행
-  const { data, error, count } = await query;
+  // RPC 함수 호출
+  const { data, error } = await client.rpc("get_classes_with_tags_and_user_status", {
+    p_category: category,
+    p_search: search,
+    p_page: page,
+    p_page_size: pageSize,
+    p_user_id: userId || null,
+  });
 
   if (error) {
     throw new Error(`클래스 목록 조회 실패: ${error.message}`);
   }
 
-  // 전체 페이지 수 계산
-  const totalCount = count ?? 0;
+  // RPC 함수는 단일 행을 반환
+  const result = data?.[0];
+  if (!result) {
+    return {
+      classes: [],
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: page,
+      pageSize,
+      likedClasses: [],
+      savedClasses: [],
+    };
+  }
+
+  // JSON 파싱
+  const classesJson = result.classes as unknown;
+  const classes: ClassListItem[] = Array.isArray(classesJson)
+    ? classesJson.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description || null,
+        category: item.category,
+        slug: item.slug,
+        thumbnail_image_url: item.thumbnail_image_url || null,
+        view_count: item.view_count,
+        like_count: item.like_count,
+        save_count: item.save_count,
+        comment_count: item.comment_count,
+        published_at: item.published_at || null,
+        created_at: item.created_at,
+        tags: Array.isArray(item.tags) ? item.tags : [],
+      }))
+    : [];
+
+  const totalCount = Number(result.total_count) || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
+  const likedClasses = Array.isArray(result.liked_class_ids)
+    ? result.liked_class_ids.map((id: string) => String(id))
+    : [];
+  const savedClasses = Array.isArray(result.saved_class_ids)
+    ? result.saved_class_ids.map((id: string) => String(id))
+    : [];
 
   return {
-    classes: (data as unknown as ClassListItem[]) ?? [],
+    classes,
     totalCount,
     totalPages,
     currentPage: page,
     pageSize,
+    likedClasses,
+    savedClasses,
   };
 }
 
@@ -410,6 +434,10 @@ export async function getUserCommentLikes(
  *
  * 현재 사용자가 좋아요를 누른 클래스 ID 목록을 반환합니다.
  *
+ * @deprecated 이 함수는 더 이상 사용되지 않습니다.
+ * getClasses() RPC 함수가 좋아요/저장 상태를 함께 반환합니다.
+ * 다른 용도로 필요할 경우에만 사용하세요.
+ *
  * @param client - Supabase 클라이언트 인스턴스
  * @param userId - 사용자 ID
  * @returns 좋아요를 누른 클래스 ID 목록
@@ -434,6 +462,10 @@ export async function getUserLikedClasses(
  * 사용자가 저장한 클래스 ID 목록 조회
  *
  * 현재 사용자가 저장한 클래스 ID 목록을 반환합니다.
+ *
+ * @deprecated 이 함수는 더 이상 사용되지 않습니다.
+ * getClasses() RPC 함수가 좋아요/저장 상태를 함께 반환합니다.
+ * 다른 용도로 필요할 경우에만 사용하세요.
  *
  * @param client - Supabase 클라이언트 인스턴스
  * @param userId - 사용자 ID

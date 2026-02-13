@@ -43,7 +43,12 @@ export default function ClassList({
     const isInitialLoad = prevSearchRef.current === null && search === null;
 
     // 초기 로드가 아니고, 검색어가 변경되었으며, 검색 결과가 있는 경우에만 스크롤
-    if (!isInitialLoad && hasSearchChanged && hasResults && resultsRef.current) {
+    if (
+      !isInitialLoad &&
+      hasSearchChanged &&
+      hasResults &&
+      resultsRef.current
+    ) {
       // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 스크롤
       const timeoutId = setTimeout(() => {
         if (resultsRef.current) {
@@ -113,8 +118,10 @@ export default function ClassList({
               title: classItem.title,
               imageUrl: classItem.thumbnail_image_url || "",
               category: classItem.category,
-              tags: [], // TODO: tags 필드가 스키마에 추가되면 연결
+              tags: classItem.tags || [],
               slug: classItem.slug,
+              likeCount: classItem.like_count,
+              saveCount: classItem.save_count,
             }}
             initialLiked={likedClassesSet.has(classItem.id)}
             initialSaved={savedClassesSet.has(classItem.id)}

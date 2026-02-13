@@ -45,7 +45,6 @@ export async function classAction({ request }: Route.ActionArgs) {
 
         const isLiked = await toggleClassLike(client, classId, user.id);
 
-        // 좋아요는 페이지 리다이렉트 없이 결과만 반환 (UX 향상)
         return data({ success: true, isLiked }, { status: 200 });
       }
 
@@ -56,7 +55,6 @@ export async function classAction({ request }: Route.ActionArgs) {
 
         const isSaved = await toggleClassSave(client, classId, user.id);
 
-        // 저장은 페이지 리다이렉트 없이 결과만 반환 (UX 향상)
         return data({ success: true, isSaved }, { status: 200 });
       }
 

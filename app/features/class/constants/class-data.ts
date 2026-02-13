@@ -5,6 +5,8 @@ export interface ClassLecture {
   category: string;
   tags: string[];
   slug: string;
+  likeCount?: number;
+  saveCount?: number;
 }
 
 // 임시 강의 데이터 (구동 확인용)

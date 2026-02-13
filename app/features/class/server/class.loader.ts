@@ -6,11 +6,7 @@ import { getUserRole } from "~/core/lib/guards.server";
 import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
-import {
-  getClasses,
-  getUserLikedClasses,
-  getUserSavedClasses,
-} from "../queries";
+import { getClasses } from "../queries";
 
 /**
  * 페이지당 표시할 클래스 수
@@ -48,24 +44,22 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
   // 페이지 번호 파싱 (기본값: 1)
   const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
 
-  // 클래스 목록 조회
-  // 검색어가 있으면 카테고리 필터를 무시하고 전체 클래스에서 검색
-  const result = await getClasses(client, {
-    category: search ? null : category, // 검색어가 있으면 카테고리 무시
-    page,
-    pageSize: DEFAULT_PAGE_SIZE,
-    search: search || null,
-  });
-
   // 현재 사용자 정보 조회
   const { user } = await getUserRole(client);
   const userId = user?.id || null;
 
-  // 사용자가 좋아요/저장한 클래스 ID 목록 조회
-  const [likedClasses, savedClasses] = await Promise.all([
-    getUserLikedClasses(client, userId),
-    getUserSavedClasses(client, userId),
-  ]);
+  // 클래스 목록 조회 (RPC 함수로 태그와 사용자 상태도 함께 조회)
+  // 검색어가 있으면 카테고리 필터를 무시하고 전체 클래스에서 검색
+  const result = await getClasses(
+    client,
+    {
+      category: search ? null : category, // 검색어가 있으면 카테고리 무시
+      page,
+      pageSize: DEFAULT_PAGE_SIZE,
+      search: search || null,
+    },
+    userId, // 사용자 ID 전달하여 좋아요/저장 상태도 함께 조회
+  );
 
   return {
     category,
@@ -77,7 +71,7 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
       pageSize: result.pageSize,
     },
     search: search || null,
-    likedClasses: Array.from(likedClasses),
-    savedClasses: Array.from(savedClasses),
+    likedClasses: result.likedClasses,
+    savedClasses: result.savedClasses,
   };
 };

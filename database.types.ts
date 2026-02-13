@@ -141,6 +141,42 @@ export type Database = {
           },
         ]
       }
+      class_tags: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_tags_class_id_classes_id_fk"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_tags_tag_id_tags_id_fk"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       class_view_events: {
         Row: {
           anon_id: string | null
@@ -380,12 +416,55 @@ export type Database = {
         }
         Relationships: []
       }
+      tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          usage_count?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      can_delete_class_comment: {
+        Args: { target_comment_id: string }
+        Returns: boolean
+      }
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_classes_with_tags_and_user_status: {
+        Args: {
+          p_category?: string
+          p_page?: number
+          p_page_size?: number
+          p_search?: string
+          p_user_id?: string
+        }
+        Returns: {
+          classes: Json
+          liked_class_ids: string[]
+          saved_class_ids: string[]
+          total_count: number
+        }[]
+      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
     }

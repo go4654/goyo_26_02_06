@@ -27,7 +27,7 @@ export default function LectureCard({
   const prevLikeState = useRef(likeFetcher.state);
   const prevSaveState = useRef(saveFetcher.state);
 
-  // 초기 상태가 변경되면 업데이트 (예: 페이지 새로고침 시)
+  // 초기 상태 동기화
   useEffect(() => {
     setIsLiked(initialLiked);
   }, [initialLiked]);
@@ -78,10 +78,7 @@ export default function LectureCard({
     e.preventDefault();
     e.stopPropagation();
 
-    // 낙관적 업데이트
-    setIsLiked(!isLiked);
-
-    // 서버 액션으로 좋아요 토글
+    // 서버 액션으로 좋아요 토글 (낙관적 업데이트 제거)
     likeFetcher.submit(
       {
         action: "toggleLike",
@@ -95,10 +92,7 @@ export default function LectureCard({
     e.preventDefault();
     e.stopPropagation();
 
-    // 낙관적 업데이트
-    setIsSaved(!isSaved);
-
-    // 서버 액션으로 저장 토글
+    // 서버 액션으로 저장 토글 (낙관적 업데이트 제거)
     saveFetcher.submit(
       {
         action: "toggleSave",
