@@ -26,17 +26,32 @@ export default function Gallery() {
           <div className="bg-primary absolute -bottom-2 left-0 h-1 w-full"></div>
         </li>
         <li>
-          <Link to={"/gallery?category=design"}>Deisgn</Link>
+          <Link
+            to={"/gallery?category=design"}
+            className="text-text-2/60 hover:text-text-2"
+          >
+            Deisgn
+          </Link>
         </li>
         <li>
-          <Link to={"/gallery?category=publishing"}>Publishing</Link>
+          <Link
+            to={"/gallery?category=publishing"}
+            className="text-text-2/60 hover:text-text-2"
+          >
+            Publishing
+          </Link>
         </li>
         <li>
-          <Link to={"/gallery?category=development"}>Development</Link>
+          <Link
+            to={"/gallery?category=development"}
+            className="text-text-2/60 hover:text-text-2"
+          >
+            Development
+          </Link>
         </li>
       </ul>
 
-      <div className="text-text-2/80 pt-14 pb-4 text-sm">
+      <div className="text-text-2/60 pt-14 pb-4 text-sm">
         이 작업물들은 학생들의 포트폴리오로, 교육적 목적으로 제작되었으며 상업적
         이득을 취하지 않습니다
       </div>

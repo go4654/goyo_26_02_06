@@ -57,6 +57,13 @@
       "when": 1770970492565,
       "tag": "0007_organic_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1771053020990,
+      "tag": "0008_handy_phalanx",
+      "breakpoints": true
     }
   ]
 }
