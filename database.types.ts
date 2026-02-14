@@ -323,6 +323,215 @@ export type Database = {
           },
         ]
       }
+      galleries: {
+        Row: {
+          author_id: string | null
+          caption: string | null
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_urls: string[]
+          is_published: boolean
+          like_count: number
+          save_count: number
+          slug: string
+          subtitle: string | null
+          thumbnail_image_url: string | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id?: string | null
+          caption?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          is_published?: boolean
+          like_count?: number
+          save_count?: number
+          slug: string
+          subtitle?: string | null
+          thumbnail_image_url?: string | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string | null
+          caption?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_urls?: string[]
+          is_published?: boolean
+          like_count?: number
+          save_count?: number
+          slug?: string
+          subtitle?: string | null
+          thumbnail_image_url?: string | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "galleries_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      gallery_likes: {
+        Row: {
+          created_at: string
+          gallery_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gallery_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gallery_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_likes_gallery_id_galleries_id_fk"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      gallery_saves: {
+        Row: {
+          created_at: string
+          gallery_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          gallery_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          gallery_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_saves_gallery_id_galleries_id_fk"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_saves_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      gallery_tags: {
+        Row: {
+          gallery_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          gallery_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          gallery_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_tags_gallery_id_galleries_id_fk"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_tags_tag_id_tags_id_fk"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gallery_view_events: {
+        Row: {
+          anon_id: string | null
+          created_at: string
+          gallery_id: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          anon_id?: string | null
+          created_at?: string
+          gallery_id: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          anon_id?: string | null
+          created_at?: string
+          gallery_id?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_view_events_gallery_id_galleries_id_fk"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           approved_at: string

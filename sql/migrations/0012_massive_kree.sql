@@ -1,0 +1,1 @@
+DROP INDEX "galleries_slug_idx";

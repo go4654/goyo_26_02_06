@@ -1,0 +1,1 @@
+ALTER TABLE "galleries" ALTER COLUMN "category" SET DEFAULT 'design';

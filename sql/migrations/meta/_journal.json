@@ -64,6 +64,41 @@
       "when": 1771053020990,
       "tag": "0008_handy_phalanx",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1771055275562,
+      "tag": "0009_furry_madelyne_pryor",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771058100483,
+      "tag": "0010_open_vertigo",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1771058203005,
+      "tag": "0011_fluffy_thunderbolts",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1771058484803,
+      "tag": "0012_massive_kree",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1771058822438,
+      "tag": "0013_sweet_crystal",
+      "breakpoints": true
     }
   ]
 }

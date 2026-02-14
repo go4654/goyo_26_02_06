@@ -14,6 +14,7 @@ import { authUid, authenticatedRole } from "drizzle-orm/supabase";
 
 import { timestamps } from "~/core/db/helpers.server";
 
+import { tags } from "../class/schema";
 import { profiles } from "../users/schema";
 
 export const galleries = pgTable(
@@ -25,6 +26,7 @@ export const galleries = pgTable(
     // 기본 정보
     // =========================
     title: text("title").notNull(),
+    category: text("category").notNull().default("design"),
     subtitle: text("subtitle"),
     description: text("description"),
     caption: text("caption"),
@@ -63,8 +65,8 @@ export const galleries = pgTable(
     ...timestamps,
   },
   (table) => [
-    index("galleries_slug_idx").on(table.slug),
     index("galleries_published_idx").on(table.is_published),
+    index("galleries_category_idx").on(table.category),
 
     // =========================
     // SELECT 정책
@@ -263,6 +265,121 @@ export const gallerySaves = pgTable(
       to: authenticatedRole,
       as: "permissive",
       using: sql`${table.user_id} = ${authUid} OR public.is_admin()`,
+    }),
+  ],
+);
+
+// =============================================
+// GALLERY 태그 테이블
+// =============================================
+
+export const galleryTags = pgTable(
+  "gallery_tags",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    gallery_id: uuid("gallery_id")
+      .notNull()
+      .references(() => galleries.id, { onDelete: "cascade" }),
+
+    tag_id: uuid("tag_id")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    uniqueIndex("gallery_tags_unique").on(table.gallery_id, table.tag_id),
+    index("gallery_tags_gallery_id_idx").on(table.gallery_id),
+    index("gallery_tags_tag_id_idx").on(table.tag_id),
+
+    // SELECT: 갤러리 접근 권한 있는 유저만
+    pgPolicy("select-gallery-tags", {
+      for: "select",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`
+          EXISTS (
+            SELECT 1 FROM galleries g
+            WHERE g.id = ${table.gallery_id}
+            AND g.is_published = true
+          )
+        `,
+    }),
+
+    // INSERT: 관리자만
+    pgPolicy("insert-gallery-tags", {
+      for: "insert",
+      to: authenticatedRole,
+      as: "permissive",
+      withCheck: sql`public.is_admin()`,
+    }),
+
+    pgPolicy("delete-gallery-tags", {
+      for: "delete",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`public.is_admin()`,
+    }),
+  ],
+);
+
+// =============================================
+// GALLERY 조회 이벤트 테이블
+// =============================================
+
+export const galleryViewEvents = pgTable(
+  "gallery_view_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    gallery_id: uuid("gallery_id")
+      .notNull()
+      .references(() => galleries.id, { onDelete: "cascade" }),
+
+    // 로그인 유저면 user_id, 아니면 null
+    user_id: uuid("user_id").references(() => profiles.profile_id, {
+      onDelete: "set null",
+    }),
+
+    // 비로그인 추적용 (선택)
+    anon_id: text("anon_id"),
+
+    created_at: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("gallery_view_events_gallery_id_idx").on(table.gallery_id),
+    index("gallery_view_events_user_id_idx").on(table.user_id),
+    index("gallery_view_events_created_at_idx").on(table.created_at),
+
+    // 관리자만 조회 가능
+    pgPolicy("select-gallery-view-events-admin-only", {
+      for: "select",
+      to: authenticatedRole,
+      as: "permissive",
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM profiles p
+          WHERE p.profile_id = ${authUid}
+          AND p.role = 'admin'
+        )
+      `,
+    }),
+
+    // 로그인 유저 insert
+    pgPolicy("insert-gallery-view-events-auth", {
+      for: "insert",
+      to: authenticatedRole,
+      as: "permissive",
+      withCheck: sql`${table.user_id} = ${authUid}`,
+    }),
+
+    // anon insert 허용
+    pgPolicy("insert-gallery-view-events-anon", {
+      for: "insert",
+      to: "anon",
+      as: "permissive",
+      withCheck: sql`true`,
     }),
   ],
 );

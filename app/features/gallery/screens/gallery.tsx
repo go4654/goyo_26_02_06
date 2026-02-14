@@ -1,11 +1,9 @@
 import type { Route } from "./+types/gallery";
 
-import { Heart } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 
-import Tags from "~/core/components/tags";
-
-import { GALLERY_LIST_MOCKUP } from "../constant/gallery-list-mockup";
+import GalleryList from "../components/gallery-list";
+import SearchForm from "../components/search-form";
 import { galleryAction } from "../server/gallery.action";
 import { galleryLoader } from "../server/gallery.loader";
 
@@ -16,77 +14,83 @@ export const meta: Route.MetaFunction = () => {
 export const loader = galleryLoader;
 export const action = galleryAction;
 
-export default function Gallery() {
+/** 상단 탭용 카테고리 설정 (slug → 표시명) */
+const GALLERY_CATEGORIES = [
+  { slug: "all", label: "All" },
+  { slug: "design", label: "Design" },
+  { slug: "publishing", label: "Publishing" },
+  { slug: "development", label: "Development" },
+] as const;
+
+export default function Gallery({ loaderData }: Route.ComponentProps) {
+  const { hasGalleryAccess, category, search, galleries, pagination } =
+    loaderData;
+  const [searchParams] = useSearchParams();
+
+  // 권한이 없으면 지정 문구로 차단 화면 노출
+  if (!hasGalleryAccess) {
+    return (
+      <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-40">
+        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 text-center">
+          <h1 className="text-h5 xl:text-h4">
+            이 콘텐츠는 승인된 회원만 열람할 수 있습니다
+          </h1>
+          <p className="text-text-2/70 max-w-[780px] text-base xl:text-lg">
+            갤러리 접근 권한이 아직 활성화되지 않았습니다. 권한 신청 후 승인이
+            완료되면 바로 이용하실 수 있습니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-40">
-      {/* 카테고리 목록 */}
-      <ul className="xl:text-h6 flex items-center gap-10">
-        <li className="relative">
-          <Link to={"/gallery?category=all"}>All</Link>
-          <div className="bg-primary absolute -bottom-2 left-0 h-1 w-full"></div>
-        </li>
-        <li>
-          <Link
-            to={"/gallery?category=design"}
-            className="text-text-2/60 hover:text-text-2"
-          >
-            Deisgn
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={"/gallery?category=publishing"}
-            className="text-text-2/60 hover:text-text-2"
-          >
-            Publishing
-          </Link>
-        </li>
-        <li>
-          <Link
-            to={"/gallery?category=development"}
-            className="text-text-2/60 hover:text-text-2"
-          >
-            Development
-          </Link>
-        </li>
-      </ul>
+      <div className="flex flex-col items-start justify-between gap-6 xl:flex-row xl:items-center">
+        {/* 카테고리 탭: 현재 선택값과 일치하면 밑줄 표시 */}
+        <ul className="xl:text-h6 flex items-center gap-10">
+          {GALLERY_CATEGORIES.map(({ slug, label }) => {
+            const isActive = (category ?? "all") === slug;
+
+            // 검색어가 있어도 유지하고, 카테고리 변경 시 page는 리셋
+            const params = new URLSearchParams(searchParams);
+            params.set("category", slug);
+            params.delete("page");
+            const to = `/gallery?${params.toString()}`;
+
+            return (
+              <li key={slug} className="relative">
+                <Link
+                  to={to}
+                  className={
+                    isActive ? undefined : "text-text-2/60 hover:text-text-2"
+                  }
+                >
+                  {label}
+                </Link>
+                {isActive && (
+                  <div className="bg-primary absolute -bottom-2 left-0 h-1 w-full" />
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* 클래스 페이지와 동일 디자인의 검색 UI */}
+        <SearchForm category={category} search={search} />
+      </div>
 
       <div className="text-text-2/60 pt-14 pb-4 text-sm">
         이 작업물들은 학생들의 포트폴리오로, 교육적 목적으로 제작되었으며 상업적
         이득을 취하지 않습니다
       </div>
 
-      {/* 갤러리 목록 */}
-      <div className="grid grid-cols-2 gap-2 gap-y-10 xl:grid-cols-4 xl:gap-6 xl:gap-y-16">
-        {/* 갤러리 컨텐츠 */}
-        {GALLERY_LIST_MOCKUP.map((data) => (
-          <Link to={`/gallery/${data.id}`} key={data.id}>
-            <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[500px] lg:h-[500px]">
-              <img
-                src={data.image}
-                alt={data.title}
-                className="h-full w-full object-cover"
-              />
-            </div>
-
-            <div className="mt-2 mb-2 flex items-center justify-between">
-              {/* 타이틀 */}
-              <h3 className="text-small md:text-small-title line-clamp-1">
-                {data.title}
-              </h3>
-
-              {/* 좋아요 */}
-              <div className="text-text-2 flex items-center gap-1 md:gap-2">
-                <Heart className="size-4 md:size-5" />
-                <span className="text-sm md:text-base">{data.likeCount}</span>
-              </div>
-            </div>
-
-            {/* 태그 */}
-            <Tags tags={data.tags} borderColor="primary" />
-          </Link>
-        ))}
-      </div>
+      {/* 실제 DB 갤러리 목록 + 페이지네이션 */}
+      <GalleryList
+        galleries={galleries}
+        pagination={pagination}
+        category={category}
+      />
     </div>
   );
 }
