@@ -57,7 +57,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css",
+    href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css",
   },
   {
     rel: "stylesheet",
@@ -165,7 +165,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang={data?.locale ?? "en"}
-      className={cn(theme ?? "", "h-full")}
+      className={cn(theme ?? "", "relative h-full")}
       dir={i18n.dir()}
     >
       <head>
@@ -179,7 +179,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
           <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         )}
       </head>
-      <body className="h-full">
+      <body className="relative h-full">
         {children}
         <Toaster richColors position="bottom-right" />
         <ScrollRestoration />

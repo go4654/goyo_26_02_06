@@ -4,9 +4,9 @@ import { Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
 
-import { cn } from "~/core/lib/utils";
 import Tags from "~/core/components/tags";
 import { Separator } from "~/core/components/ui/separator";
+import { cn } from "~/core/lib/utils";
 
 import ClassComment from "../comments/class-comment";
 import { classCommentAction } from "../server/class-comment.action";
@@ -196,11 +196,6 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
               {classData.description}
             </p>
           )}
-
-          {/* TODO: tags 필드가 스키마에 추가되면 연결 */}
-          {/* <div className="mt-6">
-            <Tags tags={classData.tags || []} borderColor="primary" />
-          </div> */}
         </div>
       </div>
 

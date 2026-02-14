@@ -532,6 +532,98 @@ export type Database = {
           },
         ]
       }
+      news: {
+        Row: {
+          author_id: string | null
+          category: string
+          content_mdx: string
+          created_at: string
+          id: string
+          is_published: boolean
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string
+          view_count: number
+          visibility: string
+        }
+        Insert: {
+          author_id?: string | null
+          category?: string
+          content_mdx: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+          view_count?: number
+          visibility?: string
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content_mdx?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+          view_count?: number
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      news_view_events: {
+        Row: {
+          anon_id: string | null
+          created_at: string
+          id: string
+          news_id: string
+          user_id: string | null
+        }
+        Insert: {
+          anon_id?: string | null
+          created_at?: string
+          id?: string
+          news_id: string
+          user_id?: string | null
+        }
+        Update: {
+          anon_id?: string | null
+          created_at?: string
+          id?: string
+          news_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_view_events_news_id_news_id_fk"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "news_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           approved_at: string

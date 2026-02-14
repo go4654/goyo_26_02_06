@@ -3,15 +3,21 @@ import type { Route } from "./+types/gallery-detail";
 import { useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
 
+import { MDXContent } from "~/core/components/mdx-content";
 import Tags from "~/core/components/tags";
 import { Separator } from "~/core/components/ui/separator";
 
+import { DubleQuote } from "../components/duble_quote";
 import FloatingActionBar from "../components/floating-action-bar";
 import GalleryLikeSaveButtons from "../components/gallery-like-save-buttons";
 import { galleryDetailAction } from "../server/gallery-detail.action";
 import { galleryDetailLoader } from "../server/gallery-detail.loader";
 
-export const meta: Route.MetaFunction = ({ params }: { params: { slug?: string } }) => {
+export const meta: Route.MetaFunction = ({
+  params,
+}: {
+  params: { slug?: string };
+}) => {
   return [{ title: `갤러리 · ${params.slug ?? "상세"}` }];
 };
 
@@ -30,10 +36,8 @@ function getMainImageUrl(
   return first?.trim() ? first : null;
 }
 
-export default function GalleryDetail({
-  loaderData,
-}: Route.ComponentProps) {
-  const { gallery, adjacent } = loaderData;
+export default function GalleryDetail({ loaderData }: Route.ComponentProps) {
+  const { gallery, adjacent, descriptionCode, captionCode } = loaderData;
 
   const likeFetcher = useFetcher();
   const saveFetcher = useFetcher();
@@ -135,16 +139,16 @@ export default function GalleryDetail({
   );
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-40">
+    <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-30">
       {/* ---------- 1. 대표 이미지 (없으면 "이미지 없음" 표기) ---------- */}
       <div className="relative xl:h-[1000px]">
         {mainImageUrl ? (
           <div
-            className="aspect-[16/12] h-full w-full rounded-2xl bg-cover bg-top xl:aspect-[16/7]"
+            className="aspect-[16/12] h-full w-full bg-cover bg-fixed bg-top xl:aspect-[16/7]"
             style={{ backgroundImage: `url(${mainImageUrl})` }}
           />
         ) : (
-          <div className="flex aspect-[16/12] h-full w-full items-center justify-center rounded-2xl bg-gray-500 xl:aspect-[16/7]">
+          <div className="flex aspect-[16/12] h-full w-full items-center justify-center bg-gray-500 xl:aspect-[16/7]">
             <span className="text-text-2/70 text-h6">이미지 없음</span>
           </div>
         )}
@@ -176,18 +180,18 @@ export default function GalleryDetail({
         </div>
       </div>
 
-      {/* ---------- 5. Description ---------- */}
-      {gallery.description ? (
-        <div className="my-12 xl:max-w-[50%]">
-          <p className="text-text-2/80 leading-loose font-light xl:text-[20px]">
-            {gallery.description}
-          </p>
+      <Separator className="my-10" />
+
+      {/* ---------- 5. Description (MDX) ---------- */}
+      {descriptionCode ? (
+        <div className="my-12 xl:max-w-[40%]">
+          <MDXContent code={descriptionCode} className="" />
         </div>
       ) : null}
 
       {/* ---------- 6. 상세 이미지들 (image_urls) ---------- */}
       {gallery.image_urls.length > 0 ? (
-        <div className="xl:mt-20 flex flex-col gap-6">
+        <div className="flex flex-col gap-6 xl:mt-20">
           {gallery.image_urls.map((url: string, index: number) => (
             <img
               key={`${gallery.id}-img-${index}`}
@@ -199,12 +203,12 @@ export default function GalleryDetail({
         </div>
       ) : null}
 
-      {/* ---------- 7. Caption ---------- */}
-      {gallery.caption ? (
-        <div className="mt-8 xl:max-w-[50%]">
-          <p className="text-text-2/80 text-small-title font-regular">
-            {gallery.caption}
-          </p>
+      {/* ---------- 7. Caption (MDX) ---------- */}
+      {captionCode ? (
+        <div className="mx-auto mt-[150px] w-full text-center xl:max-w-[50%]">
+          <DubleQuote className="mx-auto size-20 opacity-10" />
+          <MDXContent code={captionCode} />
+          <DubleQuote className="mx-auto mt-15 size-20 rotate-180 opacity-10" />
         </div>
       ) : null}
 

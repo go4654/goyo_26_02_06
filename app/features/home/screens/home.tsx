@@ -1,8 +1,5 @@
 import type { Route } from "./+types/home";
 
-import { useScroll } from "motion/react";
-import { useRef } from "react";
-
 import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 

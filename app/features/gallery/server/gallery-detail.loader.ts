@@ -1,5 +1,6 @@
 import type { Route } from "../screens/+types/gallery-detail";
 
+import { bundleMDX } from "mdx-bundler";
 import { data } from "react-router";
 
 import { requireAuthentication } from "~/core/lib/guards.server";
@@ -11,6 +12,13 @@ import {
   getGalleryUserActions,
   incrementGalleryView,
 } from "../queries";
+
+/** MDX 문자열이 있으면 번들 후 code 반환, 없으면 null */
+async function bundleMdxIfPresent(source: string | null): Promise<string | null> {
+  if (!source?.trim()) return null;
+  const { code } = await bundleMDX({ source: source.trim() });
+  return code;
+}
 
 /**
  * 갤러리 상세 페이지 로더
@@ -82,13 +90,20 @@ export async function galleryDetailLoader({
     }
   });
 
-  // 세션 갱신을 위한 Set-Cookie 헤더를 반드시 응답에 포함
+  // description / caption이 MDX로 저장된 경우 번들링
+  const [descriptionCode, captionCode] = await Promise.all([
+    bundleMdxIfPresent(gallery.description),
+    bundleMdxIfPresent(gallery.caption),
+  ]);
+
   return data(
     {
       gallery: galleryWithCounts,
       hasLiked: userActions.liked,
       hasSaved: userActions.saved,
       adjacent,
+      descriptionCode,
+      captionCode,
     },
     { headers },
   );
