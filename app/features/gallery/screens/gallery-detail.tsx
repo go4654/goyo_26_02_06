@@ -214,8 +214,16 @@ export default function GalleryDetail({
       <FloatingActionBar
         listHref="/gallery"
         listState={{ revalidateGalleryList: true }}
-        prevHref={adjacent.prevSlug ? `/gallery/${adjacent.prevSlug}` : null}
-        nextHref={adjacent.nextSlug ? `/gallery/${adjacent.nextSlug}` : null}
+        prevHref={
+          adjacent?.prevSlug
+            ? `/gallery/${encodeURIComponent(adjacent.prevSlug)}`
+            : null
+        }
+        nextHref={
+          adjacent?.nextSlug
+            ? `/gallery/${encodeURIComponent(adjacent.nextSlug)}`
+            : null
+        }
         likeCount={likeCount}
         saveCount={saveCount}
         isLiked={isLiked}

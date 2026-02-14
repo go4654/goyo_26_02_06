@@ -4,6 +4,7 @@ import { Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
 
+import { cn } from "~/core/lib/utils";
 import Tags from "~/core/components/tags";
 import { Separator } from "~/core/components/ui/separator";
 
@@ -161,22 +162,28 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
           <button
             type="button"
             onClick={handleLikeClick}
-            className={`flex cursor-pointer items-center gap-2 transition-colors ${
-              isLiked ? "text-primary" : "text-text-3 hover:text-primary"
-            }`}
+            className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
-            <Heart className="size-4 xl:size-5" />
+            <Heart
+              className={cn(
+                "size-4 xl:size-5",
+                isLiked ? "fill-red-500 text-red-500" : "",
+              )}
+            />
             <span>{likeCount}</span>
           </button>
           <span className="text-text-3/50">•</span>
           <button
             type="button"
             onClick={handleSaveClick}
-            className={`flex cursor-pointer items-center gap-2 transition-colors ${
-              isSaved ? "text-primary" : "text-text-3 hover:text-primary"
-            }`}
+            className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
-            <Bookmark className="size-4 xl:size-5" />
+            <Bookmark
+              className={cn(
+                "size-4 xl:size-5",
+                isSaved ? "fill-success text-success" : "",
+              )}
+            />
             <span>{saveCount}</span>
           </button>
         </div>
@@ -228,27 +235,33 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
             <span>목록으로 가기</span>
           </div>
 
-          {/* 좋아요, 북마크 버튼 */}
+          {/* 좋아요, 북마크 버튼 (갤러리와 동일: 활성 시 빨간 하트 / success 색상) */}
           <div className="text-small-title text-text-3 flex items-center gap-2">
             <button
               type="button"
               onClick={handleLikeClick}
-              className={`flex cursor-pointer items-center gap-2 transition-colors ${
-                isLiked ? "text-primary" : "text-text-3 hover:text-primary"
-              }`}
+              className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
-              <Heart className="size-4 xl:size-5" />
+              <Heart
+                className={cn(
+                  "size-4 xl:size-5",
+                  isLiked ? "fill-red-500 text-red-500" : "",
+                )}
+              />
               <span className="text-sm xl:text-base">{likeCount}</span>
             </button>
             <span className="text-text-3/50">•</span>
             <button
               type="button"
               onClick={handleSaveClick}
-              className={`flex cursor-pointer items-center gap-2 transition-colors ${
-                isSaved ? "text-primary" : "text-text-3 hover:text-primary"
-              }`}
+              className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
-              <Bookmark className="size-4 xl:size-5" />
+              <Bookmark
+                className={cn(
+                  "size-4 xl:size-5",
+                  isSaved ? "fill-success text-success" : "",
+                )}
+              />
               <span className="text-sm xl:text-base">{saveCount}</span>
             </button>
           </div>

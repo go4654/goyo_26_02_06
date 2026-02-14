@@ -232,36 +232,46 @@ export async function getGalleryUserActions(
 }
 
 /**
- * 목록 정렬(created_at desc) 기준으로 이전/다음 갤러리 슬러그 조회
- * 목록에서 "이전" = 더 최신 글, "다음" = 더 오래된 글
+ * 목록과 동일한 정렬(created_at desc, id desc)로 슬러그 목록을 조회한 뒤,
+ * 현재 슬러그 위치 기준으로 이전/다음 슬러그를 반환합니다.
+ * 목록에서 "이전" = 더 최신 글, "다음" = 더 오래된 글.
  */
 export async function getAdjacentGallerySlugs(
   client: SupabaseClient,
   currentSlug: string,
-  currentCreatedAt: string,
+  _currentCreatedAt: string,
 ): Promise<AdjacentGalleries> {
-  const [prevRes, nextRes] = await Promise.all([
-    client
-      .from("galleries")
-      .select("slug")
-      .eq("is_published", true)
-      .gt("created_at", currentCreatedAt)
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .maybeSingle(),
-    client
-      .from("galleries")
-      .select("slug")
-      .eq("is_published", true)
-      .lt("created_at", currentCreatedAt)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  const { data: rows, error } = await client
+    .from("galleries")
+    .select("slug")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    if (
+      typeof process !== "undefined" &&
+      process.env?.NODE_ENV === "development"
+    ) {
+      console.error("[getAdjacentGallerySlugs]", error.message);
+    }
+    return { prevSlug: null, nextSlug: null };
+  }
+
+  const list = Array.isArray(rows) ? rows : [];
+  const slugs = list
+    .map((r: { slug?: unknown }) =>
+      typeof r?.slug === "string" && r.slug.length > 0 ? r.slug : null,
+    )
+    .filter((s): s is string => s != null);
+
+  const idx = slugs.indexOf(currentSlug);
+  if (idx === -1) return { prevSlug: null, nextSlug: null };
 
   return {
-    prevSlug: prevRes.data?.slug ?? null,
-    nextSlug: nextRes.data?.slug ?? null,
+    prevSlug: idx > 0 ? slugs[idx - 1] ?? null : null,
+    nextSlug: idx < slugs.length - 1 ? slugs[idx + 1] ?? null : null,
   };
 }
 
