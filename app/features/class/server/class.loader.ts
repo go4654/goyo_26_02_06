@@ -3,7 +3,6 @@ import type { Route } from "../screens/+types/class";
 import { redirect } from "react-router";
 
 import { getUserRole } from "~/core/lib/guards.server";
-import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 import { getClasses } from "../queries";
@@ -22,14 +21,14 @@ const DEFAULT_CATEGORY = "figma";
  * 클래스 페이지 로더
  *
  * 기능:
- * - 인증 확인
+ * - 공개 페이지: 로그인 없이 접근 가능 (비로그인 시 좋아요/저장 상태만 미표시)
  * - 카테고리 파라미터 처리 (없으면 기본 카테고리로 리다이렉트)
  * - 페이지네이션 처리
  * - 실제 데이터베이스에서 클래스 목록 조회
  */
 export const classLoader = async ({ request }: Route.LoaderArgs) => {
   const [client] = makeServerClient(request);
-  await requireAuthentication(client);
+  const { user } = await getUserRole(client);
 
   const url = new URL(request.url);
   const category = url.searchParams.get("category");
@@ -44,8 +43,6 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
   // 페이지 번호 파싱 (기본값: 1)
   const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
 
-  // 현재 사용자 정보 조회
-  const { user } = await getUserRole(client);
   const userId = user?.id || null;
 
   // 클래스 목록 조회 (RPC 함수로 태그와 사용자 상태도 함께 조회)
