@@ -76,10 +76,9 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
           {GALLERY_CATEGORIES.map(({ slug, label }) => {
             const isActive = (category ?? "all") === slug;
 
-            // 검색어가 있어도 유지하고, 카테고리 변경 시 page는 리셋
-            const params = new URLSearchParams(searchParams);
+            // 카테고리 탭 클릭 시: 해당 카테고리만 적용하고 검색·페이지는 제거
+            const params = new URLSearchParams();
             params.set("category", slug);
-            params.delete("page");
             const to = `/gallery?${params.toString()}`;
 
             return (
@@ -116,6 +115,11 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
         savedGalleries={savedGalleries}
         pagination={pagination}
         category={category}
+        search={search}
+        categoryLabel={
+          GALLERY_CATEGORIES.find((c) => c.slug === (category ?? "all"))?.label ??
+          "All"
+        }
       />
     </div>
   );

@@ -264,3 +264,33 @@ export async function getAdjacentGallerySlugs(
     nextSlug: nextRes.data?.slug ?? null,
   };
 }
+
+/**
+ * 갤러리 조회수 증가
+ *
+ * 상세 페이지 조회 시 gallery_view_events에 이벤트를 삽입합니다.
+ * DB 트리거(trigger_increment_gallery_view_count)가 galleries.view_count를 자동 증가시킵니다.
+ *
+ * @param client - Supabase 클라이언트
+ * @param galleryId - 갤러리 ID
+ * @param userId - 로그인 유저 ID (null이면 anon 정책으로 삽입)
+ */
+export async function incrementGalleryView(
+  client: SupabaseClient,
+  galleryId: string,
+  userId: string | null,
+): Promise<void> {
+  const { error } = await client.from("gallery_view_events").insert({
+    gallery_id: galleryId,
+    user_id: userId,
+  });
+  if (error) {
+    if (
+      typeof process !== "undefined" &&
+      process.env?.NODE_ENV === "development"
+    ) {
+      console.error("[incrementGalleryView]", error.message);
+    }
+    throw new Error("갤러리 조회 이벤트 기록에 실패했습니다.");
+  }
+}

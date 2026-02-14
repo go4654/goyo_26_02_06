@@ -9,6 +9,7 @@ import {
   getAdjacentGallerySlugs,
   getGalleryBySlug,
   getGalleryUserActions,
+  incrementGalleryView,
 } from "../queries";
 
 /**
@@ -70,6 +71,16 @@ export async function galleryDetailLoader({
     like_count: likeCountResult.count,
     save_count: saveCountResult.count,
   };
+
+  // 조회 이벤트 기록 (트리거로 galleries.view_count 자동 증가). 실패해도 페이지는 노출
+  incrementGalleryView(client, gallery.id, userId).catch((err) => {
+    if (
+      typeof process !== "undefined" &&
+      process.env?.NODE_ENV === "development"
+    ) {
+      console.error("갤러리 조회수 증가 실패:", err);
+    }
+  });
 
   // 세션 갱신을 위한 Set-Cookie 헤더를 반드시 응답에 포함
   return data(

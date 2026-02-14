@@ -21,6 +21,10 @@ interface GalleryListProps {
     pageSize: number;
   };
   category: string | null;
+  /** 검색어(있으면 검색 결과 없음 메시지에 반영) */
+  search: string | null;
+  /** 카테고리 표시명 (All, Design, Publishing, Development) */
+  categoryLabel: string;
 }
 
 /**
@@ -33,6 +37,8 @@ export default function GalleryList({
   savedGalleries,
   pagination,
   category,
+  search,
+  categoryLabel,
 }: GalleryListProps) {
   const [searchParams] = useSearchParams();
 
@@ -48,13 +54,16 @@ export default function GalleryList({
   };
 
   if (!galleries || galleries.length === 0) {
+    const searchKeyword = search != null ? search.trim() : "";
+    const hasSearch = searchKeyword.length > 0;
+    const emptyMessage = hasSearch
+      ? `${categoryLabel} 카테고리의 "${searchKeyword}"의 검색결과가 없습니다.`
+      : category && category !== "all"
+        ? "해당 카테고리의 갤러리가 없습니다."
+        : "등록된 갤러리가 없습니다.";
     return (
       <div className="flex min-h-[200px] items-center justify-center py-20">
-        <p className="text-text-2/60 text-h6">
-          {category && category !== "all"
-            ? "해당 카테고리의 갤러리가 없습니다."
-            : "등록된 갤러리가 없습니다."}
-        </p>
+        <p className="text-text-2/60 text-h6">{emptyMessage}</p>
       </div>
     );
   }
