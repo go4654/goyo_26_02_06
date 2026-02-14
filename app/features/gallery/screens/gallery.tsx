@@ -1,6 +1,7 @@
 import type { Route } from "./+types/gallery";
 
-import { Link, useSearchParams } from "react-router";
+import { useEffect } from "react";
+import { Link, useLocation, useNavigate, useRevalidator, useSearchParams } from "react-router";
 
 import GalleryList from "../components/gallery-list";
 import SearchForm from "../components/search-form";
@@ -23,9 +24,32 @@ const GALLERY_CATEGORIES = [
 ] as const;
 
 export default function Gallery({ loaderData }: Route.ComponentProps) {
-  const { hasGalleryAccess, category, search, galleries, pagination } =
+  const {
+    hasGalleryAccess,
+    category,
+    search,
+    galleries,
+    likedGalleries,
+    savedGalleries,
+    pagination,
+  } =
     loaderData;
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const revalidator = useRevalidator();
+
+  // 상세 페이지에서 목록으로 돌아올 때, 카운트가 즉시 반영되도록 목록 로더를 1회 재검증
+  useEffect(() => {
+    const state = location.state as { revalidateGalleryList?: boolean } | null;
+    if (!state?.revalidateGalleryList) return;
+
+    revalidator.revalidate();
+    navigate(`${location.pathname}${location.search}`, {
+      replace: true,
+      state: null,
+    });
+  }, [location.state, location.pathname, location.search, navigate, revalidator]);
 
   // 권한이 없으면 지정 문구로 차단 화면 노출
   if (!hasGalleryAccess) {
@@ -88,6 +112,8 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
       {/* 실제 DB 갤러리 목록 + 페이지네이션 */}
       <GalleryList
         galleries={galleries}
+        likedGalleries={likedGalleries}
+        savedGalleries={savedGalleries}
         pagination={pagination}
         category={category}
       />

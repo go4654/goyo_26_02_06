@@ -1,5 +1,7 @@
 import type { Route } from "../screens/+types/gallery";
 
+import { data } from "react-router";
+
 import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
@@ -20,13 +22,14 @@ const DEFAULT_CATEGORY = "all";
  * - getGalleries로 페이지네이션·카테고리 필터 적용 후 반환
  */
 export async function galleryLoader({ request }: Route.LoaderArgs) {
-  const [client] = makeServerClient(request);
+  const [client, headers] = makeServerClient(request);
   await requireAuthentication(client);
 
   // 추가 접근 제어: gallery_access 허용 유저(또는 관리자)만 갤러리 열람 가능
   const {
     data: { user },
   } = await client.auth.getUser();
+  const userId = user?.id ?? null;
 
   const { data: profile, error: profileError } = user
     ? await client
@@ -47,18 +50,23 @@ export async function galleryLoader({ request }: Route.LoaderArgs) {
 
   // 프로필 조회 실패 또는 접근 불가 시: 목록 쿼리를 실행하지 않고 화면에서 안내 문구 처리
   if (profileError || !hasGalleryAccess) {
-    return {
+    return data(
+      {
       hasGalleryAccess: false,
       category,
       search: search || null,
       galleries: [],
+      likedGalleries: [],
+      savedGalleries: [],
       pagination: {
         currentPage: 1,
         totalPages: 0,
         totalCount: 0,
         pageSize: DEFAULT_PAGE_SIZE,
       },
-    };
+      },
+      { headers },
+    );
   }
 
   const result = await getGalleries(client, {
@@ -68,16 +76,48 @@ export async function galleryLoader({ request }: Route.LoaderArgs) {
     pageSize: DEFAULT_PAGE_SIZE,
   });
 
-  return {
+  // 목록 카드에서 좋아요/저장 아이콘 상태를 즉시 표시하기 위해
+  // 현재 페이지의 갤러리 id들에 대해 유저 상태를 함께 조회
+  const galleryIds = result.galleries.map((g) => g.id);
+  const [likedRows, savedRows] = await Promise.all([
+    userId && galleryIds.length > 0
+      ? client
+          .from("gallery_likes")
+          .select("gallery_id")
+          .eq("user_id", userId)
+          .in("gallery_id", galleryIds)
+      : Promise.resolve({ data: [], error: null }),
+    userId && galleryIds.length > 0
+      ? client
+          .from("gallery_saves")
+          .select("gallery_id")
+          .eq("user_id", userId)
+          .in("gallery_id", galleryIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const likedGalleries = (likedRows.data ?? [])
+    .map((r: { gallery_id?: string }) => r.gallery_id)
+    .filter((id): id is string => typeof id === "string");
+  const savedGalleries = (savedRows.data ?? [])
+    .map((r: { gallery_id?: string }) => r.gallery_id)
+    .filter((id): id is string => typeof id === "string");
+
+  return data(
+    {
     hasGalleryAccess: true,
     category,
     search: search || null,
     galleries: result.galleries,
+    likedGalleries,
+    savedGalleries,
     pagination: {
       currentPage: result.currentPage,
       totalPages: result.totalPages,
       totalCount: result.totalCount,
       pageSize: result.pageSize,
     },
-  };
+    },
+    { headers },
+  );
 }
