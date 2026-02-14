@@ -39,6 +39,18 @@ export async function profileLoader({ request, params }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const category = url.searchParams.get("category") ?? "class";
 
+  // 프로필 집계: 저장한 클래스/갤러리 수, 이번주 학습 수 (RPC 1회 호출)
+  const { data: statsRows, error: statsError } = await client.rpc(
+    "get_profile_stats",
+  );
+  if (statsError) {
+    throw statsError;
+  }
+  const stats = Array.isArray(statsRows) ? statsRows[0] : statsRows;
+  const savedClassCount = Number(stats?.saved_class_count ?? 0);
+  const savedGalleryCount = Number(stats?.saved_gallery_count ?? 0);
+  const weeklyLearningCount = Number(stats?.weekly_learning_count ?? 0);
+
   // TODO: 나중에 Supabase 연동 시 여기서 실제 저장된 데이터 가져오기
   // const { data: savedLectures } = await client
   //   .from("saved_lectures")
@@ -47,5 +59,13 @@ export async function profileLoader({ request, params }: Route.LoaderArgs) {
   //   .eq("type", category);
   const savedLectures = getLecturesByCategory(null); // 임시 데이터
 
-  return { profile, email: user.email, category, savedLectures };
+  return {
+    profile,
+    email: user.email,
+    category,
+    savedLectures,
+    savedClassCount,
+    savedGalleryCount,
+    weeklyLearningCount,
+  };
 }

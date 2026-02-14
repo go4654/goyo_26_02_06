@@ -766,6 +766,14 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_profile_stats: {
+        Args: never
+        Returns: {
+          saved_class_count: number
+          saved_gallery_count: number
+          weekly_learning_count: number
+        }[]
+      }
       get_user_role: { Args: { user_id: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
     }

@@ -23,7 +23,13 @@ export const loader = profileLoader;
 export const action = profileAction;
 
 export default function Profile({ loaderData }: Route.ComponentProps) {
-  const { category, savedLectures } = loaderData;
+  const {
+    category,
+    savedLectures,
+    savedClassCount,
+    savedGalleryCount,
+    weeklyLearningCount,
+  } = loaderData;
   const activeCategory = category ?? "class";
 
   return (
@@ -98,19 +104,21 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
           <ul className="grid grid-cols-3 gap-3 xl:gap-5">
             <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-10">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
-                최근 열람한 기록
+                저장한 클래스
               </p>
               <div className="text-small-title xl:text-h4">
-                340 <span className="text-text-2/80 text-sm">개</span>
+                {savedClassCount}{" "}
+                <span className="text-text-2/80 text-sm">개</span>
               </div>
             </li>
 
             <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-10">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
-                저장한 기록
+                저장한 갤러리
               </p>
               <div className="text-small-title xl:text-h4">
-                340 <span className="text-text-2/80 text-sm">개</span>
+                {savedGalleryCount}{" "}
+                <span className="text-text-2/80 text-sm">개</span>
               </div>
             </li>
 
@@ -119,7 +127,8 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
                 이번주 학습
               </p>
               <div className="text-small-title xl:text-h4">
-                340 <span className="text-text-2/80 text-sm">개</span>
+                {weeklyLearningCount}{" "}
+                <span className="text-text-2/80 text-sm">개</span>
               </div>
             </li>
           </ul>
