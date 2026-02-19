@@ -96,10 +96,12 @@ export default function GalleryList({
   );
 }
 
-interface GalleryCardProps {
+export interface GalleryCardProps {
   item: GalleryListItem;
   initialLiked: boolean;
   initialSaved: boolean;
+  /** 좋아요/저장 버튼 표시 여부 (프로필 저장 목록에서는 false) */
+  showActions?: boolean;
 }
 
 /**
@@ -108,7 +110,12 @@ interface GalleryCardProps {
  * - 카드 전체 클릭: 상세로 이동
  * - 좋아요/저장 클릭: 페이지 이동 막고(fetcher), 낙관적 업데이트로 즉시 반영
  */
-function GalleryCard({ item, initialLiked, initialSaved }: GalleryCardProps) {
+export function GalleryCard({
+  item,
+  initialLiked,
+  initialSaved,
+  showActions = true,
+}: GalleryCardProps) {
   const likeFetcher = useFetcher();
   const saveFetcher = useFetcher();
 
@@ -192,44 +199,46 @@ function GalleryCard({ item, initialLiked, initialSaved }: GalleryCardProps) {
 
   return (
     <Link to={`/gallery/${item.slug}`} key={item.id}>
-            <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[500px] lg:h-[500px]">
-              <img
-                src={item.thumbnail_image_url ?? ""}
-                alt={item.title}
-                className="h-full w-full object-cover"
+      <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[500px] lg:h-[500px]">
+        <img
+          src={item.thumbnail_image_url ?? ""}
+          alt={item.title}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      <div className="flex items-center justify-between xl:mt-4">
+        <h3 className="text-small xl:text-small-title line-clamp-1 font-[600]">
+          {item.title}
+        </h3>
+
+        {showActions && (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleLikeClick}
+              className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
+            >
+              <Heart
+                className={`size-4 md:size-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
               />
-            </div>
+              <span className="text-sm md:text-base">{likeCount}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveClick}
+              className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
+            >
+              <Bookmark
+                className={`size-4 md:size-5 ${isSaved ? "fill-success text-success" : ""}`}
+              />
+              <span className="text-sm md:text-base">{saveCount}</span>
+            </button>
+          </div>
+        )}
+      </div>
 
-            <div className="mt-2 mb-2 flex items-center justify-between xl:mt-4">
-              <h3 className="text-small md:text-small-title line-clamp-1">
-                {item.title}
-              </h3>
-
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleLikeClick}
-                  className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
-                >
-                  <Heart
-                    className={`size-4 md:size-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
-                  />
-                  <span className="text-sm md:text-base">{likeCount}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveClick}
-                  className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
-                >
-                  <Bookmark
-                    className={`size-4 md:size-5 ${isSaved ? "fill-success text-success" : ""}`}
-                  />
-                  <span className="text-sm md:text-base">{saveCount}</span>
-                </button>
-              </div>
-            </div>
-
-            <Tags tags={item.tags} borderColor="primary" />
-          </Link>
+      <Tags tags={item.tags} borderColor="primary" />
+    </Link>
   );
 }

@@ -43,6 +43,7 @@ export default [
       route("/password", "features/users/api/change-password.tsx"),
       route("/email", "features/users/api/change-email.tsx"),
       route("/profile", "features/users/api/edit-profile.tsx"),
+      route("/saved-items", "features/users/api/saved-items.tsx"),
       route("/providers", "features/users/api/connect-provider.tsx"),
       route(
         "/providers/:provider",

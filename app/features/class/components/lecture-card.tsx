@@ -11,6 +11,8 @@ interface LectureCardProps {
   to?: string;
   initialLiked?: boolean;
   initialSaved?: boolean;
+  /** 좋아요/저장 버튼 표시 여부 (프로필 저장 목록에서는 false) */
+  showActions?: boolean;
 }
 
 export default function LectureCard({
@@ -18,6 +20,7 @@ export default function LectureCard({
   to,
   initialLiked = false,
   initialSaved = false,
+  showActions = true,
 }: LectureCardProps) {
   const linkTo = to ?? `/class/${lecture.slug}`;
   const likeFetcher = useFetcher();
@@ -111,7 +114,7 @@ export default function LectureCard({
   return (
     <Link
       to={linkTo}
-      className="group space-between flex flex-col items-start gap-2 transition-colors xl:h-[350px] xl:max-h-[350px] xl:gap-4"
+      className="group space-between flex flex-col items-start transition-colors xl:h-[350px] xl:max-h-[350px] xl:gap-4"
     >
       {/* img 영역 */}
       <div className="group relative h-full max-h-[350px] w-full overflow-hidden rounded-xl bg-gray-400 md:block md:max-h-[480px] xl:rounded-[20px]">
@@ -123,44 +126,45 @@ export default function LectureCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-300 text-gray-500/50">
-            <span className="text-sm">
-              <Image className="size-4 xl:size-6" />
+            <span className="flex h-[120px] items-center justify-center text-sm">
+              <Image className="size-6" />
             </span>
           </div>
         )}
 
-        {/* 블랙 오버레이 좋아요, 북마크 버튼*/}
-        <div className="absolute top-0 right-0 h-full w-full">
-          <div className="absolute top-3 right-3 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleLikeClick}
-              className={`cursor-pointer rounded-full p-3 transition-colors ${
-                isLiked
-                  ? "bg-primary text-white"
-                  : "hover:bg-primary bg-gray-500/30 hover:text-white"
-              }`}
-            >
-              <Heart className="size-4 xl:size-5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveClick}
-              className={`cursor-pointer rounded-full p-3 transition-colors ${
-                isSaved
-                  ? "bg-primary text-white"
-                  : "hover:bg-primary bg-gray-500/30 hover:text-white"
-              }`}
-            >
-              <Bookmark className="size-4 xl:size-5" />
-            </button>
+        {showActions && (
+          <div className="absolute top-0 right-0 h-full w-full">
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleLikeClick}
+                className={`cursor-pointer rounded-full p-3 transition-colors ${
+                  isLiked
+                    ? "bg-primary text-white"
+                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
+                }`}
+              >
+                <Heart className="size-4 xl:size-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveClick}
+                className={`cursor-pointer rounded-full p-3 transition-colors ${
+                  isSaved
+                    ? "bg-primary text-white"
+                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
+                }`}
+              >
+                <Bookmark className="size-4 xl:size-5" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 타이틀 영역 */}
       <div className="flex flex-col gap-1 xl:gap-2">
-        <h3 className="xl:text-small-title group-hover:text-primary mt-2 line-clamp-1 text-base font-medium xl:mt-0 xl:text-[20px]">
+        <h3 className="text-small xl:text-small-title group-hover:text-primary line-clamp-1 font-[600] xl:text-[20px]">
           {lecture.title}
         </h3>
 
