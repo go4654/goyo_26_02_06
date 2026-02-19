@@ -144,5 +144,6 @@ function convertToCommentData(comment: CommentWithProfile): CommentData {
     userProfileImage: comment.profile?.avatar_url || null,
     likes: comment.likes_count,
     isLiked: comment.is_liked,
+    role: comment.profile?.role,
   };
 }

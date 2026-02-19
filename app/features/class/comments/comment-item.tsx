@@ -3,6 +3,7 @@ import {
   ChevronUp,
   EllipsisVertical,
   MessageCircle,
+  Moon,
   Pencil,
   ThumbsUp,
   Trash,
@@ -17,6 +18,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "~/core/components/ui/avatar";
+import { Badge } from "~/core/components/ui/badge";
 import { Button } from "~/core/components/ui/button";
 import {
   Dialog,
@@ -50,6 +52,7 @@ export interface CommentData {
   userProfileImage: string | null;
   likes: number;
   isLiked?: boolean; // 현재 사용자가 좋아요를 눌렀는지 여부
+  role?: string; // 작성자 역할 (admin일 때 뱃지 표시)
 }
 
 interface CommentItemProps {
@@ -288,6 +291,12 @@ export function CommentItem({
           <div className="flex items-center gap-2">
             {/* 유저 이름 */}
             <span className="text-text-2 text-sm">@{comment.userName}</span>
+            {/* 관리자 뱃지 */}
+            {comment.role === "admin" && (
+              <Badge variant="default" className="text-xs">
+                <Moon className="size-3" /> <span>고요</span>
+              </Badge>
+            )}
             {/* 댓글 작성 시간 */}
             <span className="text-text-3/50 text-sm">
               {formatRelativeDate(comment.createdAt)}
