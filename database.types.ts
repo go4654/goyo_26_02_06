@@ -776,11 +776,13 @@ export type Database = {
           total_saved_galleries: number
         }[]
       }
+      get_profile_page_data: { Args: { p_user_uuid: string }; Returns: Json }
       get_profile_recent_views: {
         Args: { user_uuid: string }
         Returns: {
           category: string
           id: string
+          slug: string
           title: string
           type: string
           viewed_at: string

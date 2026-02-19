@@ -122,22 +122,14 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
 
             <li className="flex flex-col items-center gap-1">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
-                최근 학습 주제
+                이번주 학습
               </p>
               <div
                 className="text-small-title xl:text-h5 w-full max-w-[120px] truncate text-center xl:max-w-[200px]"
                 title={lastViewedClass?.title}
               >
-                {lastViewedClass ? (
-                  <Link
-                    to={`/class/${lastViewedClass.slug}`}
-                    className="block truncate hover:underline"
-                  >
-                    {lastViewedClass.title}
-                  </Link>
-                ) : (
-                  "—"
-                )}
+                {weeklyLearningCount}{" "}
+                <span className="text-text-2/80 text-sm">개</span>
               </div>
             </li>
           </ul>
@@ -146,7 +138,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
         {/* 기록 카드 */}
         <div className="flex flex-col gap-5 rounded-[20px]">
           <ul className="grid grid-cols-3 gap-3 xl:gap-5">
-            <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-10">
+            <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-14">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
                 저장한 클래스
               </p>
@@ -156,7 +148,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
               </div>
             </li>
 
-            <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-10">
+            <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-14">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
                 저장한 갤러리
               </p>
@@ -166,19 +158,30 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
               </div>
             </li>
 
-            <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-10">
+            <li className="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:px-6 xl:py-14">
               <p className="text-text-2/80 text-[10px] xl:text-sm">
-                이번주 학습
+                최근 학습 주제
               </p>
-              <div className="text-small-title xl:text-h4">
-                {weeklyLearningCount}{" "}
-                <span className="text-text-2/80 text-sm">개</span>
+              <div
+                className="text-small-title w-full min-w-0 overflow-hidden text-center text-ellipsis"
+                title={lastViewedClass?.title}
+              >
+                {lastViewedClass ? (
+                  <Link
+                    to={`/class/${lastViewedClass.slug}`}
+                    className="hover:text-primary block overflow-hidden text-ellipsis whitespace-nowrap hover:underline"
+                  >
+                    {lastViewedClass.title}
+                  </Link>
+                ) : (
+                  "—"
+                )}
               </div>
             </li>
           </ul>
 
-          {/* 학습 흐름 그래프 */}
-          <UserGraph />
+          {/* 학습 흐름 그래프 (RPC get_profile_weekly_learning 데이터) */}
+          <UserGraph data={loaderData.weeklyLearningChartData ?? []} />
         </div>
       </div>
 
