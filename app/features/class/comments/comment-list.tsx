@@ -42,7 +42,10 @@ export function CommentList({
     const prev = prevNavigationState.current;
     prevNavigationState.current = navigation.state;
 
-    if (navigation.state === "idle" && (prev === "submitting" || prev === "loading")) {
+    if (
+      navigation.state === "idle" &&
+      (prev === "submitting" || prev === "loading")
+    ) {
       setReplyingToId(null);
     }
   }, [navigation.state]);
@@ -100,7 +103,7 @@ export function CommentList({
             }
           >
             {visibleReplies.length > 0 && (
-              <div className="mt-6 space-y-6">
+              <div className="mt-2 space-y-6">
                 {visibleReplies.map((reply) => (
                   <CommentItem
                     key={reply.id}

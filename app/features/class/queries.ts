@@ -408,6 +408,146 @@ export async function getClassComments(
   })) as CommentWithProfile[];
 }
 
+/** 댓글 페이지네이션 옵션 */
+export interface GetClassCommentsPageOptions {
+  limit: number;
+  offset: number;
+  sortOrder: "latest" | "popular";
+}
+
+/** 댓글 페이지 조회 결과 */
+export interface GetClassCommentsPageResult {
+  comments: CommentWithProfile[];
+  totalTopLevel: number;
+}
+
+/**
+ * 클래스 댓글 목록 페이지 단위 조회 (최상위 댓글 기준 페이지네이션)
+ *
+ * RPC로 해당 페이지의 최상위 댓글 ID 목록과 전체 최상위 댓글 수를 조회한 뒤,
+ * 해당 최상위 댓글과 그 대댓글만 프로필/좋아요 정보와 함께 반환합니다.
+ * 정렬은 서버에서 적용되며, 100개 이상 댓글도 효율적으로 처리합니다.
+ */
+export async function getClassCommentsPage(
+  client: SupabaseClient,
+  classId: string,
+  userId: string | null | undefined,
+  options: GetClassCommentsPageOptions,
+): Promise<GetClassCommentsPageResult> {
+  const { limit, offset, sortOrder } = options;
+  const rpcClient = client as {
+    rpc: (
+      fn: string,
+      args?: Record<string, unknown>,
+    ) => ReturnType<typeof client.rpc>;
+  };
+
+  const { data: pageRows, error: rpcError } = await rpcClient.rpc(
+    "get_class_comments_page_ids",
+    {
+      p_class_id: classId,
+      p_sort_order: sortOrder,
+      p_limit: limit,
+      p_offset: offset,
+    },
+  );
+
+  if (rpcError) {
+    throw new Error(`댓글 페이지 조회 실패: ${rpcError.message}`);
+  }
+
+  const rows = Array.isArray(pageRows) ? pageRows : [];
+  const topLevelIds = rows
+    .map((r: { id?: string }) => r.id as string)
+    .filter(Boolean);
+  const totalTopLevel = Number(rows[0]?.total_top_level ?? 0);
+
+  if (topLevelIds.length === 0) {
+    return { comments: [], totalTopLevel };
+  }
+
+  // 해당 페이지의 최상위 댓글 + 그 대댓글만 조회
+  const [topResult, repliesResult] = await Promise.all([
+    client
+      .from("class_comments")
+      .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+      .eq("class_id", classId)
+      .eq("is_deleted", false)
+      .in("id", topLevelIds),
+    client
+      .from("class_comments")
+      .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+      .eq("class_id", classId)
+      .eq("is_deleted", false)
+      .in("parent_id", topLevelIds),
+  ]);
+
+  const topData = topResult.data ?? [];
+  const repliesData = repliesResult.data ?? [];
+  const idToOrder = new Map(topLevelIds.map((id, i) => [id, i]));
+
+  const merged = [...topData, ...repliesData].sort((a, b) => {
+    const aId = a.id as string;
+    const bId = b.id as string;
+    const aTop = a.parent_id == null;
+    const bTop = b.parent_id == null;
+    if (aTop && bTop) {
+      return (idToOrder.get(aId) ?? 0) - (idToOrder.get(bId) ?? 0);
+    }
+    if (aTop) return -1;
+    if (bTop) return 1;
+    return 0;
+  });
+
+  const userIds = [...new Set(merged.map((c) => c.user_id as string))];
+  const commentIds = merged.map((c) => c.id as string);
+
+  const [profilesResult, likesDataResult, userLikesResult] = await Promise.all([
+    client
+      .from("profiles")
+      .select("profile_id, name, avatar_url")
+      .in("profile_id", userIds),
+    client
+      .from("comment_likes")
+      .select("comment_id")
+      .in("comment_id", commentIds),
+    userId
+      ? getUserCommentLikes(client, commentIds, userId)
+      : Promise.resolve(new Set<string>()),
+  ]);
+
+  const profileMap = new Map(
+    (profilesResult.data || []).map((p) => [
+      p.profile_id as string,
+      {
+        profile_id: p.profile_id as string,
+        name: p.name as string,
+        avatar_url: p.avatar_url as string | null,
+      },
+    ]),
+  );
+
+  const likesCountMap = new Map<string, number>();
+  (likesDataResult.data || []).forEach((like) => {
+    const cid = like.comment_id as string;
+    likesCountMap.set(cid, (likesCountMap.get(cid) || 0) + 1);
+  });
+
+  const comments = merged.map((item) => ({
+    id: item.id as string,
+    class_id: item.class_id as string,
+    user_id: item.user_id as string,
+    parent_id: (item.parent_id as string | null) || null,
+    content: item.content as string,
+    created_at: item.created_at as string,
+    updated_at: item.updated_at as string,
+    profile: profileMap.get(item.user_id as string) || null,
+    likes_count: likesCountMap.get(item.id as string) || 0,
+    is_liked: userLikesResult.has(item.id as string),
+  })) as CommentWithProfile[];
+
+  return { comments, totalTopLevel };
+}
 
 /**
  * 사용자가 좋아요를 누른 댓글 목록 조회

@@ -261,54 +261,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
             </button>
           </div>
         </div>
-
-        {/* 이전/다음 클래스 네비게이션 */}
-        {/* {(navigation.prev || navigation.next) && (
-          <div className="mt-10 flex w-[180px] items-center justify-between xl:w-[220px]">
-            {navigation.prev ? (
-              <Link
-                to={`/class/${navigation.prev.slug}`}
-                className="group flex items-center gap-2"
-              >
-                <div className="border-text-2 flex h-[30px] w-[30px] items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
-                  <MoveLeft
-                    className="text-text-2 ml-1 size-4 transition-all duration-300 group-hover:text-white xl:size-5"
-                    strokeWidth={1}
-                  />
-                </div>
-                <span className="text-small-title text-text-2 text-sm transition-all duration-300 group-hover:text-white xl:text-base">
-                  PREV
-                </span>
-              </Link>
-            ) : (
-              <div className="w-[180px] xl:w-[220px]" />
-            )}
-
-            {navigation.next ? (
-              <Link
-                to={`/class/${navigation.next.slug}`}
-                className="group flex items-center gap-2"
-              >
-                <span className="text-small-title text-text-2 text-sm transition-all duration-300 group-hover:text-white xl:text-base">
-                  NEXT
-                </span>
-                <div className="border-text-2 flex h-[30px] w-[30px] items-center justify-start rounded-full border group-hover:border-white xl:h-[35px] xl:w-[35px]">
-                  <MoveRight
-                    className="text-text-2 ml-1 size-4 transition-all duration-300 group-hover:text-white xl:size-5"
-                    strokeWidth={1}
-                  />
-                </div>
-              </Link>
-            ) : (
-              <div />
-            )}
-          </div>
-        )} */}
       </div>
 
       <ClassComment
         classId={classData.id}
         comments={loaderData.comments}
+        totalTopLevelComments={loaderData.totalTopLevelComments}
         currentUserId={currentUserId}
         isAdmin={isAdmin}
       />

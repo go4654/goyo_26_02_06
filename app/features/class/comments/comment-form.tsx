@@ -1,10 +1,11 @@
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Form, useActionData, useNavigation } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 import { Input } from "~/core/components/ui/input";
 
-import { commentSchema, type CommentFormValues } from "./comment-item";
+import { type CommentFormValues, commentSchema } from "./comment-item";
 
 interface CommentFormProps {
   /** 클래스 ID */
@@ -88,14 +89,16 @@ export function CommentForm({ classId }: CommentFormProps) {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
                 if (newComment.trim() && !isSubmitting) {
-                  (event.currentTarget.form as HTMLFormElement)?.requestSubmit();
+                  (
+                    event.currentTarget.form as HTMLFormElement
+                  )?.requestSubmit();
                 }
               }
             }}
           />
           {isSubmitting && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <div className="size-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <div className="absolute top-1/2 right-3 -translate-y-1/2">
+              <div className="border-primary size-5 animate-spin rounded-full border-2 border-t-transparent" />
             </div>
           )}
         </div>
@@ -104,7 +107,7 @@ export function CommentForm({ classId }: CommentFormProps) {
           disabled={!newComment.trim() || isSubmitting}
           className="h-[50px] px-6"
         >
-          {isSubmitting ? "등록 중..." : "등록"}
+          {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "등록"}
         </Button>
       </div>
       {newCommentError && (

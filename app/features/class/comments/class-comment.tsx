@@ -1,16 +1,35 @@
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 
 import { Badge } from "~/core/components/ui/badge";
+import { Button } from "~/core/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/core/components/ui/dropdown-menu";
 
+import { COMMENTS_PAGE_SIZE } from "../constants/comment.constants";
 import { type CommentWithProfile } from "../queries";
 import { CommentForm } from "./comment-form";
 import { CommentList } from "./comment-list";
+import { COMMENT_SORT_LABELS, type CommentSortOrder } from "./comment-sort";
+
+/** 댓글 더보기 API 응답 */
+interface CommentsPageResponse {
+  comments: CommentWithProfile[];
+  totalTopLevel: number;
+}
 
 interface ClassCommentProps {
   /** 클래스 ID */
   classId: string;
-  /** 댓글 목록 */
+  /** 초기 댓글 목록 (로더 첫 페이지) */
   comments: CommentWithProfile[];
+  /** 전체 최상위 댓글 수 (페이지네이션용) */
+  totalTopLevelComments: number;
   /** 현재 사용자 ID (권한 확인용) */
   currentUserId?: string | null;
   /** 관리자 여부 */
@@ -20,46 +39,129 @@ interface ClassCommentProps {
 /**
  * 클래스 댓글 컴포넌트
  *
- * 댓글 작성, 조회, 수정, 삭제 기능을 제공합니다.
- * 실제 데이터베이스의 댓글 데이터를 표시합니다.
+ * 댓글 작성, 조회, 수정, 삭제, 최신순/인기순 정렬, 더보기 페이지네이션을 제공합니다.
+ * 최상위 댓글 기준으로 10개씩 로드하며, 대댓글은 각 부모와 함께 유지됩니다.
  */
 export default function ClassComment({
   classId,
-  comments,
+  comments: initialComments,
+  totalTopLevelComments: initialTotal,
   currentUserId,
   isAdmin = false,
 }: ClassCommentProps) {
-  // 최상위 댓글만 필터링 (대댓글 제외)
-  const topLevelComments = comments.filter(
-    (comment) => comment.parent_id === null,
-  );
+  const [sortOrder, setSortOrder] = useState<CommentSortOrder>("latest");
+  const [accumulatedComments, setAccumulatedComments] =
+    useState<CommentWithProfile[]>(initialComments);
+  const [totalTopLevel, setTotalTopLevel] = useState(initialTotal);
+  const replaceOnNextData = useRef(false);
+
+  const fetcher = useFetcher<CommentsPageResponse>();
+
+  // 로더 리밸리데이션 시 초기 상태로 동기화
+  useEffect(() => {
+    setAccumulatedComments(initialComments);
+    setTotalTopLevel(initialTotal);
+  }, [initialComments, initialTotal]);
+
+  // 더보기/정렬 API 응답 처리
+  useEffect(() => {
+    const data = fetcher.data;
+    if (!data) return;
+
+    if (replaceOnNextData.current) {
+      setAccumulatedComments(data.comments);
+      replaceOnNextData.current = false;
+    } else {
+      setAccumulatedComments((prev) => [...prev, ...data.comments]);
+    }
+    setTotalTopLevel(data.totalTopLevel);
+  }, [fetcher.data]);
+
+  const loadedTopCount = accumulatedComments.filter(
+    (c) => c.parent_id === null,
+  ).length;
+  const hasMore = loadedTopCount < totalTopLevel;
+
+  const handleSortChange = (newOrder: CommentSortOrder) => {
+    if (newOrder === sortOrder) return;
+    setSortOrder(newOrder);
+    replaceOnNextData.current = true;
+    fetcher.load(
+      `/api/class/comments?classId=${classId}&offset=0&limit=${COMMENTS_PAGE_SIZE}&sortOrder=${newOrder}`,
+    );
+  };
+
+  const handleLoadMore = () => {
+    replaceOnNextData.current = false;
+    fetcher.load(
+      `/api/class/comments?classId=${classId}&offset=${loadedTopCount}&limit=${COMMENTS_PAGE_SIZE}&sortOrder=${sortOrder}`,
+    );
+  };
 
   return (
     <>
-      {/* 댓글 */}
       <div className="mt-26">
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h2 className="xl:text-h6">댓글</h2>
-            <Badge className="mt-1">{topLevelComments.length}</Badge>
+            <Badge className="mt-1">{totalTopLevel}</Badge>
           </div>
 
-          <div className="text-text-3 flex cursor-pointer items-center gap-2 text-base">
-            <span className="text-sm xl:text-base">최신순</span>{" "}
-            <ArrowUpDown className="size-4 xl:size-5" />
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="text-text-3 flex cursor-pointer items-center gap-2 text-base"
+              >
+                <span className="text-sm xl:text-base">
+                  {COMMENT_SORT_LABELS[sortOrder]}
+                </span>
+                <ArrowUpDown className="size-4 xl:size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => handleSortChange("latest")}
+                className="cursor-pointer"
+              >
+                {COMMENT_SORT_LABELS.latest}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleSortChange("popular")}
+                className="cursor-pointer"
+              >
+                {COMMENT_SORT_LABELS.popular}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {/* 댓글 작성 폼 */}
         <CommentForm classId={classId} />
 
-        {/* 댓글 목록 */}
         <CommentList
-          comments={comments}
+          comments={accumulatedComments}
           classId={classId}
           currentUserId={currentUserId}
           isAdmin={isAdmin}
         />
+
+        {hasMore && (
+          <div className="mt-10 flex justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleLoadMore}
+              disabled={fetcher.state !== "idle"}
+              className="border-primary text-primary hover:bg-primary/10 cursor-pointer"
+            >
+              {fetcher.state === "loading" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "댓글 더보기"
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

@@ -114,10 +114,10 @@ export default function LectureCard({
   return (
     <Link
       to={linkTo}
-      className="group space-between flex flex-col items-start transition-colors xl:h-[350px] xl:max-h-[350px] xl:gap-4"
+      className="group space-between flex flex-col items-start transition-colors xl:gap-4"
     >
       {/* img 영역 */}
-      <div className="group relative h-full max-h-[350px] w-full overflow-hidden rounded-xl bg-gray-400 md:block md:max-h-[480px] xl:rounded-[20px]">
+      <div className="group relative h-full max-h-[200px] min-h-[200px] w-full overflow-hidden rounded-xl bg-gray-400 xl:block xl:max-h-[250px] xl:min-h-[250px] xl:rounded-[20px]">
         {lecture.imageUrl ? (
           <img
             src={lecture.imageUrl}
@@ -126,36 +126,37 @@ export default function LectureCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-300 text-gray-500/50">
-            <span className="flex h-[120px] items-center justify-center text-sm">
+            <span className="flex h-full items-center justify-center text-sm">
               <Image className="size-6" />
             </span>
           </div>
         )}
 
+        {/* 좋아요, 저장 버튼 */}
         {showActions && (
           <div className="absolute top-0 right-0 h-full w-full">
-            <div className="absolute top-3 right-3 flex items-center gap-2">
+            <div className="absolute top-2 right-2 flex items-center gap-2 xl:top-3 xl:right-3">
               <button
                 type="button"
                 onClick={handleLikeClick}
-                className={`cursor-pointer rounded-full p-3 transition-colors ${
+                className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isLiked
                     ? "bg-primary text-white"
                     : "hover:bg-primary bg-gray-500/30 hover:text-white"
                 }`}
               >
-                <Heart className="size-4 xl:size-5" />
+                <Heart className="size-3.5 xl:size-5" />
               </button>
               <button
                 type="button"
                 onClick={handleSaveClick}
-                className={`cursor-pointer rounded-full p-3 transition-colors ${
+                className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isSaved
                     ? "bg-primary text-white"
                     : "hover:bg-primary bg-gray-500/30 hover:text-white"
                 }`}
               >
-                <Bookmark className="size-4 xl:size-5" />
+                <Bookmark className="size-3.5 xl:size-5" />
               </button>
             </div>
           </div>

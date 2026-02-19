@@ -25,7 +25,8 @@ export default function Category({ category }: { category: string | null }) {
           key={categoryGroup.id}
           className="flex flex-col items-start border-t border-b py-4 xl:flex-row xl:items-center xl:py-8"
         >
-          <h3 className="xl:text-h5 mb-4 text-base font-medium xl:mb-0 xl:w-[300px]">
+          {/* 카테고리 타이틀 */}
+          <h3 className="xl:text-h6 mb-4 text-sm font-[300] xl:mb-0 xl:w-[300px]">
             {categoryGroup.name}
           </h3>
 
@@ -39,7 +40,7 @@ export default function Category({ category }: { category: string | null }) {
                   <Link
                     to={`/class?category=${categoryValue}`}
                     className={`transition-colors ${
-                      isActive ? "text-text-1 font-medium" : "hover:text-text-1"
+                      isActive ? "font-bold text-white" : "xl:hover:text-white"
                     }`}
                   >
                     {skill.name}

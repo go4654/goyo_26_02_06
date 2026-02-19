@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Form, useNavigation } from "react-router";
 
@@ -19,10 +20,7 @@ interface ReplyFormProps {
  * 특정 댓글에 대한 대댓글을 작성하는 폼입니다.
  * 서버 액션을 통해 실제 데이터베이스에 저장됩니다.
  */
-export function ReplyForm({
-  parentId,
-  classId,
-}: ReplyFormProps) {
+export function ReplyForm({ parentId, classId }: ReplyFormProps) {
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -50,7 +48,7 @@ export function ReplyForm({
     <Form
       method="post"
       onSubmit={handleSubmit}
-      className="mt-4 flex flex-col gap-2"
+      className="mt-2 flex flex-col gap-2"
     >
       {/* 액션 타입 */}
       <input type="hidden" name="action" value="create" />
@@ -80,8 +78,12 @@ export function ReplyForm({
         </p>
       )}
       <div className="flex justify-end">
-        <Button type="submit" size="sm" disabled={!value.trim() || isSubmitting}>
-          {isSubmitting ? "등록 중..." : "등록"}
+        <Button
+          type="submit"
+          size="sm"
+          disabled={!value.trim() || isSubmitting}
+        >
+          {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "등록"}
         </Button>
       </div>
     </Form>

@@ -6,9 +6,10 @@ import rehypePrettyCode from "rehype-pretty-code";
 import { getUserRole, requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
+import { COMMENTS_PAGE_SIZE } from "../constants/comment.constants";
 import {
   getClassBySlug,
-  getClassComments,
+  getClassCommentsPage,
   getClassNavigation,
   getUserClassStatus,
   incrementClassView,
@@ -53,7 +54,7 @@ export async function classDetailLoader({
     countsResult,
     userStatus,
     navigation,
-    comments,
+    commentsPage,
   ] = await Promise.all([
     // 좋아요/저장 카운트는 denormalized 컬럼에만 의존하지 않고 실제 레코드 수로 계산
     Promise.all([
@@ -75,8 +76,12 @@ export async function classDetailLoader({
     getUserClassStatus(client, classDetail.id, userId),
     // 이전/다음 클래스 조회
     getClassNavigation(client, slug, classDetail.category),
-    // 댓글 목록 조회
-    getClassComments(client, classDetail.id, userId),
+    // 댓글 목록 첫 페이지 조회 (최상위 댓글 기준)
+    getClassCommentsPage(client, classDetail.id, userId, {
+      limit: COMMENTS_PAGE_SIZE,
+      offset: 0,
+      sortOrder: "latest",
+    }),
   ]);
 
   // 조회수 증가 (트리거에 의해 자동으로 view_count 증가)
@@ -110,7 +115,8 @@ export async function classDetailLoader({
     class: classDetailWithCounts,
     code,
     navigation,
-    comments,
+    comments: commentsPage.comments,
+    totalTopLevelComments: commentsPage.totalTopLevel,
     currentUserId: userId,
     isAdmin,
     isLiked: userStatus.isLiked,

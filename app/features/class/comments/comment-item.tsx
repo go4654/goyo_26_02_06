@@ -1,5 +1,6 @@
 import {
   ChevronDown,
+  ChevronUp,
   EllipsisVertical,
   MessageCircle,
   Pencil,
@@ -7,7 +8,7 @@ import {
   Trash,
 } from "lucide-react";
 import { DateTime } from "luxon";
-import { useEffect, type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
 import { z } from "zod";
 
@@ -80,25 +81,27 @@ export type CommentFormValues = z.infer<typeof commentSchema>;
 /**
  * ISO 날짜를 한국 시간으로 변환하여 상대 시간 표시
  * Luxon을 사용하여 한국 시간대(Asia/Seoul)로 변환
- * 
+ *
  * DB에서 가져온 시간은 UTC일 수 있으므로, UTC로 파싱한 후 한국 시간대로 변환합니다.
  */
 function formatRelativeDate(isoDate: string) {
   // UTC로 파싱한 후 한국 시간대로 변환 (DB 시간이 UTC로 저장되어 있을 수 있음)
   let date = DateTime.fromISO(isoDate, { zone: "utc" });
-  
+
   // UTC 파싱 실패 시 기본 파싱 시도
   if (!date.isValid) {
     date = DateTime.fromISO(isoDate);
   }
-  
+
   // 한국 시간대로 변환
   date = date.setZone("Asia/Seoul");
-  
+
   if (!date.isValid) return isoDate;
 
   const now = DateTime.now().setZone("Asia/Seoul");
-  const diff = now.diff(date, ["days", "hours", "minutes", "seconds"]).toObject();
+  const diff = now
+    .diff(date, ["days", "hours", "minutes", "seconds"])
+    .toObject();
 
   const days = diff.days ?? 0;
   const hours = diff.hours ?? 0;
@@ -257,7 +260,7 @@ export function CommentItem({
       {/* 아바타 */}
       <Avatar className={avatarSizeClass}>
         <AvatarImage src={comment.userProfileImage ?? undefined} />
-        <AvatarFallback className="text-sm">
+        <AvatarFallback className="text-xs xl:text-sm">
           {comment.userName.slice(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
@@ -279,38 +282,38 @@ export function CommentItem({
           {/* 본인 댓글이거나 관리자일 때 수정/삭제 메뉴 표시 */}
           {canModify && (
             <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="text-text-2 cursor-pointer">
-                <EllipsisVertical size={16} />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-2">
-              {/* 본인 댓글만 수정 가능 */}
-              {isOwnComment && (
+              <DropdownMenuTrigger asChild>
+                <div className="text-text-2 cursor-pointer">
+                  <EllipsisVertical size={16} />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="p-2">
+                {/* 본인 댓글만 수정 가능 */}
+                {isOwnComment && (
+                  <DropdownMenuItem
+                    className="mb-2 flex cursor-pointer items-center gap-2"
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleEditClick();
+                    }}
+                  >
+                    <Pencil className="text-text-2 size-4" /> <span> 수정</span>
+                  </DropdownMenuItem>
+                )}
+
+                {/* 본인 댓글 또는 관리자는 삭제 가능 */}
                 <DropdownMenuItem
-                  className="mb-2 flex cursor-pointer items-center gap-2"
+                  className="flex cursor-pointer items-center gap-2"
                   onSelect={(event) => {
                     event.preventDefault();
-                    handleEditClick();
+                    setIsDeleteOpen(true);
                   }}
                 >
-                  <Pencil className="text-text-2 size-4" /> <span> 수정</span>
+                  <Trash className="text-text-2 size-4" />{" "}
+                  <span className="text-text-2"> 삭제</span>
                 </DropdownMenuItem>
-              )}
-
-              {/* 본인 댓글 또는 관리자는 삭제 가능 */}
-              <DropdownMenuItem
-                className="flex cursor-pointer items-center gap-2"
-                onSelect={(event) => {
-                  event.preventDefault();
-                  setIsDeleteOpen(true);
-                }}
-              >
-                <Trash className="text-text-2 size-4" />{" "}
-                <span className="text-text-2"> 삭제</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
 
@@ -348,27 +351,30 @@ export function CommentItem({
             {/* 댓글 내용 */}
             <p className="text-base whitespace-pre-line">{value}</p>
             {/* 좋아요, 댓글 달기, 답글 더보기 버튼 */}
-            <div className="mt-4 flex items-center gap-6">
+            <div className="mt-2 flex items-center gap-6">
               <button
                 type="button"
                 className={`flex cursor-pointer items-center gap-1 ${
-                  liked ? "text-primary" : "text-text-2"
+                  liked ? "text-white" : "text-text-2"
                 }`}
                 onClick={handleLikeClick}
               >
-                <ThumbsUp size={16} />
-                <span>{likeCount}</span>
+                <ThumbsUp
+                  className="size-3 xl:size-4"
+                  fill={liked ? "currentColor" : "none"}
+                />
+                <span className="text-sm xl:text-base">{likeCount}</span>
               </button>
 
               {!isReply && (
                 <div className="flex items-center gap-4">
                   <button
                     type="button"
-                    className="text-text-2 flex cursor-pointer items-center gap-1"
+                    className="text-text-2 flex cursor-pointer items-center gap-1 text-sm xl:text-base"
                     onClick={onReplyClick}
                   >
-                    <MessageCircle size={16} />
-                    <span>답글</span>
+                    <MessageCircle className="size-3 xl:size-4" />
+                    <span className="text-sm xl:text-base">답글</span>
                   </button>
                 </div>
               )}
@@ -379,13 +385,15 @@ export function CommentItem({
               {replyCount !== undefined && replyCount > 1 && (
                 <button
                   type="button"
-                  className="text-text-2 text-sm underline-offset-2 hover:underline"
+                  className="text-text-2 text-sm underline-offset-2 hover:underline xl:text-base"
                   onClick={onToggleReplies}
                 >
                   {isRepliesExpanded ? (
-                    "답글 숨기기"
+                    <div className="flex items-center gap-1 text-sm xl:text-base">
+                      답글 숨기기 <ChevronUp size={16} />
+                    </div>
                   ) : (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-sm xl:text-base">
                       답글 {replyCount}개 보기 <ChevronDown size={16} />
                     </div>
                   )}

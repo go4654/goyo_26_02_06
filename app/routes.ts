@@ -50,6 +50,9 @@ export default [
         "features/users/api/disconnect-provider.tsx",
       ),
     ]),
+    ...prefix("/class", [
+      route("/comments", "features/class/api/comments-page.tsx"),
+    ]),
     ...prefix("/admin", [
       route("/users", "features/admin/api/manage-users.tsx"),
     ]),

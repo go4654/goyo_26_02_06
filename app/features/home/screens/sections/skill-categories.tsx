@@ -25,9 +25,11 @@ export default function SkillCategories() {
             </div>
 
             <div className="flex flex-col gap-1 xl:gap-2">
+              {/* 타이틀 */}
               <h3 className="text-small-title xl:text-h4">{data.name}</h3>
 
-              <div className="flex flex-wrap items-center gap-2">
+              {/* 태그 */}
+              <div className="mt-1 flex flex-wrap items-center gap-2 xl:mt-2">
                 {data.skills.map((skill) => (
                   <div
                     className="border-text-3 text-text-3 rounded-full border px-2 py-1 text-xs"
