@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import AdminContentForm, {
   type ContentFormData,
+  type SubCategory,
 } from "../../components/admin-content-form";
 import { classDetailLoader } from "./server/classes-detail.loader";
 import { classesAction } from "./server/classes.action";
@@ -31,7 +32,10 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
    * 폼 제출 핸들러
    * 수정된 클래스 데이터를 처리합니다.
    */
-  const handleSubmit = async (data: ContentFormData) => {
+  const handleSubmit = async (
+    data: ContentFormData,
+    thumbnailFile: File | null,
+  ) => {
     // TODO: Supabase 연동하여 실제 수정 처리
     console.log("클래스 수정 데이터:", {
       id: classData.id,
@@ -43,6 +47,7 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
         .filter(Boolean),
       content: data.content,
       isVisible: data.isVisible,
+      thumbnailFile: thumbnailFile ? thumbnailFile.name : "없음",
     });
 
     // 임시: 성공 메시지 표시 후 목록으로 이동
@@ -65,6 +70,7 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
   const initialFormData: ContentFormData = {
     title: classData.title,
     description: classData.description ?? "",
+    category: classData.category as SubCategory,
     tags: classData.tags.join(", "), // 배열을 쉼표로 구분된 문자열로 변환
     content: classData.content,
     isVisible: classData.isVisible,
@@ -87,6 +93,7 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           submitLabel="수정 완료"
+          classId={classData.id}
         />
       </div>
     </div>

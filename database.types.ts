@@ -67,6 +67,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "class_comments_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       class_likes: {
@@ -103,6 +110,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "class_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       class_saves: {
@@ -137,6 +151,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "class_saves_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["profile_id"]
           },
         ]
@@ -214,6 +235,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "class_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       classes: {
@@ -285,6 +313,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "classes_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       comment_likes: {
@@ -319,6 +354,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "comment_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["profile_id"]
           },
         ]
@@ -386,6 +428,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "galleries_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       gallery_likes: {
@@ -422,6 +471,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "gallery_likes_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       gallery_saves: {
@@ -456,6 +512,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "gallery_saves_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["profile_id"]
           },
         ]
@@ -530,6 +593,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "gallery_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       news: {
@@ -583,6 +653,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["profile_id"]
           },
+          {
+            foreignKeyName: "news_author_id_profiles_profile_id_fk"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
         ]
       }
       news_view_events: {
@@ -620,6 +697,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "news_view_events_user_id_profiles_profile_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["profile_id"]
           },
         ]
@@ -743,7 +827,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          name: string | null
+          profile_id: string | null
+          role: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          name?: string | null
+          profile_id?: string | null
+          role?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          name?: string | null
+          profile_id?: string | null
+          role?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_delete_class_comment: {
@@ -751,6 +855,18 @@ export type Database = {
         Returns: boolean
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_class_comments_page_ids: {
+        Args: {
+          p_class_id: string
+          p_limit?: number
+          p_offset?: number
+          p_sort_order?: string
+        }
+        Returns: {
+          id: string
+          total_top_level: number
+        }[]
+      }
       get_classes_with_tags_and_user_status: {
         Args: {
           p_category?: string
@@ -801,6 +917,36 @@ export type Database = {
         Returns: {
           date: string
           view_count: number
+        }[]
+      }
+      get_saved_classes: {
+        Args: {
+          p_page_limit?: number
+          p_page_offset?: number
+          p_user_uuid: string
+        }
+        Returns: {
+          category: string
+          id: string
+          saved_at: string
+          slug: string
+          thumbnail_image_url: string
+          title: string
+        }[]
+      }
+      get_saved_galleries: {
+        Args: {
+          p_page_limit?: number
+          p_page_offset?: number
+          p_user_uuid: string
+        }
+        Returns: {
+          category: string
+          id: string
+          saved_at: string
+          slug: string
+          thumbnail_image_url: string
+          title: string
         }[]
       }
       get_user_role: { Args: { user_id: string }; Returns: string }

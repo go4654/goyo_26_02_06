@@ -6,9 +6,78 @@ import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/core/components/ui/select";
 import { Textarea } from "~/core/components/ui/textarea";
 
 import MDXEditor from "./mdx-editor";
+import type { PendingImage } from "./mdx-editor";
+
+/**
+ * 대분류 카테고리 타입
+ */
+export type MainCategory = "design" | "publishing" | "development";
+
+/**
+ * 소분류 카테고리 타입
+ */
+export type SubCategory =
+  | "figma"
+  | "uxui"
+  | "photoshop"
+  | "illustrator"
+  | "html"
+  | "css"
+  | "jquery"
+  | "javascript"
+  | "react"
+  | "git"
+  | "typescript";
+
+/**
+ * 대분류별 소분류 매핑
+ */
+export const CATEGORY_SUBCATEGORIES: Record<MainCategory, SubCategory[]> = {
+  design: ["figma", "uxui", "photoshop", "illustrator"],
+  publishing: ["html", "css", "jquery", "javascript"],
+  development: ["react", "git", "typescript"],
+};
+
+/**
+ * 소분류 표시 이름 매핑
+ */
+export const SUBCATEGORY_LABELS: Record<SubCategory, string> = {
+  figma: "Figma",
+  uxui: "UX UI",
+  photoshop: "Photoshop",
+  illustrator: "Illustrator",
+  html: "HTML",
+  css: "CSS",
+  jquery: "jQuery",
+  javascript: "JavaScript",
+  react: "React",
+  git: "Git",
+  typescript: "TypeScript",
+};
+
+/**
+ * 소분류에서 대분류 찾기
+ */
+export function getMainCategoryFromSub(
+  subCategory: SubCategory,
+): MainCategory | null {
+  for (const [main, subs] of Object.entries(CATEGORY_SUBCATEGORIES)) {
+    if (subs.includes(subCategory)) {
+      return main as MainCategory;
+    }
+  }
+  return null;
+}
 
 /**
  * 콘텐츠 폼 데이터 타입
@@ -16,6 +85,7 @@ import MDXEditor from "./mdx-editor";
 export interface ContentFormData {
   title: string;
   description: string;
+  category: SubCategory; // 소분류 카테고리 (실제 DB에 저장되는 값)
   tags: string; // 쉼표로 구분된 태그 문자열 (예: "design, uxui")
   content: string; // MDX 코드
   isVisible: boolean; // 공개 여부
@@ -39,7 +109,10 @@ interface AdminContentFormProps {
   /** 초기 폼 데이터 */
   initialData?: Partial<ContentFormData>;
   /** 폼 제출 콜백 */
-  onSubmit: (data: ContentFormData) => void | Promise<void>;
+  onSubmit: (
+    data: ContentFormData,
+    thumbnailFile: File | null,
+  ) => void | Promise<void>;
   /** 취소 버튼 클릭 콜백 */
   onCancel?: () => void;
   /** 제출 버튼 텍스트 */
@@ -48,7 +121,16 @@ interface AdminContentFormProps {
   cancelLabel?: string;
   /** 로딩 상태 */
   isLoading?: boolean;
+  /** 클래스 ID (MDX 이미지 업로드용, 선택적) */
+  classId?: string | null;
+  /** 임시 이미지 파일들 변경 콜백 (클래스 생성 전 이미지용) */
+  onPendingImagesChange?: (updater: (prev: PendingImage[]) => PendingImage[]) => void;
 }
+
+/**
+ * 임시 이미지 정보 타입 재export
+ */
+export type { PendingImage } from "./mdx-editor";
 
 /**
  * AdminContentForm - 재사용 가능한 콘텐츠 등록 폼
@@ -77,10 +159,21 @@ export default function AdminContentForm({
   submitLabel = "등록",
   cancelLabel = "취소",
   isLoading = false,
+  classId = null,
+  onPendingImagesChange,
 }: AdminContentFormProps) {
+  // 초기 카테고리 설정
+  const initialCategory = initialData.category || "figma";
+  const initialMainCategory =
+    getMainCategoryFromSub(initialCategory as SubCategory) || "design";
+
+  const [mainCategory, setMainCategory] = useState<MainCategory>(
+    initialMainCategory,
+  );
   const [formData, setFormData] = useState<ContentFormData>({
     title: initialData.title || "",
     description: initialData.description || "",
+    category: (initialCategory as SubCategory) || "figma", // 기본값: figma
     tags: initialData.tags || "",
     content: initialData.content || "",
     isVisible: initialData.isVisible ?? true, // 기본값: 공개
@@ -121,7 +214,7 @@ export default function AdminContentForm({
     }
 
     setErrors({});
-    await onSubmit(formData);
+    await onSubmit(formData, thumbnailFile);
   };
 
   const updateField = <K extends keyof ContentFormData>(
@@ -270,6 +363,75 @@ export default function AdminContentForm({
         </div>
       </div>
 
+      {/* 카테고리 선택 */}
+      <div className="space-y-2">
+        <Label>
+          카테고리 <span className="text-destructive">*</span>
+        </Label>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {/* 대분류 선택 */}
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="mainCategory" className="text-text-3 text-xs">
+              대분류
+            </Label>
+            <Select
+              value={mainCategory}
+              onValueChange={(value: MainCategory) => {
+                setMainCategory(value);
+                // 대분류 변경 시 현재 소분류가 새로운 대분류에 포함되어 있지 않으면 첫 번째 소분류로 자동 설정
+                const availableSubs = CATEGORY_SUBCATEGORIES[value];
+                const currentSub = formData.category;
+                if (!availableSubs.includes(currentSub)) {
+                  const firstSub = availableSubs[0];
+                  updateField("category", firstSub);
+                }
+              }}
+            >
+              <SelectTrigger id="mainCategory" className="w-full">
+                <SelectValue placeholder="대분류를 선택하세요" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="design">DESIGN</SelectItem>
+                <SelectItem value="publishing">PUBLISHING</SelectItem>
+                <SelectItem value="development">DEVELOPMENT</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* 소분류 선택 */}
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="subCategory" className="text-text-3 text-xs">
+              소분류
+            </Label>
+            <Select
+              value={formData.category}
+              onValueChange={(value: SubCategory) => {
+                updateField("category", value);
+                // 소분류 변경 시 해당하는 대분류로 자동 업데이트
+                const newMainCategory = getMainCategoryFromSub(value);
+                if (newMainCategory && newMainCategory !== mainCategory) {
+                  setMainCategory(newMainCategory);
+                }
+              }}
+            >
+              <SelectTrigger id="subCategory" className="w-full">
+                <SelectValue placeholder="소분류를 선택하세요" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORY_SUBCATEGORIES[mainCategory].map((sub) => (
+                  <SelectItem key={sub} value={sub}>
+                    {SUBCATEGORY_LABELS[sub]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <p className="text-text-3 text-xs">
+          대분류와 소분류를 선택하여 클래스를 분류하세요.
+        </p>
+      </div>
+
       {/* 타이틀 */}
       <div className="space-y-2">
         <Label htmlFor="title">
@@ -332,6 +494,8 @@ export default function AdminContentForm({
           onChange={(value) => updateField("content", value)}
           placeholder="MDX 코드를 입력하세요..."
           error={errors.content}
+          classId={classId}
+          onPendingImagesChange={onPendingImagesChange}
         />
         {errors.content && (
           <p className="text-destructive text-sm">{errors.content}</p>

@@ -1,9 +1,12 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Image, Loader2 } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 import { Textarea } from "~/core/components/ui/textarea";
+
+import { compressImageToWebp } from "../utils/image-upload";
 
 /**
  * MDX 에디터 컴포넌트
@@ -17,6 +20,16 @@ import { Textarea } from "~/core/components/ui/textarea";
  * 참고: 실제 MDX 컴파일은 서버 사이드에서 처리됩니다.
  * 미리보기는 기본 마크다운 렌더링으로 표시됩니다.
  */
+/**
+ * 임시 이미지 정보
+ * 클래스 생성 전에 선택한 이미지를 저장합니다.
+ */
+export interface PendingImage {
+  file: File;
+  tempId: string; // 임시 ID (MDX에서 사용)
+  tempUrl: string; // 임시 blob URL
+}
+
 interface MDXEditorProps {
   /** MDX 코드 값 */
   value: string;
@@ -26,6 +39,10 @@ interface MDXEditorProps {
   placeholder?: string;
   /** 에러 메시지 */
   error?: string;
+  /** 클래스 ID (이미지 업로드용, 선택적) */
+  classId?: string | null;
+  /** 임시 이미지 파일들 변경 콜백 (클래스 생성 전 이미지용) */
+  onPendingImagesChange?: (updater: (prev: PendingImage[]) => PendingImage[]) => void;
 }
 
 export default function MDXEditor({
@@ -33,11 +50,14 @@ export default function MDXEditor({
   onChange,
   placeholder = "MDX 코드를 입력하세요...",
   error,
+  classId,
+  onPendingImagesChange,
 }: MDXEditorProps) {
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const [isUploading, setIsUploading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fetcher = useFetcher();
 
   /**
    * 커서 위치에 텍스트를 삽입하는 함수
@@ -83,29 +103,95 @@ export default function MDXEditor({
     setIsUploading(true);
 
     try {
-      // TODO: Supabase storage에 실제 업로드
-      // 현재는 모양만 구현 (임시 URL 생성)
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 업로드 시뮬레이션
+      // 이미지 압축 (webp 변환)
+      const compressedFile = await compressImageToWebp(file);
 
-      // 임시: 파일명 기반 URL 생성 (실제로는 Supabase에서 반환된 URL 사용)
-      const fileName = file.name;
-      const timestamp = Date.now();
-      const publicUrl = `https://your-supabase-project.supabase.co/storage/v1/object/public/images/${timestamp}-${fileName}`;
+      // 클래스 ID가 있으면 즉시 업로드
+      if (classId) {
+        // FormData 생성
+        const formData = new FormData();
+        formData.append("classId", classId);
+        formData.append("image", compressedFile);
 
-      // MDX 이미지 마크다운 삽입
-      const imageMarkdown = `![${fileName}](${publicUrl})\n\n`;
-      insertTextAtCursor(imageMarkdown);
+        // 서버에 업로드 요청
+        fetcher.submit(formData, {
+          method: "POST",
+          action: "/admin/api/upload-content-image",
+          encType: "multipart/form-data",
+        });
+      } else {
+        // 클래스 생성 전: 임시 이미지로 저장
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+        const tempUrl = URL.createObjectURL(compressedFile);
+        
+        const pendingImage: PendingImage = {
+          file: compressedFile,
+          tempId,
+          tempUrl,
+        };
+
+        // 상위 컴포넌트에 알림
+        onPendingImagesChange?.((prev) => [...(prev || []), pendingImage]);
+
+        // MDX에 임시 이미지 마크다운 삽입 (tempId를 포함하여 나중에 교체 가능하도록)
+        const imageMarkdown = `![이미지](TEMP_IMAGE_${tempId})\n\n`;
+        insertTextAtCursor(imageMarkdown);
+
+        setIsUploading(false);
+        // 파일 입력 초기화
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
     } catch (err) {
-      console.error("이미지 업로드 실패:", err);
-      alert("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
-    } finally {
+      console.error("이미지 압축 실패:", err);
+      alert(
+        err instanceof Error
+          ? err.message
+          : "이미지 압축에 실패했습니다. 다시 시도해주세요.",
+      );
       setIsUploading(false);
-      // 파일 입력 초기화 (같은 파일을 다시 선택할 수 있도록)
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
   };
+
+  // 업로드 완료 처리 (useEffect로 처리)
+  useEffect(() => {
+    if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
+      const publicUrl = fetcher.data.url as string;
+      const fileName = "이미지";
+      
+      // MDX 이미지 마크다운 삽입
+      const imageMarkdown = `![${fileName}](${publicUrl})\n\n`;
+      insertTextAtCursor(imageMarkdown);
+      
+      setIsUploading(false);
+      // 파일 입력 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+
+    // 업로드 에러 처리
+    if (fetcher.data && "error" in fetcher.data && fetcher.data.error) {
+      alert(fetcher.data.error as string);
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }, [fetcher.data]);
+
+  // 업로드 중 상태 업데이트
+  useEffect(() => {
+    if (fetcher.state === "submitting") {
+      setIsUploading(true);
+    } else if (fetcher.state === "idle" && !fetcher.data) {
+      setIsUploading(false);
+    }
+  }, [fetcher.state, fetcher.data]);
 
   /**
    * 이미지 업로드 버튼 클릭 핸들러
@@ -152,6 +238,7 @@ export default function MDXEditor({
                 size="sm"
                 onClick={handleUploadClick}
                 disabled={isUploading}
+                title="이미지 업로드"
               >
                 {isUploading ? (
                   <>

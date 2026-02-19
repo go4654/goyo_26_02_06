@@ -55,6 +55,10 @@ export default [
     ]),
     ...prefix("/admin", [
       route("/users", "features/admin/api/manage-users.tsx"),
+      route(
+        "/upload-content-image",
+        "features/admin/api/upload-content-image.tsx",
+      ),
     ]),
     ...prefix("/cron", [route("/mailer", "features/cron/api/mailer.tsx")]),
     ...prefix("/blog", [route("/og", "features/blog/api/og.tsx")]),
