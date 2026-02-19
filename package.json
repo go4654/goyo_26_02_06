@@ -41,6 +41,7 @@
     "@tosspayments/tosspayments-sdk": "^2.3.4",
     "@vercel/og": "^0.6.5",
     "@vercel/react-router": "^1.1.0",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",

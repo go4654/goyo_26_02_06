@@ -124,11 +124,11 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 200,
   },
   {
-    accessorKey: "likes",
+    accessorKey: "like_count",
     header: "좋아요 수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.likes)}
+        {formatNumber(row.original.like_count)}
       </div>
     ),
     size: 100,
@@ -136,11 +136,11 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "saves",
+    accessorKey: "save_count",
     header: "저장 수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.saves)}
+        {formatNumber(row.original.save_count)}
       </div>
     ),
     size: 100,
@@ -148,11 +148,11 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "views",
+    accessorKey: "view_count",
     header: "조회수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.views)}
+        {formatNumber(row.original.view_count)}
       </div>
     ),
     size: 100,
@@ -160,16 +160,16 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "isVisible",
+    accessorKey: "is_published",
     header: "노출여부",
     cell: ({ row }) => {
-      const isVisible = row.original.isVisible;
+      const isPublished = row.original.is_published;
       return (
         <Badge
-          variant={isVisible ? "default" : "secondary"}
+          variant={isPublished ? "default" : "secondary"}
           className="rounded-full"
         >
-          {isVisible ? "노출" : "비노출"}
+          {isPublished ? "노출" : "비노출"}
         </Badge>
       );
     },
@@ -178,11 +178,11 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 120,
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created_at",
     header: "등록일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.createdAt)}
+        {formatDate(row.original.created_at)}
       </div>
     ),
     size: 120,
@@ -190,11 +190,11 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "updated_at",
     header: "최근 수정일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.updatedAt)}
+        {formatDate(row.original.updated_at)}
       </div>
     ),
     size: 120,

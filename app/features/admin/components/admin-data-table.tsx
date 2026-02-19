@@ -127,7 +127,7 @@ export default function AdminDataTable<TData>({
   });
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+    <div className="rounded-xl backdrop-blur-sm">
       {/* Toolbar: 검색 + 결과 카운트 */}
       <div className="mb-4 flex items-center justify-between gap-3">
         <Input
@@ -184,8 +184,12 @@ export default function AdminDataTable<TData>({
                                 header.column.columnDef.header,
                                 header.getContext(),
                               )}
-                              {header.column.getIsSorted() === "asc" ? " ↑" : ""}
-                              {header.column.getIsSorted() === "desc" ? " ↓" : ""}
+                              {header.column.getIsSorted() === "asc"
+                                ? " ↑"
+                                : ""}
+                              {header.column.getIsSorted() === "desc"
+                                ? " ↓"
+                                : ""}
                             </button>
                           ) : (
                             // 정렬 불가능한 컬럼(체크박스, 액션)은 버튼 없이 렌더링

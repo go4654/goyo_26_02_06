@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+
+import { Image, X } from "lucide-react";
 
 import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
@@ -17,6 +19,16 @@ export interface ContentFormData {
   tags: string; // 쉼표로 구분된 태그 문자열 (예: "design, uxui")
   content: string; // MDX 코드
   isVisible: boolean; // 공개 여부
+  thumbnailImageUrl?: string; // 썸네일 이미지 URL (초기값용, 선택적)
+}
+
+/**
+ * 썸네일 이미지 파일 정보
+ * 나중에 버킷에 업로드할 수 있도록 File 객체를 별도로 관리합니다.
+ */
+export interface ThumbnailImageFile {
+  file: File;
+  previewUrl: string;
 }
 
 /**
@@ -74,7 +86,16 @@ export default function AdminContentForm({
     isVisible: initialData.isVisible ?? true, // 기본값: 공개
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof ContentFormData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof ContentFormData, string>>
+  >({});
+
+  // 썸네일 이미지 관련 상태
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
+    initialData.thumbnailImageUrl || null,
+  );
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const thumbnailInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,8 +135,141 @@ export default function AdminContentForm({
     }
   };
 
+  /**
+   * 썸네일 이미지 파일 선택 핸들러
+   * 파일 선택 시 미리보기 URL을 생성하고 File 객체를 저장합니다.
+   */
+  const handleThumbnailSelect = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 이미지 파일인지 확인
+    if (!file.type.startsWith("image/")) {
+      alert("이미지 파일만 업로드 가능합니다.");
+      return;
+    }
+
+    // 파일 크기 확인 (10MB 제한)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert("파일 크기는 10MB 이하여야 합니다.");
+      return;
+    }
+
+    // 미리보기 URL 생성
+    const previewUrl = URL.createObjectURL(file);
+    setThumbnailPreview(previewUrl);
+    setThumbnailFile(file);
+  };
+
+  /**
+   * 썸네일 이미지 제거 핸들러
+   */
+  const handleThumbnailRemove = () => {
+    // 미리보기 URL 정리
+    if (thumbnailPreview && thumbnailPreview.startsWith("blob:")) {
+      URL.revokeObjectURL(thumbnailPreview);
+    }
+    setThumbnailPreview(null);
+    setThumbnailFile(null);
+    // 파일 입력 초기화
+    if (thumbnailInputRef.current) {
+      thumbnailInputRef.current.value = "";
+    }
+  };
+
+  /**
+   * 썸네일 업로드 버튼 클릭 핸들러
+   */
+  const handleThumbnailUploadClick = () => {
+    thumbnailInputRef.current?.click();
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* 썸네일 이미지 */}
+      <div className="space-y-2">
+        <Label htmlFor="thumbnail">썸네일 이미지</Label>
+        <div className="space-y-3">
+          {/* 미리보기 영역 */}
+          {thumbnailPreview ? (
+            <div className="relative inline-block">
+              <div className="relative h-48 w-48 overflow-hidden rounded-lg border border-white/10">
+                <img
+                  src={thumbnailPreview}
+                  alt="썸네일 미리보기"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="absolute -right-2 -top-2 size-6"
+                onClick={handleThumbnailRemove}
+                aria-label="썸네일 제거"
+              >
+                <X className="size-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5">
+              <div className="flex flex-col items-center gap-2">
+                <Image className="text-text-3 size-8" />
+                <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
+              </div>
+            </div>
+          )}
+
+          {/* 파일 입력 (숨김) */}
+          <input
+            ref={thumbnailInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleThumbnailSelect}
+            className="hidden"
+            id="thumbnail"
+            aria-label="썸네일 이미지 선택"
+          />
+
+          {/* 업로드 버튼 */}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleThumbnailUploadClick}
+              disabled={isLoading}
+            >
+              <Image className="mr-2 size-4" />
+              {thumbnailPreview ? "이미지 변경" : "이미지 선택"}
+            </Button>
+            {thumbnailPreview && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleThumbnailRemove}
+                disabled={isLoading}
+              >
+                <X className="mr-2 size-4" />
+                제거
+              </Button>
+            )}
+          </div>
+
+          <p className="text-text-3 text-xs">
+            이미지 파일만 업로드 가능합니다. (최대 10MB)
+            {thumbnailFile && (
+              <span className="ml-2">
+                선택된 파일: {thumbnailFile.name} (
+                {(thumbnailFile.size / 1024 / 1024).toFixed(2)}MB)
+              </span>
+            )}
+          </p>
+        </div>
+      </div>
+
       {/* 타이틀 */}
       <div className="space-y-2">
         <Label htmlFor="title">
@@ -154,7 +308,8 @@ export default function AdminContentForm({
       {/* 태그 */}
       <div className="space-y-2">
         <Label htmlFor="tags">
-          태그 <span className="text-text-3 text-xs font-normal">(쉼표로 구분)</span>
+          태그{" "}
+          <span className="text-text-3 text-xs font-normal">(쉼표로 구분)</span>
         </Label>
         <Input
           id="tags"
@@ -194,7 +349,7 @@ export default function AdminContentForm({
         />
         <Label
           htmlFor="isVisible"
-          className="text-sm font-normal cursor-pointer"
+          className="cursor-pointer text-sm font-normal"
         >
           공개 여부
         </Label>
@@ -204,7 +359,7 @@ export default function AdminContentForm({
       </div>
 
       {/* 액션 버튼 */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+      <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
         {onCancel && (
           <Button
             type="button"

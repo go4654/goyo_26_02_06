@@ -37,7 +37,10 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
       id: classData.id,
       title: data.title,
       description: data.description,
-      tags: data.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      tags: data.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
       content: data.content,
       isVisible: data.isVisible,
     });
@@ -61,7 +64,7 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
    */
   const initialFormData: ContentFormData = {
     title: classData.title,
-    description: classData.description,
+    description: classData.description ?? "",
     tags: classData.tags.join(", "), // 배열을 쉼표로 구분된 문자열로 변환
     content: classData.content,
     isVisible: classData.isVisible,

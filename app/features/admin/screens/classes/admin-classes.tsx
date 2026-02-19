@@ -56,8 +56,8 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
           }
         }}
         onRowClick={(row) => {
-          // 클래스 상세 페이지로 이동
-          navigate(`/admin/classes/${row.id}`);
+          // 클래스 상세 페이지로 이동 (slug 기반)
+          navigate(`/admin/classes/${row.slug}`);
         }}
       />
     </div>

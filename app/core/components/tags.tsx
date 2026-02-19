@@ -8,7 +8,7 @@ export default function Tags({
   borderColor?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="mt-2 flex flex-wrap items-center gap-2">
       {tags.map((tag, index) => (
         <div
           className={cn(
