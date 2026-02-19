@@ -16,8 +16,15 @@ export const loader = classLoader;
 export const action = classAction;
 
 export default function Class({ loaderData }: Route.ComponentProps) {
-  const { category, classes, pagination, search, likedClasses, savedClasses } =
-    loaderData;
+  const {
+    category,
+    classes,
+    pagination,
+    search,
+    likedClasses,
+    savedClasses,
+    isLoggedIn,
+  } = loaderData;
 
   return (
     <div className="py-24 xl:py-40">
@@ -43,6 +50,7 @@ export default function Class({ loaderData }: Route.ComponentProps) {
           category={category}
           likedClasses={likedClasses}
           savedClasses={savedClasses}
+          isLoggedIn={isLoggedIn}
         />
       </Container>
     </div>

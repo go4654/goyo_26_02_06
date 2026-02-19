@@ -70,5 +70,7 @@ export const classLoader = async ({ request }: Route.LoaderArgs) => {
     search: search || null,
     likedClasses: result.likedClasses,
     savedClasses: result.savedClasses,
+    /** 로그인한 유저만 좋아요/저장 버튼 표시용 */
+    isLoggedIn: !!user,
   };
 };

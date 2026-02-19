@@ -17,6 +17,8 @@ interface ClassListProps {
   category: string | null;
   likedClasses: string[];
   savedClasses: string[];
+  /** 로그인한 유저만 좋아요/저장 버튼 표시 */
+  isLoggedIn: boolean;
 }
 
 export default function ClassList({
@@ -26,6 +28,7 @@ export default function ClassList({
   category,
   likedClasses,
   savedClasses,
+  isLoggedIn,
 }: ClassListProps) {
   const [searchParams] = useSearchParams();
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -125,6 +128,7 @@ export default function ClassList({
             }}
             initialLiked={likedClassesSet.has(classItem.id)}
             initialSaved={savedClassesSet.has(classItem.id)}
+            showActions={isLoggedIn}
           />
         ))}
       </div>
