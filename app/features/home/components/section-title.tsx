@@ -26,7 +26,7 @@ export default function SectionTitle({
 
       <Link
         to={link}
-        className="text-small xl:text-h6 text-text-2 hover:text-primary flex items-center gap-2 transition-colors"
+        className="text-small xl:text-h6 text-text-2 hover:text-primary flex translate-2 items-center gap-2 font-[300] transition-colors"
       >
         View More <MoveRight className="mt-1 hidden md:block" />
       </Link>

@@ -40,11 +40,6 @@ export default function Footer() {
           {/* 네비게이션 */}
           <ul className="text-small flex items-center justify-center gap-10 xl:text-base">
             <li>
-              <Link to="/" className="hover:text-text-2">
-                HOME
-              </Link>
-            </li>
-            <li>
               <Link to="/class" className="hover:text-text-2">
                 CLASS
               </Link>

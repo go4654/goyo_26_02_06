@@ -23,11 +23,11 @@ import {
   MenuIcon,
   UserIcon,
 } from "lucide-react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { LOGO_URL } from "../constant/imgUrls";
-import LangSwitcher from "./lang-switcher";
-import ThemeSwitcher from "./theme-switcher";
+import { cn } from "../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -39,7 +39,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Separator } from "./ui/separator";
 import {
   SheetClose,
   SheetContent,
@@ -83,7 +82,9 @@ function UserMenu({
       <DropdownMenuTrigger asChild>
         <Avatar className="size-8 cursor-pointer rounded-full">
           <AvatarImage src={avatarUrl ?? undefined} />
-          <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+          <AvatarFallback className="text-sm">
+            {name.slice(0, 2)}
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
 
@@ -268,6 +269,13 @@ function Actions() {
  * @param loading - Boolean indicating if the auth state is still loading
  * @returns The complete navigation bar component
  */
+
+const NAV_ITEMS = [
+  { label: "CLASS", path: "/class", key: "class" },
+  { label: "GALLERY", path: "/gallery", key: "gallery" },
+  { label: "NEWS", path: "/news", key: "news" },
+];
+
 export function NavigationBar({
   name,
   email,
@@ -281,6 +289,18 @@ export function NavigationBar({
   isAdmin?: boolean;
   loading: boolean;
 }) {
+  const { pathname } = useLocation();
+  const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pathname.includes("/")) {
+      const item = NAV_ITEMS.find((item) => pathname.includes(item.path));
+      setActive(item?.key ?? null);
+    } else {
+      setActive(null);
+    }
+  }, [pathname]);
+
   return (
     <nav
       className={
@@ -295,26 +315,26 @@ export function NavigationBar({
 
         {/* 메인 내비게이션 */}
         <ul className="text-small-title mt-1 hidden items-center gap-18 md:flex">
-          <li className="group relative">
-            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-200 group-hover:scale-100"></div>
-            <Link to="/class" className="hover:text-primary">
-              CLASS
-            </Link>
-          </li>
-
-          <li className="group relative">
-            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-300 group-hover:scale-100"></div>
-            <Link to="/gallery" className="hover:text-primary">
-              GALLERY
-            </Link>
-          </li>
-
-          <li className="group relative">
-            <div className="bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-300 group-hover:scale-100"></div>
-            <Link to="/news" className="hover:text-primary">
-              NEWS
-            </Link>
-          </li>
+          {NAV_ITEMS.map((nav) => (
+            <li key={nav.key} className="group relative">
+              <div
+                className={cn(
+                  "bg-success absolute top-0 -right-3 h-2 w-2 scale-0 rounded-full transition-all duration-200 group-hover:scale-100",
+                  active === nav.key && "scale-100",
+                )}
+              ></div>
+              <Link
+                to={nav.path}
+                viewTransition
+                className={cn(
+                  "hover:text-primary",
+                  active === nav.key && "text-primary",
+                )}
+              >
+                {nav.label}
+              </Link>
+            </li>
+          ))}
         </ul>
 
         {/* 데스크탑 유저 메뉴 */}
