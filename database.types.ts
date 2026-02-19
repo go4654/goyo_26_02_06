@@ -766,12 +766,39 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_profile_learning_summary: {
+        Args: { user_uuid: string }
+        Returns: {
+          last_learning_date: string
+          most_explored_category: string
+          recent_topics: string[]
+          total_saved_classes: number
+          total_saved_galleries: number
+        }[]
+      }
+      get_profile_recent_views: {
+        Args: { user_uuid: string }
+        Returns: {
+          category: string
+          id: string
+          title: string
+          type: string
+          viewed_at: string
+        }[]
+      }
       get_profile_stats: {
         Args: never
         Returns: {
           saved_class_count: number
           saved_gallery_count: number
           weekly_learning_count: number
+        }[]
+      }
+      get_profile_weekly_learning: {
+        Args: { user_uuid: string }
+        Returns: {
+          date: string
+          view_count: number
         }[]
       }
       get_user_role: { Args: { user_id: string }; Returns: string }

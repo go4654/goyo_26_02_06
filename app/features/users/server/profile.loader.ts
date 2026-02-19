@@ -51,6 +51,41 @@ export async function profileLoader({ request, params }: Route.LoaderArgs) {
   const savedGalleryCount = Number(stats?.saved_gallery_count ?? 0);
   const weeklyLearningCount = Number(stats?.weekly_learning_count ?? 0);
 
+  // 학습 요약: 가장 많이 탐색한 분야, 마지막 학습일, 최근 학습 주제 (RPC 1회 호출)
+  const { data: summaryRows, error: summaryError } = await client.rpc(
+    "get_profile_learning_summary",
+    { user_uuid: user.id },
+  );
+  if (summaryError) {
+    throw summaryError;
+  }
+  const summaryRow = Array.isArray(summaryRows) ? summaryRows[0] : summaryRows;
+  const learningSummary = {
+    mostExploredCategory: (summaryRow?.most_explored_category as string) ?? null,
+    lastLearningDate: summaryRow?.last_learning_date
+      ? new Date(summaryRow.last_learning_date as string)
+      : null,
+    recentTopics: (summaryRow?.recent_topics as string[]) ?? [],
+  };
+
+  // 최근 조회 (클래스/갤러리) — 최근 학습 주제 링크용
+  const { data: recentViewsRows, error: recentViewsError } = await client.rpc(
+    "get_profile_recent_views",
+    { user_uuid: user.id },
+  );
+  if (recentViewsError) {
+    throw recentViewsError;
+  }
+  type RecentViewRow = { id: string; title: string; slug?: string; category: string; type: string; viewed_at: string };
+  const recentViews = (Array.isArray(recentViewsRows) ? recentViewsRows : []).map((row: RecentViewRow) => ({
+    id: row.id,
+    title: row.title,
+    slug: row.slug ?? "",
+    category: row.category,
+    type: row.type as "class" | "gallery",
+    viewedAt: row.viewed_at ? new Date(row.viewed_at) : null,
+  }));
+
   // TODO: 나중에 Supabase 연동 시 여기서 실제 저장된 데이터 가져오기
   // const { data: savedLectures } = await client
   //   .from("saved_lectures")
@@ -67,5 +102,7 @@ export async function profileLoader({ request, params }: Route.LoaderArgs) {
     savedClassCount,
     savedGalleryCount,
     weeklyLearningCount,
+    learningSummary,
+    recentViews,
   };
 }

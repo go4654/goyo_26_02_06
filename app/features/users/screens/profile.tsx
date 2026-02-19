@@ -1,5 +1,6 @@
 import type { Route } from "./+types/profile";
 
+import { DateTime } from "luxon";
 import { Link } from "react-router";
 
 import {
@@ -15,6 +16,17 @@ import UserGraph from "../components/user-graph";
 import { profileAction } from "../server/profile.action";
 import { profileLoader } from "../server/profile.loader";
 
+/** 마지막 학습일을 "오늘" / "어제" / "N일 전" 형식으로 반환 (Luxon 사용) */
+function formatLastLearningDate(date: Date | null): string {
+  if (!date) return "—";
+  const dt = DateTime.fromJSDate(date).toUTC().startOf("day");
+  const today = DateTime.utc().startOf("day");
+  const diffDays = Math.floor(today.diff(dt, "days").days);
+  if (diffDays === 0) return "오늘";
+  if (diffDays === 1) return "어제";
+  return `${diffDays}일 전`;
+}
+
 export const meta: Route.MetaFunction = () => {
   return [{ title: `프로필 | ${import.meta.env.VITE_APP_NAME}` }];
 };
@@ -29,8 +41,17 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
     savedClassCount,
     savedGalleryCount,
     weeklyLearningCount,
+    learningSummary,
+    recentViews = [],
   } = loaderData;
   const activeCategory = category ?? "class";
+  const mostExplored =
+    learningSummary?.mostExploredCategory?.toUpperCase() ?? "—";
+  const lastLearningLabel = formatLastLearningDate(
+    learningSummary?.lastLearningDate ?? null,
+  );
+  // 최근 학습 주제: 클래스 중 마지막으로 본 주제 하나만
+  const lastViewedClass = recentViews.find((v) => v.type === "class" && v.slug);
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 pt-20 pb-8 xl:px-0 xl:py-40">
@@ -74,7 +95,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
               <p className="text-text-2/80 text-[10px] xl:text-sm">
                 가장 많이 탐색한 분야
               </p>
-              <div className="text-small-title xl:text-h5">REACT</div>
+              <div className="text-small-title xl:text-h5">{mostExplored}</div>
             </li>
 
             <Separator orientation="vertical" className="h-full" />
@@ -84,7 +105,16 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
                 마지막 학습일
               </p>
               <div className="text-small-title xl:text-h5">
-                3 <span className="text-text-2/80 text-sm">일전</span>
+                {lastLearningLabel === "오늘" ||
+                lastLearningLabel === "어제" ||
+                lastLearningLabel === "—" ? (
+                  lastLearningLabel
+                ) : (
+                  <>
+                    {lastLearningLabel.replace(/\s*일 전$/, "")}
+                    <span className="text-text-2/80 text-sm"> 일 전</span>
+                  </>
+                )}
               </div>
             </li>
 
@@ -94,7 +124,21 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
               <p className="text-text-2/80 text-[10px] xl:text-sm">
                 최근 학습 주제
               </p>
-              <div className="text-small-title xl:text-h5">REACT</div>
+              <div
+                className="text-small-title xl:text-h5 w-full max-w-[120px] truncate text-center xl:max-w-[200px]"
+                title={lastViewedClass?.title}
+              >
+                {lastViewedClass ? (
+                  <Link
+                    to={`/class/${lastViewedClass.slug}`}
+                    className="block truncate hover:underline"
+                  >
+                    {lastViewedClass.title}
+                  </Link>
+                ) : (
+                  "—"
+                )}
+              </div>
             </li>
           </ul>
         </div>
@@ -132,6 +176,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
               </div>
             </li>
           </ul>
+
           {/* 학습 흐름 그래프 */}
           <UserGraph />
         </div>
