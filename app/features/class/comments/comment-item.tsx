@@ -79,6 +79,23 @@ export const commentSchema = z.object({
 export type CommentFormValues = z.infer<typeof commentSchema>;
 
 /**
+ * @언급 패턴(@ 뒤에 공백 아닌 문자)을 파란색으로 표시
+ * 링크 등 특별 기능 없이 색상만 적용
+ */
+function renderContentWithMentions(text: string): ReactNode {
+  const parts = text.split(/(@\S+)/g);
+  return parts.map((part, i) =>
+    /^@\S+$/.test(part) ? (
+      <span key={i} className="text-blue-500">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
+/**
  * ISO 날짜를 한국 시간으로 변환하여 상대 시간 표시
  * Luxon을 사용하여 한국 시간대(Asia/Seoul)로 변환
  *
@@ -270,9 +287,7 @@ export function CommentItem({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* 유저 이름 */}
-            <span className="text-text-2 text-sm xl:text-base">
-              {comment.userName}
-            </span>
+            <span className="text-text-2 text-sm">@{comment.userName}</span>
             {/* 댓글 작성 시간 */}
             <span className="text-text-3/50 text-sm xl:text-base">
               {formatRelativeDate(comment.createdAt)}
@@ -348,8 +363,10 @@ export function CommentItem({
           </div>
         ) : (
           <>
-            {/* 댓글 내용 */}
-            <p className="text-base whitespace-pre-line">{value}</p>
+            {/* 댓글 내용 (@언급은 파란색 표시) */}
+            <p className="text-base whitespace-pre-line">
+              {renderContentWithMentions(value)}
+            </p>
             {/* 좋아요, 댓글 달기, 답글 더보기 버튼 */}
             <div className="mt-2 flex items-center gap-6">
               <button
