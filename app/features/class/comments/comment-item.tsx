@@ -289,7 +289,7 @@ export function CommentItem({
             {/* 유저 이름 */}
             <span className="text-text-2 text-sm">@{comment.userName}</span>
             {/* 댓글 작성 시간 */}
-            <span className="text-text-3/50 text-sm xl:text-base">
+            <span className="text-text-3/50 text-sm">
               {formatRelativeDate(comment.createdAt)}
             </span>
           </div>
@@ -371,27 +371,31 @@ export function CommentItem({
             <div className="mt-2 flex items-center gap-6">
               <button
                 type="button"
-                className={`flex cursor-pointer items-center gap-1 ${
+                className={`group hover:text-primary flex cursor-pointer items-center gap-1 ${
                   liked ? "text-white" : "text-text-2"
-                }`}
+                } text-sm xl:text-base`}
                 onClick={handleLikeClick}
               >
                 <ThumbsUp
-                  className="size-3 xl:size-4"
+                  className="group-hover:text-primary size-3 xl:size-4"
                   fill={liked ? "currentColor" : "none"}
                 />
-                <span className="text-sm xl:text-base">{likeCount}</span>
+                <span className="group-hover:text-primary text-sm xl:text-base">
+                  {likeCount}
+                </span>
               </button>
 
               {!isReply && (
-                <div className="flex items-center gap-4">
+                <div className="group flex items-center gap-4">
                   <button
                     type="button"
-                    className="text-text-2 flex cursor-pointer items-center gap-1 text-sm xl:text-base"
+                    className="text-text-2 group-hover:text-primary flex cursor-pointer items-center gap-1 text-sm xl:text-base"
                     onClick={onReplyClick}
                   >
                     <MessageCircle className="size-3 xl:size-4" />
-                    <span className="text-sm xl:text-base">답글</span>
+                    <span className="group-hover:text-primary text-sm xl:text-base">
+                      답글
+                    </span>
                   </button>
                 </div>
               )}

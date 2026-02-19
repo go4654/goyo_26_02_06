@@ -291,6 +291,7 @@ export async function incrementClassView(
 
 /**
  * 프로필 정보를 포함한 댓글 데이터
+ * profile은 public_profiles 뷰 기준 (profile_id, name, avatar_url, role)
  */
 export interface CommentWithProfile {
   id: string;
@@ -304,6 +305,7 @@ export interface CommentWithProfile {
     profile_id: string;
     name: string;
     avatar_url: string | null;
+    role?: string;
   } | null;
   likes_count: number;
   is_liked?: boolean;
@@ -353,13 +355,13 @@ export async function getClassComments(
   // 댓글 ID 목록 추출
   const commentIds = commentsData.map((comment) => comment.id as string);
 
-  // 프로필, 좋아요 수, 사용자 좋아요 상태를 병렬로 조회
+  // 프로필(공개용 뷰), 좋아요 수, 사용자 좋아요 상태를 병렬로 조회
   const [profilesResult, likesDataResult, userLikesResult] =
     await Promise.all([
-      // 프로필 정보 일괄 조회
+      // 공개 프로필 정보 일괄 조회 (로그인 유저 모두 조회 가능)
       client
-        .from("profiles")
-        .select("profile_id, name, avatar_url")
+        .from("public_profiles")
+        .select("profile_id, name, avatar_url, role")
         .in("profile_id", userIds),
       // 댓글 좋아요 수 조회
       client
@@ -372,7 +374,7 @@ export async function getClassComments(
         : Promise.resolve(new Set<string>()),
     ]);
 
-  // 프로필 맵 생성 (빠른 조회를 위해)
+  // 프로필 맵 생성 (public_profiles 뷰 컬럼 기준)
   const profileMap = new Map(
     (profilesResult.data || []).map((profile) => [
       profile.profile_id as string,
@@ -380,6 +382,7 @@ export async function getClassComments(
         profile_id: profile.profile_id as string,
         name: profile.name as string,
         avatar_url: profile.avatar_url as string | null,
+        role: profile.role as string | undefined,
       },
     ]),
   );
@@ -504,8 +507,8 @@ export async function getClassCommentsPage(
 
   const [profilesResult, likesDataResult, userLikesResult] = await Promise.all([
     client
-      .from("profiles")
-      .select("profile_id, name, avatar_url")
+      .from("public_profiles")
+      .select("profile_id, name, avatar_url, role")
       .in("profile_id", userIds),
     client
       .from("comment_likes")
@@ -523,6 +526,7 @@ export async function getClassCommentsPage(
         profile_id: p.profile_id as string,
         name: p.name as string,
         avatar_url: p.avatar_url as string | null,
+        role: p.role as string | undefined,
       },
     ]),
   );
