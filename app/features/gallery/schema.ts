@@ -17,6 +17,9 @@ import { timestamps } from "~/core/db/helpers.server";
 import { tags } from "../class/schema";
 import { profiles } from "../users/schema";
 
+/** 관리자 여부 (SECURITY DEFINER, RLS 재귀·UPDATE 새 행 검사 대응) */
+const isAdmin = sql`public.is_admin()`;
+
 export const galleries = pgTable(
   "galleries",
   {
@@ -71,6 +74,7 @@ export const galleries = pgTable(
     // =========================
     // SELECT 정책
     // =========================
+    // 노출된 갤러리만 조회 (gallery_access 또는 admin)
     pgPolicy("select-gallery", {
       for: "select",
       to: authenticatedRole,
@@ -85,21 +89,22 @@ export const galleries = pgTable(
           )
         `,
     }),
+    // 관리자는 모든 행 조회 가능 (노출 해제 수정 시 UPDATE 새 행이 SELECT 정책 통과)
+    pgPolicy("select-gallery-admin", {
+      for: "select",
+      to: authenticatedRole,
+      as: "permissive",
+      using: isAdmin,
+    }),
 
     // =========================
-    // INSERT (관리자만)
+    // INSERT (관리자만, is_admin()로 RLS 재귀 방지)
     // =========================
     pgPolicy("admin-insert-gallery", {
       for: "insert",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      withCheck: isAdmin,
     }),
 
     // =========================
@@ -109,20 +114,8 @@ export const galleries = pgTable(
       for: "update",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
-      withCheck: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      using: isAdmin,
+      withCheck: isAdmin,
     }),
 
     // =========================
@@ -132,13 +125,7 @@ export const galleries = pgTable(
       for: "delete",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      using: isAdmin,
     }),
   ],
 );

@@ -92,29 +92,31 @@ export async function createNewsBase(
 }
 
 /**
- * 뉴스 썸네일 업로드 (news/{newsId}/thumbnail.webp)
- * 업로드된 경로 반환 (롤백용)
+ * 뉴스 썸네일 업로드 (news/{newsId}/thumbnail_{uuid}.webp)
+ * 업로드된 경로 반환 (롤백용). 파일명 UUID로 캐시 무효화.
  */
 export async function uploadNewsThumbnail(
   client: SupabaseClient<Database>,
   newsId: string,
   file: File,
 ): Promise<{ publicUrl: string; path: string }> {
-  const path = `${newsId}/thumbnail.webp`;
+  const fileName = `thumbnail_${crypto.randomUUID()}.webp`;
+  const path = `${newsId}/${fileName}`;
   const publicUrl = await uploadToStorage(client, NEWS_BUCKET, path, file);
   return { publicUrl, path };
 }
 
 /**
- * 뉴스 커버 업로드 (news/{newsId}/cover.webp)
- * 업로드된 경로 반환 (롤백용)
+ * 뉴스 커버 업로드 (news/{newsId}/cover_{uuid}.webp)
+ * 업로드된 경로 반환 (롤백용). 파일명 UUID로 캐시 무효화.
  */
 export async function uploadNewsCover(
   client: SupabaseClient<Database>,
   newsId: string,
   file: File,
 ): Promise<{ publicUrl: string; path: string }> {
-  const path = `${newsId}/cover.webp`;
+  const fileName = `cover_${crypto.randomUUID()}.webp`;
+  const path = `${newsId}/${fileName}`;
   const publicUrl = await uploadToStorage(client, NEWS_BUCKET, path, file);
   return { publicUrl, path };
 }

@@ -40,9 +40,8 @@ export interface ExistingNewsRow {
 
 /**
  * 뉴스 수정 전체 흐름
- * - 썸네일: 새 파일 있으면 업로드 → 기존 삭제 (실패 시 새 파일 롤백) → DB 반영
- * - 커버: 동일
- * - MDX: 기존 URL 추출, TEMP 업로드·치환, 제거된 이미지만 삭제 (삭제 실패 시 DB 업데이트 중단), DB 실패 시 신규 업로드 롤백
+ * - 썸네일/커버: (1) 새 파일 업로드(UUID 파일명) (2) DB 반영 (3) 기존 파일 Storage만 삭제. DB 실패 시 방금 업로드한 파일 롤백.
+ * - MDX: 기존 URL 추출, TEMP 업로드·치환, 제거된 이미지만 삭제, DB 실패 시 신규 업로드 롤백
  * - slug 수정 금지
  */
 export async function updateNewsService(
@@ -57,11 +56,16 @@ export async function updateNewsService(
   let finalThumbnailUrl: string | null = existing.thumbnail_image_url;
   let finalCoverUrls: string[] = existing.cover_image_urls ?? [];
   const uploadedPaths: string[] = [];
+  /** 이번 요청에서 업로드한 썸네일 경로 (DB 실패 시 롤백용) */
+  let uploadedThumbPath: string | null = null;
+  /** 이번 요청에서 업로드한 커버 경로 (DB 실패 시 롤백용) */
+  let uploadedCoverPath: string | null = null;
 
   try {
-    // ---- A. 썸네일 ----
+    // ---- A. 썸네일: (1) 새 파일만 업로드, 기존 삭제는 DB 반영 후 수행 ----
     if (input.thumbnailFile && input.thumbnailFile.size > 0) {
-      const newThumbPath = `${newsId}/thumbnail.webp`;
+      const thumbFileName = `thumbnail_${crypto.randomUUID()}.webp`;
+      const newThumbPath = `${newsId}/${thumbFileName}`;
       await uploadToStorage(
         client,
         NEWS_BUCKET,
@@ -72,26 +76,14 @@ export async function updateNewsService(
         data: { publicUrl: newThumbUrl },
       } = client.storage.from(NEWS_BUCKET).getPublicUrl(newThumbPath);
 
-      if (existing.thumbnail_image_url) {
-        const oldPath = getStoragePathFromPublicUrl(
-          NEWS_BUCKET,
-          existing.thumbnail_image_url,
-        );
-        if (oldPath && oldPath.startsWith(prefix)) {
-          try {
-            await removeStorageFiles(client, NEWS_BUCKET, [oldPath]);
-          } catch {
-            await removeStorageFiles(client, NEWS_BUCKET, [newThumbPath]);
-            throw new Error("기존 썸네일 삭제 실패로 수정을 중단했습니다.");
-          }
-        }
-      }
+      uploadedThumbPath = newThumbPath;
       finalThumbnailUrl = newThumbUrl;
     }
 
-    // ---- B. 커버 ----
+    // ---- B. 커버: (1) 새 파일만 업로드, 기존 삭제는 DB 반영 후 수행 ----
     if (input.coverFile && input.coverFile.size > 0) {
-      const newCoverPath = `${newsId}/cover.webp`;
+      const coverFileName = `cover_${crypto.randomUUID()}.webp`;
+      const newCoverPath = `${newsId}/${coverFileName}`;
       await uploadToStorage(
         client,
         NEWS_BUCKET,
@@ -102,18 +94,7 @@ export async function updateNewsService(
         data: { publicUrl: newCoverUrl },
       } = client.storage.from(NEWS_BUCKET).getPublicUrl(newCoverPath);
 
-      const oldCoverUrl = existing.cover_image_urls?.[0];
-      if (oldCoverUrl) {
-        const oldPath = getStoragePathFromPublicUrl(NEWS_BUCKET, oldCoverUrl);
-        if (oldPath && oldPath.startsWith(prefix)) {
-          try {
-            await removeStorageFiles(client, NEWS_BUCKET, [oldPath]);
-          } catch {
-            await removeStorageFiles(client, NEWS_BUCKET, [newCoverPath]);
-            throw new Error("기존 커버 삭제 실패로 수정을 중단했습니다.");
-          }
-        }
-      }
+      uploadedCoverPath = newCoverPath;
       finalCoverUrls = [newCoverUrl];
     }
 
@@ -164,7 +145,45 @@ export async function updateNewsService(
     if (updateError) {
       throw new Error(`뉴스 업데이트 실패: ${updateError.message}`);
     }
+
+    // ---- E. DB 반영 후 기존 썸네일/커버 파일만 Storage에서 삭제 (해당 파일만, content 이미지 건드리지 않음) ----
+    if (uploadedThumbPath && existing.thumbnail_image_url) {
+      const oldPath = getStoragePathFromPublicUrl(
+        NEWS_BUCKET,
+        existing.thumbnail_image_url,
+      );
+      if (oldPath && oldPath.startsWith(prefix)) {
+        try {
+          await removeStorageFiles(client, NEWS_BUCKET, [oldPath]);
+        } catch {
+          // 기존 파일 삭제 실패는 무시
+        }
+      }
+    }
+    if (uploadedCoverPath && existing.cover_image_urls?.[0]) {
+      const oldPath = getStoragePathFromPublicUrl(
+        NEWS_BUCKET,
+        existing.cover_image_urls[0],
+      );
+      if (oldPath && oldPath.startsWith(prefix)) {
+        try {
+          await removeStorageFiles(client, NEWS_BUCKET, [oldPath]);
+        } catch {
+          // 기존 파일 삭제 실패는 무시
+        }
+      }
+    }
   } catch (err) {
+    const toRollback: string[] = [];
+    if (uploadedThumbPath) toRollback.push(uploadedThumbPath);
+    if (uploadedCoverPath) toRollback.push(uploadedCoverPath);
+    if (toRollback.length > 0) {
+      try {
+        await removeStorageFiles(client, NEWS_BUCKET, toRollback);
+      } catch {
+        // 롤백 삭제 실패는 무시
+      }
+    }
     if (uploadedPaths.length > 0) {
       try {
         await removeStorageFiles(client, NEWS_BUCKET, uploadedPaths);

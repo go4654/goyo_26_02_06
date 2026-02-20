@@ -173,7 +173,7 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   const handleThumbnailRemove = () => {
     if (thumbnailPreview?.startsWith("blob:"))
       URL.revokeObjectURL(thumbnailPreview);
-    setThumbnailPreview(gallery.thumbnail_image_url ?? null);
+    setThumbnailPreview(null);
     setThumbnailFile(null);
     if (thumbnailInputRef.current) thumbnailInputRef.current.value = "";
   };

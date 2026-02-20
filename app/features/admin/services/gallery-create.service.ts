@@ -99,13 +99,15 @@ export async function createGalleryBase(
 
 /**
  * 갤러리 썸네일 업로드 후 DB 반영
+ * 파일명: thumbnail_{uuid}.webp (캐시 무효화)
  */
 export async function uploadGalleryThumbnail(
   client: SupabaseClient<Database>,
   galleryId: string,
   file: File,
 ): Promise<string> {
-  const filePath = `${galleryId}/thumbnail.webp`;
+  const fileName = `thumbnail_${crypto.randomUUID()}.webp`;
+  const filePath = `${galleryId}/${fileName}`;
   const publicUrl = await uploadToStorage(
     client,
     GALLERY_BUCKET,

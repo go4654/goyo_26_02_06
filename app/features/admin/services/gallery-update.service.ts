@@ -55,7 +55,7 @@ export interface ExistingGalleryRow {
 
 /**
  * 갤러리 수정 전체 흐름
- * - 썸네일: 새 파일 있으면 업로드 → 기존 삭제 → DB 반영 (삭제 실패 시 새 업로드 롤백)
+ * - 썸네일: (1) 새 파일 업로드(UUID 파일명) (2) DB 반영 (3) 기존 썸네일 Storage만 삭제. DB 실패 시 방금 업로드한 파일 롤백.
  * - MDX: description/caption에서 기존 URL 추출, TEMP 업로드·치환, 제거된 이미지 Storage 삭제
  * - image_urls: 기존와 새 배열 diff, 제거된 파일만 삭제, 새 파일 업로드 후 재구성
  * - 태그: 기존 gallery_tags 전부 삭제 후 재연결
@@ -75,11 +75,14 @@ export async function updateGalleryService(
   let finalImageUrls: string[] = [...(existing.image_urls || [])];
   const uploadedContentPaths: string[] = [];
   const uploadedImagePaths: string[] = [];
+  /** 이번 요청에서 업로드한 썸네일 경로 (DB 실패 시 롤백용) */
+  let uploadedThumbPath: string | null = null;
 
   try {
-    // ---- A. 썸네일 처리 ----
+    // ---- A. 썸네일: (1) 새 파일만 업로드, 기존 삭제는 DB 반영 후 수행 ----
     if (input.thumbnailFile && input.thumbnailFile.size > 0) {
-      const newThumbPath = `${galleryId}/thumbnail.webp`;
+      const fileName = `thumbnail_${crypto.randomUUID()}.webp`;
+      const newThumbPath = `${galleryId}/${fileName}`;
       await uploadToStorage(
         client,
         GALLERY_BUCKET,
@@ -90,20 +93,7 @@ export async function updateGalleryService(
         data: { publicUrl: newThumbUrl },
       } = client.storage.from(GALLERY_BUCKET).getPublicUrl(newThumbPath);
 
-      if (existing.thumbnail_image_url) {
-        const oldPath = getStoragePathFromPublicUrl(
-          GALLERY_BUCKET,
-          existing.thumbnail_image_url,
-        );
-        if (oldPath && oldPath.startsWith(prefix)) {
-          try {
-            await removeStorageFiles(client, GALLERY_BUCKET, [oldPath]);
-          } catch {
-            await removeStorageFiles(client, GALLERY_BUCKET, [newThumbPath]);
-            throw new Error("기존 썸네일 삭제 실패로 수정을 중단했습니다.");
-          }
-        }
-      }
+      uploadedThumbPath = newThumbPath;
       finalThumbnailUrl = newThumbUrl;
     }
 
@@ -179,7 +169,29 @@ export async function updateGalleryService(
     if (updateError) {
       throw new Error(`갤러리 업데이트 실패: ${updateError.message}`);
     }
+
+    // ---- F. DB 반영 후 기존 썸네일 파일만 Storage에서 삭제 (폴더/콘텐츠 이미지 건드리지 않음) ----
+    if (uploadedThumbPath && existing.thumbnail_image_url) {
+      const oldPath = getStoragePathFromPublicUrl(
+        GALLERY_BUCKET,
+        existing.thumbnail_image_url,
+      );
+      if (oldPath && oldPath.startsWith(prefix)) {
+        try {
+          await removeStorageFiles(client, GALLERY_BUCKET, [oldPath]);
+        } catch {
+          // 기존 파일 삭제 실패는 무시 (새 URL은 이미 DB에 반영됨)
+        }
+      }
+    }
   } catch (err) {
+    if (uploadedThumbPath) {
+      try {
+        await removeStorageFiles(client, GALLERY_BUCKET, [uploadedThumbPath]);
+      } catch {
+        // 롤백 삭제 실패는 무시
+      }
+    }
     const allUploaded = [...uploadedContentPaths, ...uploadedImagePaths];
     if (allUploaded.length > 0) {
       const toRemove = allUploaded.filter((p) => p.startsWith(prefix));

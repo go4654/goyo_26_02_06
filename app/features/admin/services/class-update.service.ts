@@ -45,7 +45,7 @@ export interface ExistingClassRow {
 
 /**
  * 클래스 수정 전체 흐름
- * - 썸네일: 새 파일 있으면 업로드 → 기존 삭제 → DB 반영 (삭제 실패 시 새 업로드 롤백)
+ * - 썸네일: (1) 새 파일 업로드(UUID 파일명) (2) DB 반영 (3) 기존 썸네일 Storage만 삭제. DB 실패 시 방금 업로드한 파일 롤백.
  * - MDX 이미지: 기존 URL 추출, TEMP 업로드·치환, 제거된 이미지 Storage 삭제 (실패 시 중단), DB 실패 시 신규 업로드 롤백
  * - 태그: 기존 class_tags 전부 삭제 후 재연결
  * - DB: title, description, content_mdx, is_published, updated_at, (썸네일 변경 시 thumbnail_image_url)
@@ -56,15 +56,19 @@ export async function updateClassService(
   input: UpdateClassInput,
 ): Promise<void> {
   const classId = existing.id;
+  const prefix = `${classId}/`;
 
   let finalContent = input.content;
   let finalThumbnailUrl: string | null = existing.thumbnail_image_url;
   const uploadedContentPaths: string[] = [];
+  /** 이번 요청에서 업로드한 썸네일 경로 (DB 실패 시 롤백용) */
+  let uploadedThumbPath: string | null = null;
 
   try {
-    // ---- A. 썸네일 처리 ----
+    // ---- A. 썸네일: (1) 새 파일만 업로드, 기존 삭제는 DB 반영 후 수행 ----
     if (input.thumbnailFile && input.thumbnailFile.size > 0) {
-      const newThumbPath = `${classId}/thumbnail.webp`;
+      const fileName = `thumbnail_${crypto.randomUUID()}.webp`;
+      const newThumbPath = `${classId}/${fileName}`;
       await uploadToStorage(
         client,
         CLASS_BUCKET,
@@ -75,21 +79,7 @@ export async function updateClassService(
         data: { publicUrl: newThumbUrl },
       } = client.storage.from(CLASS_BUCKET).getPublicUrl(newThumbPath);
 
-      if (existing.thumbnail_image_url) {
-        const oldPath = getStoragePathFromPublicUrl(
-          CLASS_BUCKET,
-          existing.thumbnail_image_url,
-        );
-        if (oldPath && oldPath.startsWith(`${classId}/`)) {
-          try {
-            await removeStorageFiles(client, CLASS_BUCKET, [oldPath]);
-          } catch {
-            await removeStorageFiles(client, CLASS_BUCKET, [newThumbPath]);
-            throw new Error("기존 썸네일 삭제 실패로 수정을 중단했습니다.");
-          }
-        }
-      }
-
+      uploadedThumbPath = newThumbPath;
       finalThumbnailUrl = newThumbUrl;
     }
 
@@ -134,7 +124,29 @@ export async function updateClassService(
     if (updateError) {
       throw new Error(`클래스 업데이트 실패: ${updateError.message}`);
     }
+
+    // ---- E. DB 반영 후 기존 썸네일 파일만 Storage에서 삭제 (폴더/콘텐츠 이미지 건드리지 않음) ----
+    if (uploadedThumbPath && existing.thumbnail_image_url) {
+      const oldPath = getStoragePathFromPublicUrl(
+        CLASS_BUCKET,
+        existing.thumbnail_image_url,
+      );
+      if (oldPath && oldPath.startsWith(prefix)) {
+        try {
+          await removeStorageFiles(client, CLASS_BUCKET, [oldPath]);
+        } catch {
+          // 기존 파일 삭제 실패는 무시 (새 URL은 이미 DB에 반영됨)
+        }
+      }
+    }
   } catch (err) {
+    if (uploadedThumbPath) {
+      try {
+        await removeStorageFiles(client, CLASS_BUCKET, [uploadedThumbPath]);
+      } catch {
+        // 롤백 삭제 실패는 무시, 원래 에러를 다시 throw
+      }
+    }
     if (uploadedContentPaths.length > 0) {
       try {
         await removeStorageFiles(client, CLASS_BUCKET, uploadedContentPaths);

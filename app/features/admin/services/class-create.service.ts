@@ -54,13 +54,15 @@ export async function createClassBase(
 
 /**
  * 썸네일 이미지를 업로드하고 URL을 DB에 업데이트합니다.
+ * 파일명: thumbnail_{uuid}.webp (캐시 무효화)
  */
 export async function uploadThumbnail(
   client: SupabaseClient<Database>,
   classId: string,
   file: File,
 ): Promise<string> {
-  const filePath = `${classId}/thumbnail.webp`;
+  const fileName = `thumbnail_${crypto.randomUUID()}.webp`;
+  const filePath = `${classId}/${fileName}`;
   const publicUrl = await uploadToStorage(client, "class", filePath, file);
 
   const { error: updateError } = await client
