@@ -57,12 +57,6 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
     e.preventDefault();
 
     // TODO: Supabase 연동하여 실제 수정 처리
-    console.log("유저 수정 데이터:", {
-      id: userData.id,
-      galleryAccess: formData.galleryAccess, // gallery_access로 저장
-      status: formData.status,
-      adminMemo: formData.adminMemo,
-    });
 
     // TODO: Supabase 업데이트
     // await supabase

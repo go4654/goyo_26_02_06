@@ -20,11 +20,14 @@ export function ThreeColumns({ children }: { children: ReactNode }) {
 
 function Item({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="[&_p]:text-text-2 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm [&_p]:text-sm [&_p]:leading-relaxed">
+    <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm [&_p]:text-text-2 [&_p]:text-sm [&_p]:leading-relaxed">
       <h4 className="text-text-1 xl:text-small-title mb-3 text-base font-semibold">
         {title}
       </h4>
-      <p className="text-text-2 text-body leading-relaxed">{children}</p>
+      {/* 레이아웃용 wrapper는 div 사용. MDX가 children을 <p>로 넘기면 p 안에 p가 되어 hydration 오류가 나므로 p 사용 금지 */}
+      <div className="text-text-2 text-body leading-relaxed">
+        {children}
+      </div>
     </div>
   );
 }

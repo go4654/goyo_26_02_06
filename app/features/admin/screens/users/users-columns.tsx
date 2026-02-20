@@ -66,10 +66,7 @@ const actionColumn: ColumnDef<AdminUserRow> = {
           <DropdownMenuContent align="end" className="p-2">
             <DropdownMenuItem
               className="cursor-pointer"
-              onSelect={(e) => {
-                e.preventDefault();
-                console.log("edit", item.id);
-              }}
+              onSelect={(e) => e.preventDefault()}
             >
               수정
             </DropdownMenuItem>

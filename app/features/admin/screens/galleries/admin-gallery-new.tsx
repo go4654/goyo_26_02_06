@@ -35,13 +35,6 @@ export default function GalleryNew() {
    */
   const handleSubmit = async (data: ContentFormData) => {
     // TODO: Supabase 연동하여 실제 등록 처리
-    console.log("갤러리 등록 데이터:", {
-      title: data.title,
-      description: data.description,
-      tags: data.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-      content: data.content,
-      isVisible: data.isVisible,
-    });
 
     // 임시: 성공 메시지 표시 후 목록으로 이동
     alert("갤러리가 등록되었습니다. (임시 메시지)");

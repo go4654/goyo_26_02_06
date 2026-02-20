@@ -33,14 +33,6 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
    */
   const handleSubmit = async (data: ContentFormData) => {
     // TODO: Supabase 연동하여 실제 수정 처리
-    console.log("갤러리 수정 데이터:", {
-      id: galleryData.id,
-      title: data.title,
-      description: data.description,
-      tags: data.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-      content: data.content,
-      isVisible: data.isVisible,
-    });
 
     // 임시: 성공 메시지 표시 후 목록으로 이동
     alert("갤러리가 수정되었습니다. (임시 메시지)");

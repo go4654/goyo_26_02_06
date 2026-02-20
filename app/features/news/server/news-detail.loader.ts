@@ -4,6 +4,7 @@ import { bundleMDX } from "mdx-bundler";
 import { data } from "react-router";
 
 import makeServerClient from "~/core/lib/supa-client.server";
+import { logger } from "~/core/utils/logger";
 
 import { getNewsBySlug, incrementNewsView } from "../queries";
 
@@ -35,12 +36,7 @@ export async function newsDetailLoader({
   const userId = user?.id ?? null;
 
   incrementNewsView(client, news.id, userId).catch((err) => {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("뉴스 조회수 증가 실패:", err);
-    }
+    logger.error("뉴스 조회수 증가 실패:", err);
   });
 
   const { code: contentCode } = await bundleMDX({

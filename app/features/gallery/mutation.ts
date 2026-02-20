@@ -6,6 +6,8 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "~/core/utils/logger";
+
 /**
  * 갤러리 좋아요 토글
  *
@@ -30,12 +32,7 @@ export async function toggleGalleryLike(
       .eq("gallery_id", galleryId)
       .eq("user_id", userId);
     if (error) {
-      if (
-        typeof process !== "undefined" &&
-        process.env?.NODE_ENV === "development"
-      ) {
-        console.error("[toggleGalleryLike] cancel error:", error.message);
-      }
+      logger.error("[toggleGalleryLike] cancel error:", error.message);
       throw new Error("좋아요 취소에 실패했습니다.");
     }
     return false;
@@ -46,12 +43,7 @@ export async function toggleGalleryLike(
     user_id: userId,
   });
   if (error) {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("[toggleGalleryLike] add error:", error.message);
-    }
+    logger.error("[toggleGalleryLike] add error:", error.message);
     throw new Error("좋아요 등록에 실패했습니다.");
   }
   return true;
@@ -81,12 +73,7 @@ export async function toggleGallerySave(
       .eq("gallery_id", galleryId)
       .eq("user_id", userId);
     if (error) {
-      if (
-        typeof process !== "undefined" &&
-        process.env?.NODE_ENV === "development"
-      ) {
-        console.error("[toggleGallerySave] cancel error:", error.message);
-      }
+      logger.error("[toggleGallerySave] cancel error:", error.message);
       throw new Error("저장 취소에 실패했습니다.");
     }
     return false;
@@ -97,12 +84,7 @@ export async function toggleGallerySave(
     user_id: userId,
   });
   if (error) {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("[toggleGallerySave] add error:", error.message);
-    }
+    logger.error("[toggleGallerySave] add error:", error.message);
     throw new Error("저장 등록에 실패했습니다.");
   }
   return true;

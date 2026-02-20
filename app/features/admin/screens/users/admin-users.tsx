@@ -34,10 +34,7 @@ export default function AdminUsers({ loaderData }: Route.ComponentProps) {
   const handleGrantGalleryAccess = async (selectedUsers: AdminUserRow[]) => {
     // TODO: Supabase 연동하여 실제 권한 부여 처리
     // gallery_access: false -> true로 변경
-    console.log("포폴 접근 권한 부여할 유저:", selectedUsers);
-
     const userIds = selectedUsers.map((user) => user.id);
-    console.log("권한 부여할 유저 ID:", userIds);
 
     // TODO: Supabase에서 일괄 업데이트
     // await supabase
@@ -66,9 +63,7 @@ export default function AdminUsers({ loaderData }: Route.ComponentProps) {
         columns={usersColumns}
         searchPlaceholder="이메일, 닉네임 검색..."
         emptyMessage="등록된 유저가 없습니다."
-        onRowSelectionChange={(selectedRows) => {
-          console.log("선택된 유저:", selectedRows);
-        }}
+        onRowSelectionChange={() => {}}
         customAction={{
           label: "포폴 접근 권한 부여",
           variant: "default",

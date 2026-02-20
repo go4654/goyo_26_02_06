@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import FormButton from "~/core/components/form-button";
+import { logger } from "~/core/utils/logger";
 import FormErrors from "~/core/components/form-error";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
@@ -80,8 +81,7 @@ async function isTurnstileTokenValid(token: string) {
     const outcome = await result.json();
     return outcome.success;
   } catch (error) {
-    // 실패 시 에러 로깅 후 false 반환
-    console.error(error);
+    logger.error(error);
     return false;
   }
 }
@@ -123,8 +123,7 @@ async function isHcaptchaTokenValid(token: string) {
     const outcome = await result.json();
     return outcome.success;
   } catch (error) {
-    // 실패 시 에러 로깅 후 false 반환
-    console.error(error);
+    logger.error(error);
     return false;
   }
 }

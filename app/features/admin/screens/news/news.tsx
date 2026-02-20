@@ -49,12 +49,9 @@ export default function News({ loaderData }: Route.ComponentProps) {
         columns={newsColumns}
         searchPlaceholder="뉴스 제목, 카테고리 검색..."
         emptyMessage="등록된 뉴스가 없습니다."
-        onRowSelectionChange={(selectedRows) => {
-          console.log("선택된 뉴스:", selectedRows);
-        }}
+        onRowSelectionChange={() => {}}
         onDeleteSelected={async (selectedRows) => {
           // TODO: 실제 삭제 로직 구현
-          console.log("삭제할 뉴스:", selectedRows);
           if (
             confirm(
               `선택한 ${selectedRows.length}개의 뉴스를 삭제하시겠습니까?`,

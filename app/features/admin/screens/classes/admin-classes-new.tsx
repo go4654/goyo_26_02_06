@@ -70,7 +70,6 @@ export default function ClassesNew() {
           const compressedFile = await compressImageToWebp(thumbnailFile);
           formData.append("thumbnail", compressedFile);
         } catch (error) {
-          console.error("이미지 압축 실패:", error);
           alert(
             error instanceof Error
               ? error.message
@@ -94,8 +93,7 @@ export default function ClassesNew() {
         method: "POST",
         encType: "multipart/form-data",
       });
-    } catch (error) {
-      console.error("클래스 등록 실패:", error);
+    } catch {
       alert("클래스 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
       setIsSubmitting(false);
     }

@@ -5,6 +5,8 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "~/core/utils/logger";
+
 /** 뉴스 목록 조회 파라미터 */
 export interface GetNewsListParams {
   page?: number;
@@ -153,12 +155,7 @@ export async function incrementNewsView(
     user_id: userId,
   });
   if (error) {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("[incrementNewsView]", error.message);
-    }
+    logger.error("[incrementNewsView]", error.message);
     throw new Error("뉴스 조회 이벤트 기록에 실패했습니다.");
   }
 }

@@ -113,10 +113,10 @@ export default function MDXEditor({
         formData.append("classId", classId);
         formData.append("image", compressedFile);
 
-        // 서버에 업로드 요청
+        // 서버에 업로드 요청 (라우트: /api/admin/upload-content-image)
         fetcher.submit(formData, {
           method: "POST",
-          action: "/admin/api/upload-content-image",
+          action: "/api/admin/upload-content-image",
           encType: "multipart/form-data",
         });
       } else {
@@ -144,45 +144,34 @@ export default function MDXEditor({
         }
       }
     } catch (err) {
-      console.error("이미지 압축 실패:", err);
       alert(
         err instanceof Error
           ? err.message
           : "이미지 압축에 실패했습니다. 다시 시도해주세요.",
       );
       setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  // 업로드 완료 처리 (useEffect로 처리)
+  // 업로드 완료/에러 처리 (useEffect, 페이지 이동 없음)
   useEffect(() => {
-    if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
+    if (!fetcher.data || fetcher.state !== "idle") return;
+
+    if ("success" in fetcher.data && fetcher.data.success && fetcher.data.url) {
       const publicUrl = fetcher.data.url as string;
-      const fileName = "이미지";
-      
-      // MDX 이미지 마크다운 삽입
-      const imageMarkdown = `![${fileName}](${publicUrl})\n\n`;
+      const imageMarkdown = `![이미지](${publicUrl})\n\n`;
       insertTextAtCursor(imageMarkdown);
-      
-      setIsUploading(false);
-      // 파일 입력 초기화
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
 
-    // 업로드 에러 처리
-    if (fetcher.data && "error" in fetcher.data && fetcher.data.error) {
+    if ("error" in fetcher.data && fetcher.data.error) {
       alert(fetcher.data.error as string);
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }, [fetcher.data]);
+
+    setIsUploading(false);
+  }, [fetcher.data, fetcher.state]);
 
   // 업로드 중 상태 업데이트
   useEffect(() => {

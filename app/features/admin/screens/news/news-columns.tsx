@@ -66,19 +66,13 @@ const actionColumn: ColumnDef<AdminNewsRow> = {
           <DropdownMenuContent align="end" className="p-2">
             <DropdownMenuItem
               className="cursor-pointer"
-              onSelect={(e) => {
-                e.preventDefault();
-                console.log("edit", item.id);
-              }}
+              onSelect={(e) => e.preventDefault()}
             >
               수정
             </DropdownMenuItem>
             <DropdownMenuItem
               className="cursor-pointer text-destructive focus:text-destructive"
-              onSelect={(e) => {
-                e.preventDefault();
-                console.log("delete", item.id);
-              }}
+              onSelect={(e) => e.preventDefault()}
             >
               삭제
             </DropdownMenuItem>

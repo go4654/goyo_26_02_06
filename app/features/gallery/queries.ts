@@ -5,6 +5,8 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "~/core/utils/logger";
+
 /** 갤러리 목록 조회 파라미터 */
 export interface GetGalleriesParams {
   /** 카테고리 필터 (galleries.category, 'all' 또는 null이면 전체) */
@@ -250,12 +252,7 @@ export async function getAdjacentGallerySlugs(
     .limit(100);
 
   if (error) {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("[getAdjacentGallerySlugs]", error.message);
-    }
+    logger.error("[getAdjacentGallerySlugs]", error.message);
     return { prevSlug: null, nextSlug: null };
   }
 
@@ -295,12 +292,7 @@ export async function incrementGalleryView(
     user_id: userId,
   });
   if (error) {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("[incrementGalleryView]", error.message);
-    }
+    logger.error("[incrementGalleryView]", error.message);
     throw new Error("갤러리 조회 이벤트 기록에 실패했습니다.");
   }
 }

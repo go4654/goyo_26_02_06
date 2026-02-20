@@ -1,84 +1,111 @@
 import type { Route } from "./+types/admin-classes-edit";
 
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useFetcher, useNavigate } from "react-router";
 
 import AdminContentForm, {
   type ContentFormData,
+  type PendingImage,
   type SubCategory,
 } from "../../components/admin-content-form";
+import { compressImageToWebp } from "../../utils/image-upload";
 import { classDetailLoader } from "./server/classes-detail.loader";
-import { classesAction } from "./server/classes.action";
+import { classesUpdateAction } from "./server/classes-update.action";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `클래스 수정 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
 export const loader = classDetailLoader;
-export const action = classesAction;
+export const action = classesUpdateAction;
+
+/** 액션 응답 타입 */
+type ActionResponse = { success: true; slug: string } | { error: string };
 
 /**
  * 클래스 수정 페이지
  *
- * 기능:
- * - 기존 클래스 데이터를 폼에 자동으로 채움
- * - 수정된 내용을 저장
- * - 취소 시 목록 페이지로 이동
+ * - 기존 데이터 로드 후 폼에 반영, 실제 썸네일 URL로 미리보기 표시
+ * - 수정 시 썸네일·MDX 이미지·태그·DB 안전 동기화
  */
 export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const fetcher = useFetcher<ActionResponse>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
   const { class: classData } = loaderData;
 
-  /**
-   * 폼 제출 핸들러
-   * 수정된 클래스 데이터를 처리합니다.
-   */
   const handleSubmit = async (
     data: ContentFormData,
     thumbnailFile: File | null,
   ) => {
-    // TODO: Supabase 연동하여 실제 수정 처리
-    console.log("클래스 수정 데이터:", {
-      id: classData.id,
-      title: data.title,
-      description: data.description,
-      tags: data.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean),
-      content: data.content,
-      isVisible: data.isVisible,
-      thumbnailFile: thumbnailFile ? thumbnailFile.name : "없음",
-    });
+    setIsSubmitting(true);
 
-    // 임시: 성공 메시지 표시 후 목록으로 이동
-    alert("클래스가 수정되었습니다. (임시 메시지)");
-    navigate("/admin/classes");
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("description", data.description ?? "");
+      formData.append("category", data.category);
+      formData.append("tags", data.tags ?? "");
+      formData.append("content", data.content);
+      formData.append("isPublished", data.isVisible ? "true" : "false");
+
+      if (thumbnailFile && thumbnailFile.size > 0) {
+        try {
+          const compressed = await compressImageToWebp(thumbnailFile);
+          formData.append("thumbnail", compressed);
+        } catch (error) {
+          alert(
+            error instanceof Error
+              ? error.message
+              : "이미지 압축에 실패했습니다. 다시 시도해주세요.",
+          );
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      pendingImages.forEach((pending) => {
+        formData.append("contentImages", pending.file);
+        formData.append("contentImageTempIds", pending.tempId);
+      });
+
+      fetcher.submit(formData, {
+        method: "POST",
+        encType: "multipart/form-data",
+      });
+    } catch {
+      alert("클래스 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setIsSubmitting(false);
+    }
   };
 
-  /**
-   * 취소 핸들러
-   * 목록 페이지로 이동합니다.
-   */
+  useEffect(() => {
+    if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
+      navigate("/admin/classes");
+    }
+    if (fetcher.data && "error" in fetcher.data && fetcher.data.error) {
+      if (!isSubmitting) setIsSubmitting(false);
+      alert(fetcher.data.error);
+    }
+  }, [fetcher.data, isSubmitting, navigate]);
+
   const handleCancel = () => {
     navigate("/admin/classes");
   };
 
-  /**
-   * 로더에서 가져온 클래스 데이터를 폼 데이터 형식으로 변환
-   * tags 배열을 쉼표로 구분된 문자열로 변환
-   */
   const initialFormData: ContentFormData = {
     title: classData.title,
     description: classData.description ?? "",
     category: classData.category as SubCategory,
-    tags: classData.tags.join(", "), // 배열을 쉼표로 구분된 문자열로 변환
+    tags: classData.tags.join(", "),
     content: classData.content,
     isVisible: classData.isVisible,
+    thumbnailImageUrl: classData.thumbnail_image_url ?? undefined,
   };
 
   return (
     <div className="mx-auto flex w-full max-w-[1000px] flex-1 flex-col gap-6 p-4 pt-0">
-      {/* 페이지 헤더 */}
       <div>
         <h1 className="text-h5">클래스 수정</h1>
         <p className="text-text-2 mt-2 text-sm">
@@ -86,7 +113,6 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
         </p>
       </div>
 
-      {/* 폼 영역 */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <AdminContentForm
           initialData={initialFormData}
@@ -94,6 +120,10 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
           onCancel={handleCancel}
           submitLabel="수정 완료"
           classId={classData.id}
+          isLoading={isSubmitting || fetcher.state === "submitting"}
+          onPendingImagesChange={(updater) => {
+            setPendingImages((prev) => updater(prev));
+          }}
         />
       </div>
     </div>

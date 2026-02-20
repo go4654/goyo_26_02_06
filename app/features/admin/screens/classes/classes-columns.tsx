@@ -74,7 +74,7 @@ const actionColumn: ColumnDef<AdminClassRow> = {
               수정
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="cursor-pointer text-destructive focus:text-destructive"
+              className="text-destructive focus:text-destructive cursor-pointer"
               onSelect={(e) => {
                 e.preventDefault();
                 console.log("delete", item.id);

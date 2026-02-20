@@ -5,6 +5,7 @@ import { data } from "react-router";
 
 import { requireAuthentication } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
+import { logger } from "~/core/utils/logger";
 
 import {
   getAdjacentGallerySlugs,
@@ -63,7 +64,7 @@ export async function galleryDetailLoader({
         .eq("gallery_id", gallery.id)
         .then((r) => ({ count: r.count ?? 0, error: r.error })),
     ]).catch((error) => {
-      console.error("갤러리 좋아요/저장 카운트 계산 실패:", error);
+      logger.error("갤러리 좋아요/저장 카운트 계산 실패:", error);
       return [{ count: 0, error: null }, { count: 0, error: null }];
     }),
     userId
@@ -82,12 +83,7 @@ export async function galleryDetailLoader({
 
   // 조회 이벤트 기록 (트리거로 galleries.view_count 자동 증가). 실패해도 페이지는 노출
   incrementGalleryView(client, gallery.id, userId).catch((err) => {
-    if (
-      typeof process !== "undefined" &&
-      process.env?.NODE_ENV === "development"
-    ) {
-      console.error("갤러리 조회수 증가 실패:", err);
-    }
+    logger.error("갤러리 조회수 증가 실패:", err);
   });
 
   // description / caption이 MDX로 저장된 경우 번들링

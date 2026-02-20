@@ -1,30 +1,22 @@
 /**
- * 개발 환경 전용 로거
- * 프로덕션에서는 아무것도 출력하지 않습니다.
+ * 개발 환경(DEV) 전용 로거
+ * NODE_ENV가 development/dev가 아니면 로그를 출력하지 않습니다.
  */
 
-const isDevelopment =
+const isDev =
   process.env.NODE_ENV === "development" || process.env.NODE_ENV === "dev";
 
 export const logger = {
   log: (...args: unknown[]) => {
-    if (isDevelopment) {
-      console.log(...args);
-    }
+    if (isDev) console.log(...args);
   },
   error: (...args: unknown[]) => {
-    if (isDevelopment) {
-      console.error(...args);
-    }
+    if (isDev) console.error(...args);
   },
   warn: (...args: unknown[]) => {
-    if (isDevelopment) {
-      console.warn(...args);
-    }
+    if (isDev) console.warn(...args);
   },
   info: (...args: unknown[]) => {
-    if (isDevelopment) {
-      console.info(...args);
-    }
+    if (isDev) console.info(...args);
   },
 };

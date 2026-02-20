@@ -38,7 +38,10 @@ export default function NewsNew() {
     console.log("뉴스 등록 데이터:", {
       title: data.title,
       description: data.description,
-      tags: data.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      tags: data.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
       content: data.content,
       isVisible: data.isVisible,
     });

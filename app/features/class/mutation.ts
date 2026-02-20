@@ -6,6 +6,8 @@
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "~/core/utils/logger";
+
 /**
  * 댓글 생성
  *
@@ -33,9 +35,7 @@ export async function createComment(
   });
 
   if (error) {
-    if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-      console.error("[createComment] Supabase error:", error.message, error.details);
-    }
+    logger.error("[createComment] Supabase error:", error.message, error.details);
     throw new Error("댓글 등록에 실패했습니다.");
   }
 }
@@ -64,9 +64,7 @@ export async function updateComment(
     .eq("user_id", userId);
 
   if (error) {
-    if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-      console.error("[updateComment] Supabase error:", error.message, error.details);
-    }
+    logger.error("[updateComment] Supabase error:", error.message, error.details);
     throw new Error("댓글 수정에 실패했습니다.");
   }
 }
@@ -99,10 +97,7 @@ export async function deleteComment(
     .select("id");
 
   if (error) {
-    // 클라이언트에는 상세 에러를 노출하지 않음 (보안)
-    if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-      console.error("[deleteComment] Supabase error:", error.message, error.details, error.hint);
-    }
+    logger.error("[deleteComment] Supabase error:", error.message, error.details, error.hint);
     throw new Error("댓글 삭제에 실패했습니다.");
   }
 
@@ -146,9 +141,7 @@ export async function toggleCommentLike(
       .eq("user_id", userId);
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleCommentLike] cancel error:", error.message, error.details);
-      }
+      logger.error("[toggleCommentLike] cancel error:", error.message, error.details);
       throw new Error("좋아요 취소에 실패했습니다.");
     }
 
@@ -163,9 +156,7 @@ export async function toggleCommentLike(
       });
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleCommentLike] add error:", error.message, error.details);
-      }
+      logger.error("[toggleCommentLike] add error:", error.message, error.details);
       throw new Error("좋아요 등록에 실패했습니다.");
     }
 
@@ -207,9 +198,7 @@ export async function toggleClassLike(
       .eq("user_id", userId);
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleClassLike] cancel error:", error.message, error.details);
-      }
+      logger.error("[toggleClassLike] cancel error:", error.message, error.details);
       throw new Error("좋아요 취소에 실패했습니다.");
     }
 
@@ -222,9 +211,7 @@ export async function toggleClassLike(
     });
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleClassLike] add error:", error.message, error.details);
-      }
+      logger.error("[toggleClassLike] add error:", error.message, error.details);
       throw new Error("좋아요 등록에 실패했습니다.");
     }
 
@@ -266,9 +253,7 @@ export async function toggleClassSave(
       .eq("user_id", userId);
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleClassSave] cancel error:", error.message, error.details);
-      }
+      logger.error("[toggleClassSave] cancel error:", error.message, error.details);
       throw new Error("저장 취소에 실패했습니다.");
     }
 
@@ -281,9 +266,7 @@ export async function toggleClassSave(
     });
 
     if (error) {
-      if (typeof process !== "undefined" && process.env?.NODE_ENV === "development") {
-        console.error("[toggleClassSave] add error:", error.message, error.details);
-      }
+      logger.error("[toggleClassSave] add error:", error.message, error.details);
       throw new Error("저장 등록에 실패했습니다.");
     }
 

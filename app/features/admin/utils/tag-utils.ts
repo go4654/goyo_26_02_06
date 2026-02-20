@@ -110,6 +110,27 @@ export async function linkTagsToClass(
 }
 
 /**
+ * 클래스에 연결된 모든 태그 연결을 삭제합니다.
+ * 수정 시 기존 태그를 제거한 뒤 재연결할 때 사용합니다.
+ *
+ * @param client - Supabase 클라이언트
+ * @param classId - 클래스 ID
+ */
+export async function unlinkAllTagsFromClass(
+  client: SupabaseClient<Database>,
+  classId: string,
+): Promise<void> {
+  const { error } = await client
+    .from("class_tags")
+    .delete()
+    .eq("class_id", classId);
+
+  if (error) {
+    throw new Error(`클래스 태그 연결 삭제 실패: ${error.message}`);
+  }
+}
+
+/**
  * 태그 문자열을 처리하여 클래스에 연결합니다.
  *
  * @param client - Supabase 클라이언트

@@ -73,6 +73,50 @@ export async function uploadContentImage(
 }
 
 /**
+ * Supabase Storage 공개 URL에서 버킷 내 저장 경로 추출
+ * 예: .../object/public/class/classId/content/abc.webp → classId/content/abc.webp
+ *
+ * @param bucket - 버킷 이름
+ * @param publicUrl - getPublicUrl로 얻은 공개 URL
+ * @returns 경로 또는 null (패턴 불일치 시)
+ */
+export function getStoragePathFromPublicUrl(
+  bucket: string,
+  publicUrl: string,
+): string | null {
+  const segment = `/object/public/${bucket}/`;
+  const idx = publicUrl.indexOf(segment);
+  if (idx === -1) return null;
+  const path = publicUrl.slice(idx + segment.length).split("?")[0].trim();
+  return path || null;
+}
+
+/**
+ * Storage에서 지정 경로들의 파일만 삭제
+ * 다른 클래스 경로 삭제 방지를 위해 paths 검증은 호출부에서 수행할 것.
+ *
+ * @param client - Supabase 클라이언트
+ * @param bucket - 버킷 이름
+ * @param paths - 삭제할 파일 경로 배열 (버킷 기준 상대 경로)
+ */
+export async function removeStorageFiles(
+  client: SupabaseClient<Database>,
+  bucket: string,
+  paths: string[],
+): Promise<void> {
+  if (paths.length === 0) return;
+
+  const { error } = await client.storage.from(bucket).remove(paths);
+
+  if (error) {
+    if (error.message.includes("not found")) {
+      return;
+    }
+    throw new Error(`Storage 파일 삭제 실패: ${error.message}`);
+  }
+}
+
+/**
  * 재귀적으로 모든 파일 경로를 수집합니다.
  */
 async function collectAllFilePaths(
