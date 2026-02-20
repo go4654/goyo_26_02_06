@@ -56,13 +56,27 @@ export async function getOrCreateTag(
     return existingTag.id as string;
   }
 
-  // 새 태그 생성
   // slug는 name을 기반으로 생성 (소문자, 공백을 하이픈으로)
   const slug = tagName
     .toLowerCase()
     .replace(/\s+/g, "-")
     .replace(/[^\w-]/g, "");
 
+  // 같은 slug를 가진 태그가 이미 있으면 해당 id 반환 (Design / design 등으로 slug 중복 방지)
+  const { data: existingBySlug, error: slugSelectError } = await client
+    .from("tags")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+
+  if (slugSelectError && slugSelectError.code !== "PGRST116") {
+    throw new Error(`태그 조회 실패: ${slugSelectError.message}`);
+  }
+  if (existingBySlug) {
+    return existingBySlug.id as string;
+  }
+
+  // 새 태그 생성
   const { data: newTag, error: insertError } = await client
     .from("tags")
     .insert({
@@ -156,4 +170,57 @@ export async function processTagsForClass(
 
   // 클래스에 태그 연결
   await linkTagsToClass(client, classId, tagIds);
+}
+
+/**
+ * 갤러리에 태그를 연결합니다.
+ *
+ * @param client - Supabase 클라이언트
+ * @param galleryId - 갤러리 ID
+ * @param tagIds - 태그 ID 배열
+ */
+export async function linkTagsToGallery(
+  client: SupabaseClient<Database>,
+  galleryId: string,
+  tagIds: string[],
+): Promise<void> {
+  if (tagIds.length === 0) {
+    return;
+  }
+
+  const galleryTagsData = tagIds.map((tagId) => ({
+    gallery_id: galleryId,
+    tag_id: tagId,
+  }));
+
+  const { error } = await client.from("gallery_tags").insert(galleryTagsData);
+
+  if (error) {
+    throw new Error(`갤러리 태그 연결 실패: ${error.message}`);
+  }
+}
+
+/**
+ * 태그 문자열을 처리하여 갤러리에 연결합니다.
+ *
+ * @param client - Supabase 클라이언트
+ * @param galleryId - 갤러리 ID
+ * @param tagString - 쉼표로 구분된 태그 문자열
+ */
+export async function processTagsForGallery(
+  client: SupabaseClient<Database>,
+  galleryId: string,
+  tagString: string,
+): Promise<void> {
+  const tagNames = normalizeTags(tagString);
+
+  if (tagNames.length === 0) {
+    return;
+  }
+
+  const tagIds = await Promise.all(
+    tagNames.map((tagName) => getOrCreateTag(client, tagName)),
+  );
+
+  await linkTagsToGallery(client, galleryId, tagIds);
 }
