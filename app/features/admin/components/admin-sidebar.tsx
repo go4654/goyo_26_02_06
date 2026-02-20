@@ -2,11 +2,11 @@ import {
   BookOpenIcon,
   GalleryVerticalEndIcon,
   LayoutDashboardIcon,
-  LineChartIcon,
   NewspaperIcon,
   Settings2Icon,
   UsersIcon,
 } from "lucide-react";
+import { Link } from "react-router";
 
 import { Separator } from "~/core/components/ui/separator";
 import {
@@ -18,8 +18,6 @@ import {
 } from "~/core/components/ui/sidebar";
 import { LOGO_URL } from "~/core/constant/imgUrls";
 import SidebarMain from "~/features/users/components/sidebar-main";
-import SidebarProjects from "~/features/users/components/sidebar-projects";
-import TeamSwitcher from "~/features/users/components/sidebar-team-switcher";
 import SidebarUser from "~/features/users/components/sidebar-user";
 
 const data = {
@@ -51,6 +49,7 @@ const data = {
       title: "콘텐츠 관리",
       url: "#",
       icon: BookOpenIcon,
+      isActive: true,
       items: [
         {
           title: "클래스",
@@ -70,6 +69,7 @@ const data = {
       title: "사용자 관리",
       url: "#",
       icon: UsersIcon,
+      isActive: true,
       items: [
         {
           title: "회원 목록",
@@ -130,7 +130,9 @@ export default function AdminSidebar({
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
         <div className="pb-3">
-          <img src={LOGO_URL} alt="logo" width={100} height={100} />
+          <Link to="/">
+            <img src={LOGO_URL} alt="logo" width={100} height={100} />
+          </Link>
         </div>
         <Separator />
       </SidebarHeader>

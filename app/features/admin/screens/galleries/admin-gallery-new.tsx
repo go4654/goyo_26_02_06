@@ -1,14 +1,8 @@
 import type { Route } from "./+types/admin-gallery-new";
 
+import { Image, Loader2, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
-import { Image, X } from "lucide-react";
-
-import {
-  GALLERY_CATEGORIES,
-  GALLERY_CATEGORY_LABELS,
-  type GalleryCategory,
-} from "~/features/gallery/constants";
 
 import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
@@ -22,6 +16,11 @@ import {
   SelectValue,
 } from "~/core/components/ui/select";
 import { Textarea } from "~/core/components/ui/textarea";
+import {
+  GALLERY_CATEGORIES,
+  GALLERY_CATEGORY_LABELS,
+  type GalleryCategory,
+} from "~/features/gallery/constants";
 
 import MDXEditor, { type PendingImage } from "../../components/mdx-editor";
 import { compressImageToWebp } from "../../utils/image-upload";
@@ -33,9 +32,7 @@ export const meta: Route.MetaFunction = () => {
 
 export const action = galleriesCreateAction;
 
-type ActionResponse =
-  | { success: true; galleryId: string }
-  | { error: string };
+type ActionResponse = { success: true; galleryId: string } | { error: string };
 
 /** 갤러리 등록 폼: 클래스 description=subtitle, content_mdx=description, caption=추가 MDX */
 interface GalleryFormData {
@@ -72,7 +69,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
   const [formData, setFormData] = useState<GalleryFormData>(INITIAL_FORM);
-  const [errors, setErrors] = useState<Partial<Record<keyof GalleryFormData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof GalleryFormData, string>>
+  >({});
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +88,8 @@ export default function GalleryNew(_props: Route.ComponentProps) {
     e.preventDefault();
     const newErrors: Partial<Record<keyof GalleryFormData, string>> = {};
     if (!formData.title.trim()) newErrors.title = "타이틀을 입력해주세요.";
-    if (!formData.description.trim()) newErrors.description = "본문(설명)을 입력해주세요.";
+    if (!formData.description.trim())
+      newErrors.description = "본문(설명)을 입력해주세요.";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -148,13 +148,15 @@ export default function GalleryNew(_props: Route.ComponentProps) {
       alert("파일 크기는 10MB 이하여야 합니다.");
       return;
     }
-    if (thumbnailPreview?.startsWith("blob:")) URL.revokeObjectURL(thumbnailPreview);
+    if (thumbnailPreview?.startsWith("blob:"))
+      URL.revokeObjectURL(thumbnailPreview);
     setThumbnailPreview(URL.createObjectURL(file));
     setThumbnailFile(file);
   };
 
   const handleThumbnailRemove = () => {
-    if (thumbnailPreview?.startsWith("blob:")) URL.revokeObjectURL(thumbnailPreview);
+    if (thumbnailPreview?.startsWith("blob:"))
+      URL.revokeObjectURL(thumbnailPreview);
     setThumbnailPreview(null);
     setThumbnailFile(null);
     if (thumbnailInputRef.current) thumbnailInputRef.current.value = "";
@@ -194,7 +196,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="absolute -right-2 -top-2 size-6"
+                    className="absolute -top-2 -right-2 size-6"
                     onClick={handleThumbnailRemove}
                     aria-label="썸네일 제거"
                   >
@@ -265,7 +267,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
               placeholder="갤러리 제목"
               aria-invalid={!!errors.title}
             />
-            {errors.title && <p className="text-destructive text-sm">{errors.title}</p>}
+            {errors.title && (
+              <p className="text-destructive text-sm">{errors.title}</p>
+            )}
           </div>
 
           {/* 서브타이틀 (클래스 description과 동일 용도) */}
@@ -285,7 +289,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
             <Label htmlFor="category">카테고리 *</Label>
             <Select
               value={formData.category}
-              onValueChange={(v) => updateField("category", v as GalleryCategory)}
+              onValueChange={(v) =>
+                updateField("category", v as GalleryCategory)
+              }
             >
               <SelectTrigger id="category" className="w-full">
                 <SelectValue placeholder="카테고리 선택" />
@@ -319,7 +325,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
               onChange={(value) => updateField("description", value)}
               placeholder="MDX 코드를 입력하세요..."
               error={errors.description}
-              onPendingImagesChange={(updater) => setPendingImages((prev) => updater(prev))}
+              onPendingImagesChange={(updater) =>
+                setPendingImages((prev) => updater(prev))
+              }
             />
             {errors.description && (
               <p className="text-destructive text-sm">{errors.description}</p>
@@ -333,7 +341,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
               value={formData.caption}
               onChange={(value) => updateField("caption", value)}
               placeholder="추가 MDX (선택 사항)"
-              onPendingImagesChange={(updater) => setPendingImages((prev) => updater(prev))}
+              onPendingImagesChange={(updater) =>
+                setPendingImages((prev) => updater(prev))
+              }
             />
           </div>
 
@@ -342,9 +352,14 @@ export default function GalleryNew(_props: Route.ComponentProps) {
             <Checkbox
               id="isVisible"
               checked={formData.isVisible}
-              onCheckedChange={(checked) => updateField("isVisible", checked === true)}
+              onCheckedChange={(checked) =>
+                updateField("isVisible", checked === true)
+              }
             />
-            <Label htmlFor="isVisible" className="cursor-pointer text-sm font-normal">
+            <Label
+              htmlFor="isVisible"
+              className="cursor-pointer text-sm font-normal"
+            >
               공개 여부
             </Label>
           </div>
@@ -359,7 +374,11 @@ export default function GalleryNew(_props: Route.ComponentProps) {
               취소
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "처리 중..." : "갤러리 등록"}
+              {isLoading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "갤러리 등록"
+              )}
             </Button>
           </div>
         </form>

@@ -5,16 +5,18 @@ import makeServerClient from "~/core/lib/supa-client.server";
 
 /**
  * 갤러리 수정 페이지용 상세 타입
- * AdminContentForm의 ContentFormData와 맞춤
  */
 export type AdminGalleryDetail = {
   id: string;
   title: string;
-  description: string;
-  tags: string[];
-  content: string;
-  isVisible: boolean;
+  subtitle: string | null;
+  description: string | null;
+  caption: string | null;
   category: string;
+  tags: string[];
+  isVisible: boolean;
+  thumbnail_image_url: string | null;
+  image_urls: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -22,10 +24,13 @@ export type AdminGalleryDetail = {
 interface GalleryRow {
   id: string;
   title: string;
+  subtitle: string | null;
   description: string | null;
   caption: string | null;
   category: string;
   is_published: boolean;
+  thumbnail_image_url: string | null;
+  image_urls: string[];
   created_at: string;
   updated_at: string;
   gallery_tags?: Array<{ tags: { name: string } | null }>;
@@ -33,7 +38,7 @@ interface GalleryRow {
 
 /**
  * 갤러리 수정 페이지 로더
- * slug로 갤러리 조회 (관리자용, is_published 무관)
+ * slug로 갤러리 조회 (관리자용), 썸네일·image_urls·description·subtitle·caption·category·is_published 반환
  */
 export async function galleryDetailLoader({
   params,
@@ -51,7 +56,7 @@ export async function galleryDetailLoader({
   const { data: row, error } = await client
     .from("galleries")
     .select(
-      "id, title, description, caption, category, is_published, created_at, updated_at, gallery_tags(tags(name))",
+      "id, title, subtitle, description, caption, category, is_published, thumbnail_image_url, image_urls, created_at, updated_at, gallery_tags(tags(name))",
     )
     .eq("slug", slug)
     .single();
@@ -71,11 +76,14 @@ export async function galleryDetailLoader({
   const gallery: AdminGalleryDetail = {
     id: r.id,
     title: r.title,
-    description: r.description ?? "",
-    tags,
-    content: r.caption ?? r.description ?? "",
-    isVisible: r.is_published,
+    subtitle: r.subtitle ?? null,
+    description: r.description ?? null,
+    caption: r.caption ?? null,
     category: r.category,
+    tags,
+    isVisible: r.is_published,
+    thumbnail_image_url: r.thumbnail_image_url ?? null,
+    image_urls: Array.isArray(r.image_urls) ? [...r.image_urls] : [],
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };

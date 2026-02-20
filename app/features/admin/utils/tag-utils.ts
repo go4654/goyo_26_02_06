@@ -201,6 +201,24 @@ export async function linkTagsToGallery(
 }
 
 /**
+ * 갤러리에 연결된 모든 태그 연결을 삭제합니다.
+ * 수정 시 기존 태그를 제거한 뒤 재연결할 때 사용합니다.
+ */
+export async function unlinkAllTagsFromGallery(
+  client: SupabaseClient<Database>,
+  galleryId: string,
+): Promise<void> {
+  const { error } = await client
+    .from("gallery_tags")
+    .delete()
+    .eq("gallery_id", galleryId);
+
+  if (error) {
+    throw new Error(`갤러리 태그 연결 삭제 실패: ${error.message}`);
+  }
+}
+
+/**
  * 태그 문자열을 처리하여 갤러리에 연결합니다.
  *
  * @param client - Supabase 클라이언트
