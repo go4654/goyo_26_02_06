@@ -2,17 +2,8 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import type { AdminNewsRow } from "./server/news.loader";
 
-import { EllipsisVertical } from "lucide-react";
-
 import { Badge } from "~/core/components/ui/badge";
-import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/core/components/ui/dropdown-menu";
 
 import { formatDate, formatNumber } from "./lib/formatters";
 
@@ -38,73 +29,27 @@ const selectColumn: ColumnDef<AdminNewsRow> = {
       aria-label="행 선택"
     />
   ),
-  enableResizing: false, // 체크박스 컬럼은 리사이징 비활성화
-  enableSorting: false, // 체크박스 컬럼은 정렬 비활성화
+  enableResizing: false,
+  enableSorting: false,
   size: 50,
   minSize: 50,
   maxSize: 50,
 };
 
 /**
- * 액션 컬럼 - 수정/삭제 드롭다운 메뉴
- */
-const actionColumn: ColumnDef<AdminNewsRow> = {
-  id: "actions",
-  header: "",
-  cell: ({ row }) => {
-    const item = row.original;
-
-    return (
-      <div className="flex justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-text-2">
-              <EllipsisVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="p-2">
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onSelect={(e) => e.preventDefault()}
-            >
-              수정
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer text-destructive focus:text-destructive"
-              onSelect={(e) => e.preventDefault()}
-            >
-              삭제
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    );
-  },
-  enableResizing: false, // 액션 컬럼은 리사이징 비활성화
-  enableSorting: false, // 액션 컬럼은 정렬 비활성화
-  size: 60,
-  minSize: 60,
-  maxSize: 60,
-};
-
-/**
- * 뉴스 관리 테이블의 컬럼 정의
- * 컬럼 리사이징을 위해 size, minSize, maxSize 속성을 설정합니다.
- * 
- * 참고: 좋아요 수와 저장 수 컬럼은 제외되었습니다.
+ * 뉴스 관리 테이블 컬럼 정의
+ * 제목, 카테고리, 조회수, 공개여부, 작성일, 최근 수정일 (좋아요/저장 없음)
  */
 export const newsColumns: ColumnDef<AdminNewsRow>[] = [
   selectColumn,
   {
     accessorKey: "title",
     header: "제목",
-    cell: ({ row }) => {
-      const title = row.original.title;
-      return (
-        <div className="text-text-1 line-clamp-1 font-medium">{title}</div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="text-text-1 line-clamp-1 font-medium">
+        {row.original.title}
+      </div>
+    ),
     size: 300,
     minSize: 150,
     maxSize: 500,
@@ -120,11 +65,11 @@ export const newsColumns: ColumnDef<AdminNewsRow>[] = [
     maxSize: 200,
   },
   {
-    accessorKey: "views",
+    accessorKey: "view_count",
     header: "조회수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.views)}
+        {formatNumber(row.original.view_count)}
       </div>
     ),
     size: 100,
@@ -132,16 +77,16 @@ export const newsColumns: ColumnDef<AdminNewsRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "isVisible",
-    header: "노출여부",
+    accessorKey: "is_published",
+    header: "공개여부",
     cell: ({ row }) => {
-      const isVisible = row.original.isVisible;
+      const isPublished = row.original.is_published;
       return (
         <Badge
-          variant={isVisible ? "default" : "secondary"}
+          variant={isPublished ? "default" : "secondary"}
           className="rounded-full"
         >
-          {isVisible ? "노출" : "비노출"}
+          {isPublished ? "공개" : "비공개"}
         </Badge>
       );
     },
@@ -150,11 +95,11 @@ export const newsColumns: ColumnDef<AdminNewsRow>[] = [
     maxSize: 120,
   },
   {
-    accessorKey: "createdAt",
-    header: "등록일",
+    accessorKey: "created_at",
+    header: "작성일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.createdAt)}
+        {formatDate(row.original.created_at)}
       </div>
     ),
     size: 120,
@@ -162,16 +107,15 @@ export const newsColumns: ColumnDef<AdminNewsRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "updated_at",
     header: "최근 수정일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.updatedAt)}
+        {formatDate(row.original.updated_at)}
       </div>
     ),
     size: 120,
     minSize: 100,
     maxSize: 150,
   },
-  actionColumn,
 ];
