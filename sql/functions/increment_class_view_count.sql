@@ -1,24 +1,10 @@
-/**
- * 데이터베이스 트리거 함수: increment_class_view_count
- * 
- * 이 함수는 class_view_events 테이블에 새로운 조회 이벤트가 삽입될 때마다
- * classes 테이블의 view_count를 자동으로 증가시킵니다.
- * 
- * 이를 통해 조회수는 항상 조회 이벤트와 동기화되며,
- * 애플리케이션 레벨 업데이트 없이 실시간 조회 통계를 제공합니다.
- * 
- * 보안 고려사항:
- * - SECURITY DEFINER를 사용하여 함수 소유자의 권한으로 실행
- * - 빈 search_path 설정으로 search path injection 공격 방지
- * 
- * 사용법:
- * CREATE TRIGGER increment_class_view_count
- * AFTER INSERT ON class_view_events
- * FOR EACH ROW
- * EXECUTE FUNCTION public.increment_class_view_count();
- * 
- * @returns TRIGGER - 함수를 트리거한 NEW 레코드를 반환
- */
+-- ============================================================
+-- 클래스 조회수 트리거 (Supabase SQL Editor에서 전체 실행)
+-- ============================================================
+-- class_view_events INSERT 시 classes.view_count 자동 증가
+-- SET SEARCH_PATH = '' 이므로 반드시 public.classes 사용
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION public.increment_class_view_count()
 RETURNS TRIGGER
 LANGUAGE PLPGSQL
@@ -26,11 +12,18 @@ SECURITY DEFINER
 SET SEARCH_PATH = ''
 AS $$
 BEGIN
-    -- 클래스의 view_count 증가
-    UPDATE classes
+    UPDATE public.classes
     SET view_count = view_count + 1
     WHERE id = NEW.class_id;
-    
+
     RETURN NEW;
 END;
 $$;
+
+-- 트리거 재설치 (기존 트리거 제거 후 생성)
+DROP TRIGGER IF EXISTS increment_class_view_count ON public.class_view_events;
+
+CREATE TRIGGER increment_class_view_count
+AFTER INSERT ON public.class_view_events
+FOR EACH ROW
+EXECUTE FUNCTION public.increment_class_view_count();

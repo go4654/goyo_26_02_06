@@ -1,30 +1,10 @@
-/**
- * 데이터베이스 트리거 함수: sync_class_like_count
- * 
- * 이 함수는 좋아요가 삽입되거나 삭제될 때 classes 테이블의 like_count를
- * 자동으로 증가/감소시켜 유지합니다.
- * 
- * 두 가지 시나리오를 처리합니다:
- * 1. INSERT: 좋아요가 추가될 때 카운트 증가
- * 2. DELETE: 좋아요가 제거될 때 카운트 감소
- * 
- * 보안 고려사항:
- * - SECURITY DEFINER를 사용하여 함수 소유자의 권한으로 실행
- * - 빈 search_path 설정으로 search path injection 공격 방지
- * 
- * 사용법:
- * CREATE TRIGGER sync_class_like_count_insert
- * AFTER INSERT ON class_likes
- * FOR EACH ROW
- * EXECUTE FUNCTION public.sync_class_like_count();
- * 
- * CREATE TRIGGER sync_class_like_count_delete
- * AFTER DELETE ON class_likes
- * FOR EACH ROW
- * EXECUTE FUNCTION public.sync_class_like_count();
- * 
- * @returns TRIGGER - NEW 레코드(INSERT) 또는 OLD 레코드(DELETE)를 반환
- */
+-- ============================================================
+-- 클래스 좋아요 수 트리거 (Supabase SQL Editor에서 전체 실행)
+-- ============================================================
+-- class_likes INSERT/DELETE 시 classes.like_count 자동 동기화
+-- SET SEARCH_PATH = '' 이므로 반드시 public.classes 사용
+-- ============================================================
+
 CREATE OR REPLACE FUNCTION public.sync_class_like_count()
 RETURNS TRIGGER
 LANGUAGE PLPGSQL
@@ -33,21 +13,33 @@ SET SEARCH_PATH = ''
 AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
-        -- 좋아요가 추가될 때 like_count 증가
-        UPDATE classes
+        UPDATE public.classes
         SET like_count = like_count + 1
         WHERE id = NEW.class_id;
-        
+
         RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
-        -- 좋아요가 제거될 때 like_count 감소
-        UPDATE classes
-        SET like_count = like_count - 1
+        UPDATE public.classes
+        SET like_count = GREATEST(like_count - 1, 0)
         WHERE id = OLD.class_id;
-        
+
         RETURN OLD;
     END IF;
-    
+
     RETURN NULL;
 END;
 $$;
+
+-- 트리거 재설치 (기존 트리거 제거 후 생성)
+DROP TRIGGER IF EXISTS sync_class_like_count_insert ON public.class_likes;
+DROP TRIGGER IF EXISTS sync_class_like_count_delete ON public.class_likes;
+
+CREATE TRIGGER sync_class_like_count_insert
+AFTER INSERT ON public.class_likes
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_class_like_count();
+
+CREATE TRIGGER sync_class_like_count_delete
+AFTER DELETE ON public.class_likes
+FOR EACH ROW
+EXECUTE FUNCTION public.sync_class_like_count();
