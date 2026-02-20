@@ -1,8 +1,9 @@
 import type { Route } from "./+types/galleries";
 
 import { Plus } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useFetcher, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import {
   AlertDialog,
@@ -18,7 +19,7 @@ import { Button } from "~/core/components/ui/button";
 
 import AdminDataTable from "../../components/admin-data-table";
 import { galleriesColumns } from "./galleries-columns";
-import { galleriesAction } from "./server/galleries.action";
+import { galleriesDeleteAction } from "./server/galleries-delete.action";
 import { galleriesLoader } from "./server/galleries.loader";
 
 export const meta: Route.MetaFunction = () => {
@@ -26,7 +27,15 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export const loader = galleriesLoader;
-export const action = galleriesAction;
+export const action = galleriesDeleteAction;
+
+type DeleteActionResponse =
+  | {
+      success: true;
+      deletedCount: number;
+      failed: Array<{ galleryId: string; error: string }>;
+    }
+  | { error: string };
 
 /**
  * 갤러리 관리 페이지
@@ -36,6 +45,7 @@ export const action = galleriesAction;
  */
 export default function Galleries({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const fetcher = useFetcher<DeleteActionResponse>();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<typeof loaderData.rows>([]);
 
@@ -51,9 +61,49 @@ export default function Galleries({ loaderData }: Route.ComponentProps) {
   };
 
   const handleConfirmDelete = () => {
-    // TODO: 갤러리 일괄 삭제 액션 연동 시 구현
-    handleCloseDeleteDialog();
+    const galleryIds = selectedRows.map((row) => row.id);
+    fetcher.submit(
+      { galleryIds },
+      {
+        method: "DELETE",
+        encType: "application/json",
+      },
+    );
   };
+
+  useEffect(() => {
+    if (!fetcher.data) return;
+
+    if ("success" in fetcher.data && fetcher.data.success) {
+      const { deletedCount, failed } = fetcher.data;
+      handleCloseDeleteDialog();
+
+      if (failed && failed.length > 0) {
+        const errorMessages = failed
+          .map(
+            (f: { galleryId: string; error: string }) =>
+              `갤러리 ID ${f.galleryId}: ${f.error}`,
+          )
+          .join("\n");
+        toast.warning(`${deletedCount}개 삭제 완료`, {
+          description: `실패한 항목:\n${errorMessages}`,
+          duration: 5000,
+        });
+      } else {
+        toast.success(`${deletedCount}개의 갤러리가 삭제되었습니다.`, {
+          duration: 3000,
+        });
+      }
+    }
+
+    if ("error" in fetcher.data) {
+      handleCloseDeleteDialog();
+      toast.error("삭제 실패", {
+        description: fetcher.data.error,
+        duration: 5000,
+      });
+    }
+  }, [fetcher.data]);
 
   return (
     <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-4 p-4 pt-0">

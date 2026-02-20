@@ -200,3 +200,43 @@ export async function deleteClassStorageFolder(
     throw new Error(`Storage deletion failed. Database deletion aborted. ${deleteError.message}`);
   }
 }
+
+/** 갤러리 Storage 버킷 이름 */
+const GALLERY_BUCKET = "gallery";
+
+/**
+ * 갤러리의 Storage 폴더 전체를 삭제합니다.
+ * gallery/{galleryId}/ 경로의 모든 파일을 재귀적으로 삭제합니다.
+ *
+ * @param client - Supabase 클라이언트
+ * @param galleryId - 갤러리 ID
+ * @throws Storage 삭제 실패 시 에러를 throw (DB 삭제 중단)
+ */
+export async function deleteGalleryStorageFolder(
+  client: SupabaseClient<Database>,
+  galleryId: string,
+): Promise<void> {
+  const folderPath = galleryId;
+
+  const filePaths = await collectAllFilePaths(
+    client,
+    GALLERY_BUCKET,
+    folderPath,
+    [],
+  );
+
+  if (filePaths.length === 0) {
+    return;
+  }
+
+  const { error: deleteError } = await client.storage
+    .from(GALLERY_BUCKET)
+    .remove(filePaths);
+
+  if (deleteError) {
+    if (deleteError.message.includes("not found")) {
+      return;
+    }
+    throw new Error(`Storage deletion failed. Database deletion aborted. ${deleteError.message}`);
+  }
+}
