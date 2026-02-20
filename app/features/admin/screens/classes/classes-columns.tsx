@@ -201,5 +201,5 @@ export const classesColumns: ColumnDef<AdminClassRow>[] = [
     minSize: 100,
     maxSize: 150,
   },
-  actionColumn,
+  // actionColumn,
 ];

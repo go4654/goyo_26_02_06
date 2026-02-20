@@ -38,8 +38,8 @@ const selectColumn: ColumnDef<AdminGalleryRow> = {
       aria-label="행 선택"
     />
   ),
-  enableResizing: false, // 체크박스 컬럼은 리사이징 비활성화
-  enableSorting: false, // 체크박스 컬럼은 정렬 비활성화
+  enableResizing: false,
+  enableSorting: false,
   size: 50,
   minSize: 50,
   maxSize: 50,
@@ -52,8 +52,6 @@ const actionColumn: ColumnDef<AdminGalleryRow> = {
   id: "actions",
   header: "",
   cell: ({ row }) => {
-    const item = row.original;
-
     return (
       <div className="flex justify-end">
         <DropdownMenu>
@@ -71,7 +69,7 @@ const actionColumn: ColumnDef<AdminGalleryRow> = {
               수정
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="cursor-pointer text-destructive focus:text-destructive"
+              className="text-destructive focus:text-destructive cursor-pointer"
               onSelect={(e) => e.preventDefault()}
             >
               삭제
@@ -81,28 +79,27 @@ const actionColumn: ColumnDef<AdminGalleryRow> = {
       </div>
     );
   },
-  enableResizing: false, // 액션 컬럼은 리사이징 비활성화
-  enableSorting: false, // 액션 컬럼은 정렬 비활성화
+  enableResizing: false,
+  enableSorting: false,
   size: 60,
   minSize: 60,
   maxSize: 60,
 };
 
 /**
- * 갤러리 관리 테이블의 컬럼 정의
- * 컬럼 리사이징을 위해 size, minSize, maxSize 속성을 설정합니다.
+ * 갤러리 관리 테이블 컬럼 정의
+ * DB 필드(like_count, save_count, view_count, is_published, created_at, updated_at)에 바인딩
  */
 export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
   selectColumn,
   {
     accessorKey: "title",
     header: "제목",
-    cell: ({ row }) => {
-      const title = row.original.title;
-      return (
-        <div className="text-text-1 line-clamp-1 font-medium">{title}</div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="text-text-1 line-clamp-1 font-medium">
+        {row.original.title}
+      </div>
+    ),
     size: 300,
     minSize: 150,
     maxSize: 500,
@@ -118,11 +115,11 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 200,
   },
   {
-    accessorKey: "likes",
+    accessorKey: "like_count",
     header: "좋아요 수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.likes)}
+        {formatNumber(row.original.like_count)}
       </div>
     ),
     size: 100,
@@ -130,11 +127,11 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "saves",
+    accessorKey: "save_count",
     header: "저장 수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.saves)}
+        {formatNumber(row.original.save_count)}
       </div>
     ),
     size: 100,
@@ -142,11 +139,11 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "views",
+    accessorKey: "view_count",
     header: "조회수",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatNumber(row.original.views)}
+        {formatNumber(row.original.view_count)}
       </div>
     ),
     size: 100,
@@ -154,16 +151,16 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "isVisible",
+    accessorKey: "is_published",
     header: "노출여부",
     cell: ({ row }) => {
-      const isVisible = row.original.isVisible;
+      const isPublished = row.original.is_published;
       return (
         <Badge
-          variant={isVisible ? "default" : "secondary"}
+          variant={isPublished ? "default" : "secondary"}
           className="rounded-full"
         >
-          {isVisible ? "노출" : "비노출"}
+          {isPublished ? "노출" : "비노출"}
         </Badge>
       );
     },
@@ -172,11 +169,11 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 120,
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "created_at",
     header: "등록일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.createdAt)}
+        {formatDate(row.original.created_at)}
       </div>
     ),
     size: 120,
@@ -184,16 +181,16 @@ export const galleriesColumns: ColumnDef<AdminGalleryRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "updated_at",
     header: "최근 수정일",
     cell: ({ row }) => (
       <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.updatedAt)}
+        {formatDate(row.original.updated_at)}
       </div>
     ),
     size: 120,
     minSize: 100,
     maxSize: 150,
   },
-  actionColumn,
+  // actionColumn,
 ];

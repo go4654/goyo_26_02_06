@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import AdminContentForm, {
   type ContentFormData,
+  type SubCategory,
 } from "../../components/admin-content-form";
 import { galleryDetailLoader } from "./server/galleries-detail.loader";
 import { galleriesAction } from "./server/galleries.action";
@@ -54,7 +55,8 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   const initialFormData: ContentFormData = {
     title: galleryData.title,
     description: galleryData.description,
-    tags: galleryData.tags.join(", "), // 배열을 쉼표로 구분된 문자열로 변환
+    category: galleryData.category as SubCategory,
+    tags: galleryData.tags.join(", "),
     content: galleryData.content,
     isVisible: galleryData.isVisible,
   };
