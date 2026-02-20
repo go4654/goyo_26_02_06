@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  pgEnum,
   pgPolicy,
   pgTable,
   text,
@@ -13,7 +14,14 @@ import { authUid, authenticatedRole } from "drizzle-orm/supabase";
 
 import { timestamps } from "~/core/db/helpers.server";
 
+import { NEWS_CATEGORIES } from "./constants/news-categories";
 import { profiles } from "../users/schema";
+
+/** 관리자 여부 (SECURITY DEFINER, RLS 재귀 방지) */
+const isAdmin = sql`public.is_admin()`;
+
+/** DB enum: 뉴스 카테고리 (공지 / 업데이트 / 뉴스). 값은 constants/news-categories.ts와 동기화 */
+export const newsCategory = pgEnum("news_category", [...NEWS_CATEGORIES]);
 
 export const news = pgTable(
   "news",
@@ -24,12 +32,20 @@ export const news = pgTable(
     // 기본 정보
     // =========================
     title: text("title").notNull(),
-    category: text("category").notNull().default("notice"),
+    category: newsCategory("category").notNull().default("notice"),
 
     slug: text("slug").notNull().unique(),
 
     // 본문 (MDX)
     content_mdx: text("content_mdx").notNull(),
+
+    thumbnail_image_url: text("thumbnail_image_url"),
+
+    // 상세 상단 이미지들 (hero, section 등)
+    cover_image_urls: text("cover_image_urls")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
 
     // =========================
     // 공개 설정
@@ -66,6 +82,7 @@ export const news = pgTable(
     // =========================
     // SELECT 정책
     // =========================
+    // 공개된 뉴스만 조회 (공개 여부 true, visibility 조건)
     pgPolicy("select-news", {
       for: "select",
       to: "public",
@@ -81,44 +98,33 @@ export const news = pgTable(
         )
       `,
     }),
+    // 관리자는 모든 행 조회 가능 (비공개 수정 시 UPDATE 새 행이 SELECT 정책에도 통과하도록)
+    pgPolicy("select-news-admin", {
+      for: "select",
+      to: authenticatedRole,
+      as: "permissive",
+      using: isAdmin,
+    }),
 
     // =========================
-    // INSERT (관리자만)
+    // INSERT (관리자만, is_admin()로 RLS 재귀 방지)
     // =========================
     pgPolicy("admin-insert-news", {
       for: "insert",
       to: authenticatedRole,
       as: "permissive",
-      withCheck: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      withCheck: isAdmin,
     }),
 
     // =========================
-    // UPDATE (관리자만)
+    // UPDATE (관리자만, is_admin()로 RLS 재귀 방지)
     // =========================
     pgPolicy("admin-update-news", {
       for: "update",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
-      withCheck: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      using: isAdmin,
+      withCheck: isAdmin,
     }),
 
     // =========================
@@ -128,13 +134,7 @@ export const news = pgTable(
       for: "delete",
       to: authenticatedRole,
       as: "permissive",
-      using: sql`
-        EXISTS (
-          SELECT 1 FROM profiles p
-          WHERE p.profile_id = ${authUid}
-          AND p.role = 'admin'
-        )
-      `,
+      using: isAdmin,
     }),
   ],
 );

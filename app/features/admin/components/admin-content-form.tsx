@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import type { PendingImage } from "./mdx-editor";
 
-import { Image, X } from "lucide-react";
+import { Image, Loader2, X } from "lucide-react";
+import { useRef, useState } from "react";
 
 import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
@@ -16,7 +17,6 @@ import {
 import { Textarea } from "~/core/components/ui/textarea";
 
 import MDXEditor from "./mdx-editor";
-import type { PendingImage } from "./mdx-editor";
 
 /**
  * 대분류 카테고리 타입
@@ -90,6 +90,8 @@ export interface ContentFormData {
   content: string; // MDX 코드
   isVisible: boolean; // 공개 여부
   thumbnailImageUrl?: string; // 썸네일 이미지 URL (초기값용, 선택적)
+  /** 뉴스 전용: public | member (맴버만 공개 체크 시 member) */
+  visibility?: "public" | "member";
 }
 
 /**
@@ -124,7 +126,11 @@ interface AdminContentFormProps {
   /** 클래스 ID (MDX 이미지 업로드용, 선택적) */
   classId?: string | null;
   /** 임시 이미지 파일들 변경 콜백 (클래스 생성 전 이미지용) */
-  onPendingImagesChange?: (updater: (prev: PendingImage[]) => PendingImage[]) => void;
+  onPendingImagesChange?: (
+    updater: (prev: PendingImage[]) => PendingImage[],
+  ) => void;
+  /** 폼 변형: 'news' 시 카테고리(대분류/소분류)·태그 섹션 숨김 (뉴스는 별도 카테고리 Select 사용) */
+  variant?: "class" | "news";
 }
 
 /**
@@ -161,15 +167,15 @@ export default function AdminContentForm({
   isLoading = false,
   classId = null,
   onPendingImagesChange,
+  variant = "class",
 }: AdminContentFormProps) {
   // 초기 카테고리 설정
   const initialCategory = initialData.category || "figma";
   const initialMainCategory =
     getMainCategoryFromSub(initialCategory as SubCategory) || "design";
 
-  const [mainCategory, setMainCategory] = useState<MainCategory>(
-    initialMainCategory,
-  );
+  const [mainCategory, setMainCategory] =
+    useState<MainCategory>(initialMainCategory);
   const [formData, setFormData] = useState<ContentFormData>({
     title: initialData.title || "",
     description: initialData.description || "",
@@ -189,6 +195,10 @@ export default function AdminContentForm({
   );
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  // 뉴스 전용: 맴버만 공개 (기본값 false = public)
+  const [memberOnly, setMemberOnly] = useState(
+    initialData.visibility === "member",
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +210,7 @@ export default function AdminContentForm({
       newErrors.title = "타이틀을 입력해주세요.";
     }
 
-    if (!formData.description.trim()) {
+    if (variant !== "news" && !formData.description.trim()) {
       newErrors.description = "설명을 입력해주세요.";
     }
 
@@ -214,7 +224,11 @@ export default function AdminContentForm({
     }
 
     setErrors({});
-    await onSubmit(formData, thumbnailFile);
+    const submitData: ContentFormData =
+      variant === "news"
+        ? { ...formData, visibility: memberOnly ? "member" : "public" }
+        : formData;
+    await onSubmit(submitData, thumbnailFile);
   };
 
   const updateField = <K extends keyof ContentFormData>(
@@ -232,9 +246,7 @@ export default function AdminContentForm({
    * 썸네일 이미지 파일 선택 핸들러
    * 파일 선택 시 미리보기 URL을 생성하고 File 객체를 저장합니다.
    */
-  const handleThumbnailSelect = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -300,7 +312,7 @@ export default function AdminContentForm({
                 type="button"
                 variant="destructive"
                 size="icon"
-                className="absolute -right-2 -top-2 size-6"
+                className="absolute -top-2 -right-2 size-6"
                 onClick={handleThumbnailRemove}
                 aria-label="썸네일 제거"
               >
@@ -363,74 +375,71 @@ export default function AdminContentForm({
         </div>
       </div>
 
-      {/* 카테고리 선택 */}
-      <div className="space-y-2">
-        <Label>
-          카테고리 <span className="text-destructive">*</span>
-        </Label>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          {/* 대분류 선택 */}
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="mainCategory" className="text-text-3 text-xs">
-              대분류
-            </Label>
-            <Select
-              value={mainCategory}
-              onValueChange={(value: MainCategory) => {
-                setMainCategory(value);
-                // 대분류 변경 시 현재 소분류가 새로운 대분류에 포함되어 있지 않으면 첫 번째 소분류로 자동 설정
-                const availableSubs = CATEGORY_SUBCATEGORIES[value];
-                const currentSub = formData.category;
-                if (!availableSubs.includes(currentSub)) {
-                  const firstSub = availableSubs[0];
-                  updateField("category", firstSub);
-                }
-              }}
-            >
-              <SelectTrigger id="mainCategory" className="w-full">
-                <SelectValue placeholder="대분류를 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="design">DESIGN</SelectItem>
-                <SelectItem value="publishing">PUBLISHING</SelectItem>
-                <SelectItem value="development">DEVELOPMENT</SelectItem>
-              </SelectContent>
-            </Select>
+      {/* 카테고리 선택 (클래스/갤러리용 대분류·소분류, 뉴스는 미노출) */}
+      {variant !== "news" && (
+        <div className="space-y-2">
+          <Label>
+            카테고리 <span className="text-destructive">*</span>
+          </Label>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="mainCategory" className="text-text-3 text-xs">
+                대분류
+              </Label>
+              <Select
+                value={mainCategory}
+                onValueChange={(value: MainCategory) => {
+                  setMainCategory(value);
+                  const availableSubs = CATEGORY_SUBCATEGORIES[value];
+                  const currentSub = formData.category;
+                  if (!availableSubs.includes(currentSub)) {
+                    const firstSub = availableSubs[0];
+                    updateField("category", firstSub);
+                  }
+                }}
+              >
+                <SelectTrigger id="mainCategory" className="w-full">
+                  <SelectValue placeholder="대분류를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="design">DESIGN</SelectItem>
+                  <SelectItem value="publishing">PUBLISHING</SelectItem>
+                  <SelectItem value="development">DEVELOPMENT</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="subCategory" className="text-text-3 text-xs">
+                소분류
+              </Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value: SubCategory) => {
+                  updateField("category", value);
+                  const newMainCategory = getMainCategoryFromSub(value);
+                  if (newMainCategory && newMainCategory !== mainCategory) {
+                    setMainCategory(newMainCategory);
+                  }
+                }}
+              >
+                <SelectTrigger id="subCategory" className="w-full">
+                  <SelectValue placeholder="소분류를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_SUBCATEGORIES[mainCategory].map((sub) => (
+                    <SelectItem key={sub} value={sub}>
+                      {SUBCATEGORY_LABELS[sub]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-
-          {/* 소분류 선택 */}
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="subCategory" className="text-text-3 text-xs">
-              소분류
-            </Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value: SubCategory) => {
-                updateField("category", value);
-                // 소분류 변경 시 해당하는 대분류로 자동 업데이트
-                const newMainCategory = getMainCategoryFromSub(value);
-                if (newMainCategory && newMainCategory !== mainCategory) {
-                  setMainCategory(newMainCategory);
-                }
-              }}
-            >
-              <SelectTrigger id="subCategory" className="w-full">
-                <SelectValue placeholder="소분류를 선택하세요" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORY_SUBCATEGORIES[mainCategory].map((sub) => (
-                  <SelectItem key={sub} value={sub}>
-                    {SUBCATEGORY_LABELS[sub]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <p className="text-text-3 text-xs">
+            대분류와 소분류를 선택하여 클래스를 분류하세요.
+          </p>
         </div>
-        <p className="text-text-3 text-xs">
-          대분류와 소분류를 선택하여 클래스를 분류하세요.
-        </p>
-      </div>
+      )}
 
       {/* 타이틀 */}
       <div className="space-y-2">
@@ -449,40 +458,46 @@ export default function AdminContentForm({
         )}
       </div>
 
-      {/* 설명 */}
-      <div className="space-y-2">
-        <Label htmlFor="description">
-          설명 <span className="text-destructive">*</span>
-        </Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => updateField("description", e.target.value)}
-          placeholder="예: 왜 내가 만든 디자인은 가독성이 떨어질까? 그 해답은 폰트의 크기가 아니라 '위계'에 있습니다."
-          rows={3}
-          aria-invalid={errors.description ? "true" : undefined}
-        />
-        {errors.description && (
-          <p className="text-destructive text-sm">{errors.description}</p>
-        )}
-      </div>
+      {/* 설명 (뉴스는 미노출) */}
+      {variant !== "news" && (
+        <div className="space-y-2">
+          <Label htmlFor="description">
+            설명 <span className="text-destructive">*</span>
+          </Label>
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => updateField("description", e.target.value)}
+            placeholder="예: 왜 내가 만든 디자인은 가독성이 떨어질까? 그 해답은 폰트의 크기가 아니라 '위계'에 있습니다."
+            rows={3}
+            aria-invalid={errors.description ? "true" : undefined}
+          />
+          {errors.description && (
+            <p className="text-destructive text-sm">{errors.description}</p>
+          )}
+        </div>
+      )}
 
-      {/* 태그 */}
-      <div className="space-y-2">
-        <Label htmlFor="tags">
-          태그{" "}
-          <span className="text-text-3 text-xs font-normal">(쉼표로 구분)</span>
-        </Label>
-        <Input
-          id="tags"
-          value={formData.tags}
-          onChange={(e) => updateField("tags", e.target.value)}
-          placeholder="예: design, uxui"
-        />
-        <p className="text-text-3 text-xs">
-          태그를 쉼표로 구분하여 입력하세요. (예: design, uxui, frontend)
-        </p>
-      </div>
+      {/* 태그 (뉴스는 미노출) */}
+      {variant !== "news" && (
+        <div className="space-y-2">
+          <Label htmlFor="tags">
+            태그{" "}
+            <span className="text-text-3 text-xs font-normal">
+              (쉼표로 구분)
+            </span>
+          </Label>
+          <Input
+            id="tags"
+            value={formData.tags}
+            onChange={(e) => updateField("tags", e.target.value)}
+            placeholder="예: design, uxui"
+          />
+          <p className="text-text-3 text-xs">
+            태그를 쉼표로 구분하여 입력하세요. (예: design, uxui, frontend)
+          </p>
+        </div>
+      )}
 
       {/* MDX 콘텐츠 */}
       <div className="space-y-2">
@@ -501,6 +516,26 @@ export default function AdminContentForm({
           <p className="text-destructive text-sm">{errors.content}</p>
         )}
       </div>
+
+      {/* 맴버만 공개 (뉴스 전용, 공개 여부 위) */}
+      {variant === "news" && (
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="memberOnly"
+            checked={memberOnly}
+            onCheckedChange={(checked) => setMemberOnly(checked === true)}
+          />
+          <Label
+            htmlFor="memberOnly"
+            className="cursor-pointer text-sm font-normal"
+          >
+            맴버만 공개
+          </Label>
+          <p className="text-text-3 text-xs">
+            체크 시 로그인 회원만 볼 수 있습니다. (기본: 전체 공개)
+          </p>
+        </div>
+      )}
 
       {/* 공개 여부 */}
       <div className="flex items-center space-x-2">
@@ -535,7 +570,11 @@ export default function AdminContentForm({
           </Button>
         )}
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "처리 중..." : submitLabel}
+          {isLoading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            submitLabel
+          )}
         </Button>
       </div>
     </form>

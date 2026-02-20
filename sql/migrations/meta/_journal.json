@@ -113,6 +113,34 @@
       "when": 1771073421136,
       "tag": "0015_milky_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1771566494479,
+      "tag": "0016_friendly_freak",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1771567821191,
+      "tag": "0017_flowery_harry_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1771570804828,
+      "tag": "0018_small_skin",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1771571237248,
+      "tag": "0019_naive_wolfsbane",
+      "breakpoints": true
     }
   ]
 }
