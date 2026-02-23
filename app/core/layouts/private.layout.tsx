@@ -13,8 +13,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect("/login");
   }
 
-  // Return an empty object to avoid the "Cannot read properties of undefined" error
-  return {};
+  // 레이아웃은 인증 체크만 수행하고 데이터를 반환하지 않음 (자식 라우트의 loaderData가 전달되도록)
+  return null;
 }
 
 export default function PrivateLayout() {

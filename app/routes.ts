@@ -123,8 +123,14 @@ export default [
       // 유저 프로필 페이지
       route("/user/profile", "features/users/screens/account.tsx"),
 
-      // 문의 페이지
-      route("/inquiries", "features/inquiries/screens/inquiries.tsx"),
+      // 문의하기 페이지
+      route("/inquiries/new", "features/inquiries/screens/inquiries-new.tsx"),
+
+      // 문의 목록 페이지
+      route("/inquiries", "features/inquiries/screens/inquiry-list.tsx"),
+
+      // 문의 상세 페이지
+      route("/inquiries/:id", "features/inquiries/screens/inquiry-detail.tsx"),
     ]),
 
     // 인증이 필요한 인증 관련 라우트

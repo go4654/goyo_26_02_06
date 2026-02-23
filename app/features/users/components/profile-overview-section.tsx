@@ -1,3 +1,5 @@
+import type { WeeklyLearningChartItem } from "./user-graph";
+
 import { Link } from "react-router";
 
 import {
@@ -9,7 +11,6 @@ import { Button } from "~/core/components/ui/button";
 import { Separator } from "~/core/components/ui/separator";
 
 import UserGraph from "./user-graph";
-import type { WeeklyLearningChartItem } from "./user-graph";
 
 interface ProfileOverviewSectionProps {
   profile: { name: string; avatar_url: string | null };
@@ -40,7 +41,7 @@ export function ProfileOverviewSection({
       <div className="flex flex-col gap-8 rounded-[20px] bg-[#0F1117] p-4 xl:p-10">
         <h3 className="text-h5">Profile</h3>
 
-        <div className="flex items-center gap-4 xl:mt-8">
+        <div className="flex items-center gap-6 xl:mt-8">
           <Avatar className="size-28 xl:size-50">
             <AvatarImage src={profile.avatar_url ?? undefined} />
             <AvatarFallback>{profile.name.slice(0, 2)}</AvatarFallback>
@@ -51,13 +52,23 @@ export function ProfileOverviewSection({
             <span className="text-muted-foreground text-small xl:text-sm">
               {email}
             </span>
-            <Button
-              asChild
-              variant="outline"
-              className="border-secondary dark:border-secondary dark:hover:bg-primary xl:text-md mt-3 border-1 py-3 text-sm font-medium xl:mt-6 xl:px-6 xl:py-4"
-            >
-              <Link to="/user/profile">프로필 수정 &rarr;</Link>
-            </Button>
+
+            <div className="flex flex-col">
+              <Button
+                asChild
+                className="dark:hover:bg-primary xl:text-md mt-3 border-1 py-3 text-xs font-medium xl:mt-6 xl:px-6 xl:py-4 xl:text-sm"
+              >
+                <Link to="/user/profile">프로필 수정 &rarr;</Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="outline"
+                className="dark:text-text-2 dark:hover:text-text-2 xl:text-md text-text-2 mt-3 border-1 py-3 text-xs font-medium xl:mt-2 xl:px-6 xl:py-4 xl:text-sm"
+              >
+                <Link to="/inquiries">내 문의 보기</Link>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -90,9 +101,7 @@ export function ProfileOverviewSection({
           </li>
           <Separator orientation="vertical" className="h-full" />
           <li className="flex flex-col items-center gap-1">
-            <p className="text-text-2/80 text-[10px] xl:text-sm">
-              이번주 학습
-            </p>
+            <p className="text-text-2/80 text-[10px] xl:text-sm">이번주 학습</p>
             <div
               className="text-small-title xl:text-h5 w-full max-w-[120px] truncate text-center xl:max-w-[200px]"
               title={lastViewedClass?.title}
