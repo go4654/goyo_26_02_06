@@ -40,10 +40,10 @@ const data = {
           title: "개요",
           url: "/admin",
         },
-        {
-          title: "통계",
-          url: "/admin/analytics",
-        },
+        // {
+        //   title: "통계",
+        //   url: "/admin/analytics",
+        // },
       ],
     },
     {
@@ -75,6 +75,10 @@ const data = {
         {
           title: "회원 목록",
           url: "/admin/users",
+        },
+        {
+          title: "문의",
+          url: "/admin/inquiries",
         },
       ],
     },

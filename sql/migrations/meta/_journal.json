@@ -162,6 +162,13 @@
       "when": 1771808900000,
       "tag": "0022_get_admin_users_list",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1771829782269,
+      "tag": "0023_slim_dark_beast",
+      "breakpoints": true
     }
   ]
 }

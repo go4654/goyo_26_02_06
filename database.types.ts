@@ -874,6 +874,22 @@ export type Database = {
         Returns: boolean
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_admin_dashboard_stats: {
+        Args: never
+        Returns: {
+          traffic: { total_views: number; gallery_views: number }
+          users: { total_users: number; today_users: number }
+          class: {
+            top_viewed: { id: string; title: string; views_count: number }[]
+            top_saved: { id: string; title: string; saves_count: number }[]
+          }
+          comments: { last_7_days_count: number; hidden_count: number }
+          gallery: {
+            top_viewed: { id: string; title: string; views_count: number }[]
+            top_saved: { id: string; title: string; saves_count: number }[]
+          }
+        }
+      }
       get_admin_users_list: {
         Args: never
         Returns: {
