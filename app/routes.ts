@@ -105,14 +105,26 @@ export default [
 
     // 인증이 필요한 상세 페이지들 (로그인하지 않은 사용자는 /login으로 리다이렉트)
     layout("core/layouts/private.layout.tsx", { id: "private-content" }, [
+      // 클래스 상세 페이지
       route("/class/:slug", "features/class/screens/class-detail.tsx"),
+
+      // 갤러리 상세 페이지
       ...prefix("/gallery", [
         index("features/gallery/screens/gallery.tsx"),
         route("/:slug", "features/gallery/screens/gallery-detail.tsx"),
       ]),
+
+      // 뉴스 상세 페이지
       route("/news/:slug", "features/news/screens/news-detail.tsx"),
+
+      // 유저 상세 페이지
       route("/user/:slug", "features/users/screens/profile.tsx"),
+
+      // 유저 프로필 페이지
       route("/user/profile", "features/users/screens/account.tsx"),
+
+      // 문의 페이지
+      route("/inquiries", "features/inquiries/screens/inquiries.tsx"),
     ]),
 
     // 인증이 필요한 인증 관련 라우트

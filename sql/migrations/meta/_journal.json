@@ -169,6 +169,20 @@
       "when": 1771829782269,
       "tag": "0023_slim_dark_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1771834978555,
+      "tag": "0024_inquiry_ticket_system",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1771835832148,
+      "tag": "0025_inquiry_is_deleted_and_enum_etc",
+      "breakpoints": true
     }
   ]
 }

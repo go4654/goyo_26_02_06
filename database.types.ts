@@ -612,6 +612,106 @@ export type Database = {
           },
         ]
       }
+      inquiries: {
+        Row: {
+          category: Database["public"]["Enums"]["inquiry_category"]
+          created_at: string
+          id: string
+          is_deleted: boolean
+          last_activity_at: string
+          profile_id: string
+          status: Database["public"]["Enums"]["inquiry_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["inquiry_category"]
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          last_activity_at?: string
+          profile_id: string
+          status?: Database["public"]["Enums"]["inquiry_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["inquiry_category"]
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          last_activity_at?: string
+          profile_id?: string
+          status?: Database["public"]["Enums"]["inquiry_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiries_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "inquiries_profile_id_profiles_profile_id_fk"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
+        ]
+      }
+      inquiry_messages: {
+        Row: {
+          author_profile_id: string
+          author_role: Database["public"]["Enums"]["inquiry_author_role"]
+          content: string
+          created_at: string
+          id: string
+          inquiry_id: string
+        }
+        Insert: {
+          author_profile_id: string
+          author_role: Database["public"]["Enums"]["inquiry_author_role"]
+          content: string
+          created_at?: string
+          id?: string
+          inquiry_id: string
+        }
+        Update: {
+          author_profile_id?: string
+          author_role?: Database["public"]["Enums"]["inquiry_author_role"]
+          content?: string
+          created_at?: string
+          id?: string
+          inquiry_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inquiry_messages_author_profile_id_profiles_profile_id_fk"
+            columns: ["author_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "inquiry_messages_author_profile_id_profiles_profile_id_fk"
+            columns: ["author_profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["profile_id"]
+          },
+          {
+            foreignKeyName: "inquiry_messages_inquiry_id_inquiries_id_fk"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       news: {
         Row: {
           author_id: string | null
@@ -874,22 +974,7 @@ export type Database = {
         Returns: boolean
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
-      get_admin_dashboard_stats: {
-        Args: never
-        Returns: {
-          traffic: { total_views: number; gallery_views: number }
-          users: { total_users: number; today_users: number }
-          class: {
-            top_viewed: { id: string; title: string; views_count: number }[]
-            top_saved: { id: string; title: string; saves_count: number }[]
-          }
-          comments: { last_7_days_count: number; hidden_count: number }
-          gallery: {
-            top_viewed: { id: string; title: string; views_count: number }[]
-            top_saved: { id: string; title: string; saves_count: number }[]
-          }
-        }
-      }
+      get_admin_dashboard_stats: { Args: never; Returns: Json }
       get_admin_users_list: {
         Args: never
         Returns: {
@@ -1001,6 +1086,9 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
+      inquiry_author_role: "user" | "admin"
+      inquiry_category: "general" | "class" | "gallery" | "account" | "etc"
+      inquiry_status: "pending" | "answered" | "closed"
       news_category: "notice" | "update" | "news"
     }
     CompositeTypes: {
@@ -1129,6 +1217,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      inquiry_author_role: ["user", "admin"],
+      inquiry_category: ["general", "class", "gallery", "account", "etc"],
+      inquiry_status: ["pending", "answered", "closed"],
       news_category: ["notice", "update", "news"],
     },
   },

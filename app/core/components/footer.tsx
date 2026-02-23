@@ -54,8 +54,15 @@ export default function Footer() {
             </li>
           </ul>
 
-          {/* 이용약관 */}
+          {/* 이용약관, 개인정보처리방침, 문의 */}
           <div className="text-text-2 mt-10 flex justify-center gap-5 text-sm xl:mt-0 xl:justify-end">
+            <Link
+              to="/inquiries"
+              viewTransition
+              className="hover:text-primary hover:underline"
+            >
+              문의하기
+            </Link>
             <Link to="/legal/privacy-policy" viewTransition>
               개인정보처리방침
             </Link>
