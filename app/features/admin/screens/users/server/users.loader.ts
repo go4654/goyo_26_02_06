@@ -1,63 +1,52 @@
+import type { Route } from "../+types/admin-users";
+
+import type { Database } from "database.types";
+
+import { requireAdmin } from "~/core/lib/guards.server";
+import makeServerClient from "~/core/lib/supa-client.server";
+
+/** get_admin_users_list RPC 반환 행 (last_active_at nullable) */
+type AdminUsersListRow = Database["public"]["Functions"]["get_admin_users_list"]["Returns"][number] & {
+  last_active_at: string | null;
+};
+
 /**
  * 유저 관리 테이블 행 데이터 타입
  */
 export type AdminUserRow = {
   id: string;
   email: string;
-  nickname: string;
-  galleryAccess: boolean; // 포폴 접근 권한
-  status: "active" | "suspended"; // 계정 상태
-  createdAt: string; // ISO string - 가입일
-  lastActiveAt: string; // ISO string - 최근 활동일
+  name: string;
+  galleryAccess: boolean;
+  isBlocked: boolean;
+  createdAt: string;
+  lastActiveAt: string | null;
 };
 
 /**
  * 유저 목록 로더
- * 관리자 페이지에서 유저 목록을 가져옵니다.
- *
- * @returns 유저 목록 데이터
+ * requireAdmin 후 auth.users + profiles JOIN 결과를 반환합니다.
  */
-export async function usersLoader(): Promise<{ rows: AdminUserRow[] }> {
-  // TODO: Supabase에서 실제 데이터 가져오기
-  // 현재는 mock 데이터 사용
-  const rows: AdminUserRow[] = [
-    {
-      id: "user_001",
-      email: "user1@example.com",
-      nickname: "디자이너김",
-      galleryAccess: true,
-      status: "active",
-      createdAt: "2025-11-15T08:00:00.000Z",
-      lastActiveAt: "2026-02-10T14:30:00.000Z",
-    },
-    {
-      id: "user_002",
-      email: "user2@example.com",
-      nickname: "프론트개발자",
-      galleryAccess: false,
-      status: "active",
-      createdAt: "2025-12-01T10:15:00.000Z",
-      lastActiveAt: "2026-02-11T09:20:00.000Z",
-    },
-    {
-      id: "user_003",
-      email: "user3@example.com",
-      nickname: "백엔드마스터",
-      galleryAccess: true,
-      status: "suspended",
-      createdAt: "2025-10-20T11:30:00.000Z",
-      lastActiveAt: "2026-01-25T16:45:00.000Z",
-    },
-    {
-      id: "user_004",
-      email: "user4@example.com",
-      nickname: "풀스택개발자",
-      galleryAccess: false,
-      status: "active",
-      createdAt: "2026-01-10T09:00:00.000Z",
-      lastActiveAt: "2026-02-12T10:00:00.000Z",
-    },
-  ];
+export async function usersLoader({ request }: Route.LoaderArgs) {
+  const [client] = makeServerClient(request);
+  await requireAdmin(client);
+
+  const { data, error } = await client.rpc("get_admin_users_list");
+
+  if (error) {
+    throw new Response("유저 목록 조회에 실패했습니다.", { status: 500 });
+  }
+
+  const list = (data ?? []) as AdminUsersListRow[];
+  const rows: AdminUserRow[] = list.map((row) => ({
+    id: row.id,
+    email: row.email ?? "",
+    name: row.name ?? "-",
+    galleryAccess: row.gallery_access,
+    isBlocked: row.is_blocked,
+    createdAt: row.created_at,
+    lastActiveAt: row.last_active_at,
+  }));
 
   return { rows };
 }

@@ -100,10 +100,10 @@ export const usersColumns: ColumnDef<AdminUserRow>[] = [
     maxSize: 350,
   },
   {
-    accessorKey: "nickname",
+    accessorKey: "name",
     header: "닉네임",
     cell: ({ row }) => (
-      <div className="text-text-2">{row.original.nickname}</div>
+      <div className="text-text-2">{row.original.name ?? "-"}</div>
     ),
     size: 150,
     minSize: 120,
@@ -124,11 +124,19 @@ export const usersColumns: ColumnDef<AdminUserRow>[] = [
   {
     accessorKey: "lastActiveAt",
     header: "최근 활동일",
-    cell: ({ row }) => (
-      <div className="text-text-2 tabular-nums">
-        {formatDate(row.original.lastActiveAt)}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const lastActiveAt = row.original.lastActiveAt;
+      const createdAt = row.original.createdAt;
+      const value = lastActiveAt ?? createdAt;
+      const label = value ? formatDate(value) : "-";
+      const suffix = value && !lastActiveAt && createdAt ? " (가입일)" : "";
+      return (
+        <div className="text-text-2 tabular-nums">
+          {label}
+          {suffix}
+        </div>
+      );
+    },
     size: 120,
     minSize: 100,
     maxSize: 150,
@@ -143,7 +151,7 @@ export const usersColumns: ColumnDef<AdminUserRow>[] = [
           variant={hasAccess ? "default" : "secondary"}
           className="rounded-full"
         >
-          {hasAccess ? "허용" : "비허용"}
+          {hasAccess ? "허용" : "차단"}
         </Badge>
       );
     },
@@ -152,16 +160,20 @@ export const usersColumns: ColumnDef<AdminUserRow>[] = [
     maxSize: 150,
   },
   {
-    accessorKey: "status",
+    accessorKey: "isBlocked",
     header: "상태",
     cell: ({ row }) => {
-      const status = row.original.status;
+      const isBlocked = row.original.isBlocked;
       return (
         <Badge
-          variant={status === "active" ? "default" : "destructive"}
-          className="rounded-full"
+          variant={isBlocked ? "destructive" : "outline"}
+          className={
+            isBlocked
+              ? "rounded-full"
+              : "rounded-full border-green-500/50 bg-green-500/20 text-green-400"
+          }
         >
-          {status === "active" ? "활성" : "정지"}
+          {isBlocked ? "정지" : "활성"}
         </Badge>
       );
     },
@@ -169,5 +181,5 @@ export const usersColumns: ColumnDef<AdminUserRow>[] = [
     minSize: 90,
     maxSize: 120,
   },
-  actionColumn,
+  // actionColumn,
 ];

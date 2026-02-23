@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 
+import { cn } from "~/core/lib/utils";
 import { Button } from "~/core/components/ui/button";
 import { Input } from "~/core/components/ui/input";
 import {
@@ -44,12 +45,20 @@ interface AdminDataTableProps<TData> {
   onDeleteSelected?: (selectedRows: TData[]) => void | Promise<void>;
   /** 행 클릭 콜백 (행 데이터를 반환) */
   onRowClick?: (row: TData) => void;
-  /** 커스텀 액션 버튼 설정 (선택된 행에 대한 액션) */
+  /** 커스텀 액션 버튼 1개 (customActions 없을 때 사용) */
   customAction?: {
     label: string;
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost";
+    className?: string;
     onClick: (selectedRows: TData[]) => void | Promise<void>;
   };
+  /** 커스텀 액션 버튼 여러 개 (있으면 customAction 무시) */
+  customActions?: Array<{
+    label: string;
+    variant?: "default" | "destructive" | "outline" | "secondary" | "ghost";
+    className?: string;
+    onClick: (selectedRows: TData[]) => void | Promise<void>;
+  }>;
 }
 
 /**
@@ -81,7 +90,9 @@ export default function AdminDataTable<TData>({
   onDeleteSelected,
   onRowClick,
   customAction,
+  customActions,
 }: AdminDataTableProps<TData>) {
+  const actionButtons = customActions ?? (customAction ? [customAction] : []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnSizing, setColumnSizing] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -289,36 +300,40 @@ export default function AdminDataTable<TData>({
               <span className="text-text-3 text-sm">
                 {table.getFilteredSelectedRowModel().rows.length}개 선택됨
               </span>
-              {/* 커스텀 액션 버튼 (우선순위) */}
-              {customAction && (
+              {/* 커스텀 액션 버튼들 */}
+              {actionButtons.map((action, idx) => (
                 <Button
+                  key={idx}
                   type="button"
-                  variant={customAction.variant || "default"}
+                  variant={action.variant ?? "default"}
                   size="sm"
+                  className={cn(
+                    "cursor-pointer hover:outline-2 hover:outline-offset-2 hover:outline-primary",
+                    action.className,
+                  )}
                   onClick={async () => {
                     const selectedRows = table
                       .getFilteredSelectedRowModel()
                       .rows.map((row) => row.original);
-                    await customAction.onClick(selectedRows);
-                    // 액션 후 선택 해제
+                    await action.onClick(selectedRows);
                     setRowSelection({});
                   }}
                 >
-                  {customAction.label}
+                  {action.label}
                 </Button>
-              )}
-              {/* 기본 삭제 버튼 (커스텀 액션이 없을 때만 표시) */}
-              {onDeleteSelected && !customAction && (
+              ))}
+              {/* 선택 삭제 버튼 (onDeleteSelected가 있을 때 표시) */}
+              {onDeleteSelected && (
                 <Button
                   type="button"
                   variant="destructive"
                   size="sm"
+                  className="cursor-pointer hover:outline-2 hover:outline-offset-2 hover:outline-primary hover:!bg-transparent hover:!text-destructive hover:!border-destructive"
                   onClick={async () => {
                     const selectedRows = table
                       .getFilteredSelectedRowModel()
                       .rows.map((row) => row.original);
                     await onDeleteSelected(selectedRows);
-                    // 삭제 후 선택 해제
                     setRowSelection({});
                   }}
                 >

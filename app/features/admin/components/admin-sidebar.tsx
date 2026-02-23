@@ -66,7 +66,7 @@ const data = {
       ],
     },
     {
-      title: "사용자 관리",
+      title: "유저 관리",
       url: "#",
       icon: UsersIcon,
       isActive: true,
@@ -75,10 +75,10 @@ const data = {
           title: "회원 목록",
           url: "/admin/users",
         },
-        {
-          title: "권한 관리",
-          url: "/admin/roles",
-        },
+        // {
+        //   title: "권한 관리",
+        //   url: "/admin/roles",
+        // },
       ],
     },
     {

@@ -63,8 +63,9 @@ export const profiles = pgTable(
     // ✅ 차단 사유
     blocked_reason: text("blocked_reason"),
 
-    // 생성일 및 수정일
+    admin_note: text("admin_note"),
 
+    // 생성일 및 수정일
     ...timestamps,
   },
   (table) => [

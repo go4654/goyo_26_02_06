@@ -177,10 +177,10 @@ export default [
         route("/:slug", "features/admin/screens/news/admin-news-edit.tsx"),
       ]),
 
-      // 사용자 관리
+      // 유저 관리 (상세 경로: /admin/users/:username)
       ...prefix("/users", [
         index("features/admin/screens/users/admin-users.tsx"),
-        route("/:slug", "features/admin/screens/users/admin-users-edit.tsx"),
+        route("/:username", "features/admin/screens/users/admin-users-edit.tsx"),
       ]),
 
       // 설정 관리

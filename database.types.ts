@@ -868,6 +868,19 @@ export type Database = {
         Returns: boolean
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
+      get_admin_users_list: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          gallery_access: boolean
+          id: string
+          is_blocked: boolean
+          last_active_at: string
+          name: string
+          role: string
+        }[]
+      }
       get_class_comments_page_ids: {
         Args: {
           p_class_id: string

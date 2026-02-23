@@ -21,7 +21,7 @@ import { userDetailLoader } from "./server/users-detail.loader";
 import { usersAction } from "./server/users.action";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: `유저 수정 | ${import.meta.env.VITE_APP_NAME}` }];
+  return [{ title: `유저 상세 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
 export const loader = userDetailLoader;
@@ -140,7 +140,7 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                 <Label htmlFor="lastActiveAt">최근 활동일</Label>
                 <Input
                   id="lastActiveAt"
-                  value={formatDate(userData.lastActiveAt)}
+                  value={userData.lastActiveAt ? formatDate(userData.lastActiveAt) : "-"}
                   disabled
                   className="text-text-3 bg-white/5"
                 />
@@ -167,7 +167,7 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                     }))
                   }
                 />
-                <div className="space-y-1">
+                <div className="cursor-pointer space-y-1">
                   <Label
                     htmlFor="galleryAccess"
                     className="cursor-pointer text-sm font-medium"
