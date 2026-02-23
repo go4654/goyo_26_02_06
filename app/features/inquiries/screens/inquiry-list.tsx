@@ -1,8 +1,8 @@
+import type { InquiryListItem } from "../server/inquiries.loader";
 import type { Route } from "./+types/inquiry-list";
 
 import { Link } from "react-router";
 
-import type { InquiryListItem } from "../server/inquiries.loader";
 import { Badge } from "~/core/components/ui/badge";
 import { Button } from "~/core/components/ui/button";
 import {
@@ -117,7 +117,7 @@ export default function InquiryList({ loaderData }: Route.ComponentProps) {
   const hasItems = inquiries.length > 0;
 
   return (
-    <div className="mx-auto mt-20 w-full px-4 pb-40 xl:mt-25 xl:max-w-[900px]">
+    <div className="mx-auto mt-20 w-full px-4 pb-40 xl:mt-25 xl:max-w-[1000px]">
       <InquiryListHeader />
       <div className="mt-8">
         {hasItems ? <InquiryTable items={inquiries} /> : <InquiryListEmpty />}
