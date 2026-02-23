@@ -2,6 +2,7 @@ import {
   BookOpenIcon,
   GalleryVerticalEndIcon,
   LayoutDashboardIcon,
+  MessageCircleIcon,
   NewspaperIcon,
   Settings2Icon,
   UsersIcon,
@@ -75,10 +76,18 @@ const data = {
           title: "회원 목록",
           url: "/admin/users",
         },
-        // {
-        //   title: "권한 관리",
-        //   url: "/admin/roles",
-        // },
+      ],
+    },
+    {
+      title: "댓글 관리",
+      url: "#",
+      icon: MessageCircleIcon,
+      isActive: true,
+      items: [
+        {
+          title: "댓글 목록",
+          url: "/admin/comments",
+        },
       ],
     },
     {

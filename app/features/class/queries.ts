@@ -301,6 +301,7 @@ export interface CommentWithProfile {
   content: string;
   created_at: string;
   updated_at: string;
+  is_visible: boolean;
   profile: {
     profile_id: string;
     name: string;
@@ -334,7 +335,7 @@ export async function getClassComments(
   // 댓글 조회 (최신순 정렬)
   const { data: commentsData, error: commentsError } = await client
     .from("class_comments")
-    .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+    .select("id, class_id, user_id, parent_id, content, created_at, updated_at, is_visible")
     .eq("class_id", classId)
     .eq("is_deleted", false)
     .order("created_at", { ascending: false });
@@ -405,6 +406,7 @@ export async function getClassComments(
     content: item.content as string,
     created_at: item.created_at as string,
     updated_at: item.updated_at as string,
+    is_visible: item.is_visible as boolean,
     profile: profileMap.get(item.user_id as string) || null,
     likes_count: likesCountMap.get(item.id as string) || 0,
     is_liked: userLikes.has(item.id as string),
@@ -473,13 +475,13 @@ export async function getClassCommentsPage(
   const [topResult, repliesResult] = await Promise.all([
     client
       .from("class_comments")
-      .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+      .select("id, class_id, user_id, parent_id, content, created_at, updated_at, is_visible")
       .eq("class_id", classId)
       .eq("is_deleted", false)
       .in("id", topLevelIds),
     client
       .from("class_comments")
-      .select("id, class_id, user_id, parent_id, content, created_at, updated_at")
+      .select("id, class_id, user_id, parent_id, content, created_at, updated_at, is_visible")
       .eq("class_id", classId)
       .eq("is_deleted", false)
       .in("parent_id", topLevelIds),
@@ -545,6 +547,7 @@ export async function getClassCommentsPage(
     content: item.content as string,
     created_at: item.created_at as string,
     updated_at: item.updated_at as string,
+    is_visible: item.is_visible as boolean,
     profile: profileMap.get(item.user_id as string) || null,
     likes_count: likesCountMap.get(item.id as string) || 0,
     is_liked: userLikesResult.has(item.id as string),

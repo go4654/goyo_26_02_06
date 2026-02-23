@@ -331,6 +331,9 @@ export const classComments = pgTable(
 
     is_deleted: boolean("is_deleted").notNull().default(false),
 
+    // 가시성 제어 (관리자 기능)
+    is_visible: boolean("is_visible").notNull().default(true),
+
     ...timestamps,
   },
 
@@ -375,6 +378,15 @@ export const classComments = pgTable(
                   AND p.role = 'admin'
                 )
               )
+            )
+          )
+          AND (
+            ${t.is_visible} = true
+            OR EXISTS (
+              SELECT 1
+              FROM profiles p
+              WHERE p.profile_id = ${authUid}
+              AND p.role = 'admin'
             )
           )
         `,

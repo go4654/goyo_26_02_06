@@ -180,7 +180,15 @@ export default [
       // 유저 관리 (상세 경로: /admin/users/:username)
       ...prefix("/users", [
         index("features/admin/screens/users/admin-users.tsx"),
-        route("/:username", "features/admin/screens/users/admin-users-edit.tsx"),
+        route(
+          "/:username",
+          "features/admin/screens/users/admin-users-edit.tsx",
+        ),
+      ]),
+
+      // 댓글 관리
+      ...prefix("/comments", [
+        index("features/admin/screens/comments/admin-comments.tsx"),
       ]),
 
       // 설정 관리

@@ -1,7 +1,6 @@
 -- =============================================================================
--- 댓글 페이지네이션: 최상위 댓글 ID 목록 + 전체 최상위 댓글 수
--- 정렬: latest(최신순) / popular(인기순, likes_count 기준)
--- Supabase SQL Editor에 붙여넣기 후 실행
+-- 댓글 페이지네이션 RPC 함수 업데이트 (is_visible 지원)
+-- 기존 함수를 제거하고 is_visible 필터가 적용된 새 함수로 교체
 -- =============================================================================
 
 DROP FUNCTION IF EXISTS public.get_class_comments_page_ids(uuid, text, int, int);

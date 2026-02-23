@@ -21,6 +21,7 @@ export type Database = {
           created_at: string
           id: string
           is_deleted: boolean
+          is_visible: boolean
           parent_id: string | null
           updated_at: string
           user_id: string
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_deleted?: boolean
+          is_visible?: boolean
           parent_id?: string | null
           updated_at?: string
           user_id: string
@@ -41,6 +43,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_deleted?: boolean
+          is_visible?: boolean
           parent_id?: string | null
           updated_at?: string
           user_id?: string
