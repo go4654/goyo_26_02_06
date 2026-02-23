@@ -11,6 +11,7 @@ import {
   toggleClassLike,
   toggleClassSave,
   toggleCommentLike,
+  toggleCommentVisibility,
   updateComment,
 } from "../mutation";
 
@@ -22,6 +23,7 @@ type CommentAction =
   | "update"
   | "delete"
   | "toggleLike"
+  | "toggleVisibility"
   | "toggleClassLike"
   | "toggleClassSave";
 
@@ -136,6 +138,30 @@ export async function classCommentAction({
 
         // 좋아요는 페이지 리다이렉트 없이 결과만 반환 (UX 향상)
         return data({ success: true, isLiked }, { status: 200 });
+      }
+
+      case "toggleVisibility": {
+        if (!commentId) {
+          return data(
+            { success: false, error: "댓글 ID가 필요합니다." },
+            { status: 400 },
+          );
+        }
+        if (!isAdmin) {
+          return data(
+            { success: false, error: "권한이 없습니다." },
+            { status: 403 },
+          );
+        }
+
+        try {
+          await toggleCommentVisibility(client, commentId);
+          return data({ success: true }, { status: 200 });
+        } catch (err) {
+          const message =
+            err instanceof Error ? err.message : "가시성 변경에 실패했습니다.";
+          return data({ success: false, error: message }, { status: 400 });
+        }
       }
 
       case "toggleClassLike": {

@@ -145,5 +145,6 @@ function convertToCommentData(comment: CommentWithProfile): CommentData {
     likes: comment.likes_count,
     isLiked: comment.is_liked,
     role: comment.profile?.role,
+    isVisible: comment.is_visible,
   };
 }

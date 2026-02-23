@@ -2,6 +2,7 @@ import {
   ChevronDown,
   ChevronUp,
   EllipsisVertical,
+  Eye,
   MessageCircle,
   Moon,
   Pencil,
@@ -10,7 +11,7 @@ import {
 } from "lucide-react";
 import { DateTime } from "luxon";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { useFetcher } from "react-router";
+import { useFetcher, useRevalidator } from "react-router";
 import { z } from "zod";
 
 import {
@@ -36,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "~/core/components/ui/dropdown-menu";
 import { Textarea } from "~/core/components/ui/textarea";
+import { cn } from "~/core/lib/utils";
 
 /**
  * 댓글 데이터 타입
@@ -53,6 +55,8 @@ export interface CommentData {
   likes: number;
   isLiked?: boolean; // 현재 사용자가 좋아요를 눌렀는지 여부
   role?: string; // 작성자 역할 (admin일 때 뱃지 표시)
+  /** 가시성 (관리자만 숨김 댓글 조회 가능, RLS로 필터링됨) */
+  isVisible?: boolean;
 }
 
 interface CommentItemProps {
@@ -167,8 +171,10 @@ export function CommentItem({
   const [likeCount, setLikeCount] = useState(comment.likes ?? 0);
   const [liked, setLiked] = useState(comment.isLiked ?? false);
   const fetcher = useFetcher();
+  const revalidator = useRevalidator();
   const likeFetcher = useFetcher<{ success: boolean; isLiked: boolean }>();
   const prevFetcherState = useRef(fetcher.state);
+  const lastVisibilityResponseRef = useRef<unknown>(null);
 
   // 본인 댓글 또는 관리자 여부 확인 (수정/삭제 권한)
   const isOwnComment = currentUserId === comment.userId;
@@ -275,8 +281,41 @@ export function CommentItem({
     : "h-8 w-8 xl:h-10 xl:w-10";
   const containerGapClass = isReply ? "gap-2 xl:gap-4" : "gap-2 xl:gap-6";
 
+  const isHidden = isAdmin && comment.isVisible === false;
+
+  const handleToggleVisibility = () => {
+    if (!classId) return;
+    fetcher.submit(
+      {
+        action: "toggleVisibility",
+        commentId: comment.id,
+        classId,
+      },
+      { method: "post" },
+    );
+  };
+
+  // 숨김/복구 액션 응답: 성공 시에만 revalidate 1회 (redirect 없음, 낙관적 UI 없음)
+  useEffect(() => {
+    if (fetcher.state !== "idle" || !fetcher.data) return;
+    const res = fetcher.data as
+      | { success?: boolean; error?: string }
+      | undefined;
+    if (res?.success !== true) return;
+    if (lastVisibilityResponseRef.current === fetcher.data) return;
+    lastVisibilityResponseRef.current = fetcher.data;
+    revalidator.revalidate();
+  }, [fetcher.state, fetcher.data, revalidator]);
+
   return (
-    <div className={`flex items-start ${containerGapClass}`}>
+    <div
+      className={cn(
+        "flex items-start",
+        containerGapClass,
+        isHidden &&
+          "border-primary bg-muted/50 rounded-md border-l-4 py-2 pr-2 pl-2 opacity-65",
+      )}
+    >
       {/* 아바타 */}
       <Avatar className={avatarSizeClass}>
         <AvatarImage src={comment.userProfileImage ?? undefined} />
@@ -286,6 +325,16 @@ export function CommentItem({
       </Avatar>
 
       <div className="mt-0.5 flex w-full flex-col gap-1">
+        {/* 숨김 댓글 뱃지 (관리자에게만 표시) */}
+        {isHidden && (
+          <Badge
+            variant="outline"
+            className="border-primary text-primary mb-1 w-fit text-xs"
+          >
+            숨김됨
+          </Badge>
+        )}
+
         {/* 유저 정보 및 댓글 수정, 삭제 버튼 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -312,29 +361,57 @@ export function CommentItem({
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-2">
+                {/* 관리자 전용: 숨김 처리 / 복구 */}
+                {isAdmin && (
+                  <DropdownMenuItem
+                    className="mb-2"
+                    onSelect={(event) => {
+                      event.preventDefault();
+                      handleToggleVisibility();
+                    }}
+                    disabled={fetcher.state !== "idle"}
+                  >
+                    {comment.isVisible !== false ? (
+                      <>
+                        <Eye className="text-text-2 size-4" />
+                        <span className="hover:text-text-2">숨김 처리</span>
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="text-text-2 size-4" />
+                        <span className="hover:text-text-2">복구</span>
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                )}
+
                 {/* 본인 댓글만 수정 가능 */}
                 {isOwnComment && (
                   <DropdownMenuItem
-                    className="mb-2 flex cursor-pointer items-center gap-2"
+                    className="mb-2 flex cursor-pointer items-center gap-2 hover:bg-gray-200"
                     onSelect={(event) => {
                       event.preventDefault();
                       handleEditClick();
                     }}
                   >
-                    <Pencil className="text-text-2 size-4" /> <span> 수정</span>
+                    <Pencil className="text-text-2 size-4" />{" "}
+                    <span className="hover:text-text-2">수정</span>
                   </DropdownMenuItem>
                 )}
 
                 {/* 본인 댓글 또는 관리자는 삭제 가능 */}
                 <DropdownMenuItem
-                  className="flex cursor-pointer items-center gap-2"
+                  className="group flex cursor-pointer items-center gap-2"
                   onSelect={(event) => {
                     event.preventDefault();
                     setIsDeleteOpen(true);
                   }}
                 >
-                  <Trash className="text-text-2 size-4" />{" "}
-                  <span className="text-text-2"> 삭제</span>
+                  <Trash className="size-4 text-red-300 group-hover:text-red-500" />{" "}
+                  <span className="text-red-300 group-hover:text-red-500">
+                    {" "}
+                    삭제
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -35,7 +35,11 @@ export async function createComment(
   });
 
   if (error) {
-    logger.error("[createComment] Supabase error:", error.message, error.details);
+    logger.error(
+      "[createComment] Supabase error:",
+      error.message,
+      error.details,
+    );
     throw new Error("댓글 등록에 실패했습니다.");
   }
 }
@@ -64,8 +68,49 @@ export async function updateComment(
     .eq("user_id", userId);
 
   if (error) {
-    logger.error("[updateComment] Supabase error:", error.message, error.details);
+    logger.error(
+      "[updateComment] Supabase error:",
+      error.message,
+      error.details,
+    );
     throw new Error("댓글 수정에 실패했습니다.");
+  }
+}
+
+/**
+ * 댓글 숨김 토글 (관리자 전용)
+ *
+ * is_visible을 반대로 변경합니다. RLS 정책에 의해 관리자만 호출 가능해야 합니다.
+ *
+ * @param client - Supabase 클라이언트 인스턴스
+ * @param commentId - 댓글 ID
+ */
+export async function toggleCommentVisibility(
+  client: SupabaseClient,
+  commentId: string,
+): Promise<void> {
+  const { data: row, error: fetchError } = await client
+    .from("class_comments")
+    .select("is_visible")
+    .eq("id", commentId)
+    .single();
+
+  if (fetchError || !row) {
+    logger.error("[toggleCommentVisibility] fetch error:", fetchError?.message);
+    throw new Error("댓글을 찾을 수 없습니다.");
+  }
+
+  const { error: updateError } = await client
+    .from("class_comments")
+    .update({ is_visible: !row.is_visible })
+    .eq("id", commentId);
+
+  if (updateError) {
+    logger.error(
+      "[toggleCommentVisibility] update error:",
+      updateError.message,
+    );
+    throw new Error("숨김 처리에 실패했습니다.");
   }
 }
 
@@ -97,7 +142,12 @@ export async function deleteComment(
     .select("id");
 
   if (error) {
-    logger.error("[deleteComment] Supabase error:", error.message, error.details, error.hint);
+    logger.error(
+      "[deleteComment] Supabase error:",
+      error.message,
+      error.details,
+      error.hint,
+    );
     throw new Error("댓글 삭제에 실패했습니다.");
   }
 
@@ -141,22 +191,28 @@ export async function toggleCommentLike(
       .eq("user_id", userId);
 
     if (error) {
-      logger.error("[toggleCommentLike] cancel error:", error.message, error.details);
+      logger.error(
+        "[toggleCommentLike] cancel error:",
+        error.message,
+        error.details,
+      );
       throw new Error("좋아요 취소에 실패했습니다.");
     }
 
     return false;
   } else {
     // 좋아요 추가
-    const { error } = await client
-      .from("comment_likes")
-      .insert({
-        comment_id: commentId,
-        user_id: userId,
-      });
+    const { error } = await client.from("comment_likes").insert({
+      comment_id: commentId,
+      user_id: userId,
+    });
 
     if (error) {
-      logger.error("[toggleCommentLike] add error:", error.message, error.details);
+      logger.error(
+        "[toggleCommentLike] add error:",
+        error.message,
+        error.details,
+      );
       throw new Error("좋아요 등록에 실패했습니다.");
     }
 
@@ -198,7 +254,11 @@ export async function toggleClassLike(
       .eq("user_id", userId);
 
     if (error) {
-      logger.error("[toggleClassLike] cancel error:", error.message, error.details);
+      logger.error(
+        "[toggleClassLike] cancel error:",
+        error.message,
+        error.details,
+      );
       throw new Error("좋아요 취소에 실패했습니다.");
     }
 
@@ -211,7 +271,11 @@ export async function toggleClassLike(
     });
 
     if (error) {
-      logger.error("[toggleClassLike] add error:", error.message, error.details);
+      logger.error(
+        "[toggleClassLike] add error:",
+        error.message,
+        error.details,
+      );
       throw new Error("좋아요 등록에 실패했습니다.");
     }
 
@@ -253,7 +317,11 @@ export async function toggleClassSave(
       .eq("user_id", userId);
 
     if (error) {
-      logger.error("[toggleClassSave] cancel error:", error.message, error.details);
+      logger.error(
+        "[toggleClassSave] cancel error:",
+        error.message,
+        error.details,
+      );
       throw new Error("저장 취소에 실패했습니다.");
     }
 
@@ -266,7 +334,11 @@ export async function toggleClassSave(
     });
 
     if (error) {
-      logger.error("[toggleClassSave] add error:", error.message, error.details);
+      logger.error(
+        "[toggleClassSave] add error:",
+        error.message,
+        error.details,
+      );
       throw new Error("저장 등록에 실패했습니다.");
     }
 
