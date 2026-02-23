@@ -36,7 +36,11 @@ export async function userDetailLoader({
 
   const [authResult, profileResult] = await Promise.all([
     adminClient.auth.admin.getUserById(userId),
-    client.from("profiles").select("profile_id, name, gallery_access, is_blocked, blocked_reason, last_active_at, created_at").eq("profile_id", userId).maybeSingle(),
+    client
+      .from("profiles")
+      .select("profile_id, name, gallery_access, is_blocked, admin_note, last_active_at, created_at")
+      .eq("profile_id", userId)
+      .maybeSingle(),
   ]);
 
   const authUser = authResult.data?.user;
@@ -58,7 +62,7 @@ export async function userDetailLoader({
     nickname: name,
     galleryAccess,
     status: isBlocked ? "suspended" : "active",
-    adminMemo: profile?.blocked_reason ?? "",
+    adminMemo: profile?.admin_note ?? "",
     createdAt,
     lastActiveAt,
   };

@@ -1,7 +1,9 @@
 import type { Route } from "./+types/admin-users-edit";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useFetcher } from "react-router";
 import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
@@ -17,72 +19,93 @@ import {
 import { Textarea } from "~/core/components/ui/textarea";
 
 import { formatDate } from "./lib/formatters";
+import type { UserEditActionResponse } from "./server/users-edit.action";
 import { userDetailLoader } from "./server/users-detail.loader";
-import { usersAction } from "./server/users.action";
+import { userEditAction } from "./server/users-edit.action";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `유저 상세 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
 export const loader = userDetailLoader;
-export const action = usersAction;
+export const action = userEditAction;
 
 /**
  * 유저 수정 페이지
  *
- * 기능:
- * - 사용자 기본 정보 표시 (읽기 전용)
- * - 포폴 접근 권한 설정 (gallery_access)
- * - 계정 상태 변경 (active, suspended)
- * - 관리자 메모 작성
+ * - 읽기 전용: email, name, created_at, last_active_at, role
+ * - 수정 가능: gallery_access, status(active|suspended), admin_note
  */
 export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
+  const fetcher = useFetcher<UserEditActionResponse>();
   const { user: userData } = loaderData;
 
-  /**
-   * 폼 상태 관리
-   */
   const [formData, setFormData] = useState({
     galleryAccess: userData.galleryAccess,
     status: userData.status,
     adminMemo: userData.adminMemo,
   });
 
-  /**
-   * 폼 제출 핸들러
-   * 유저 정보 수정 데이터를 처리합니다.
-   */
-  const handleSubmit = async (e: React.FormEvent) => {
+  /** 서버 저장 성공 시점의 폼 값 (저장 버튼 비활성화용) */
+  const [savedAt, setSavedAt] = useState<
+    { galleryAccess: boolean; status: "active" | "suspended"; adminMemo: string }
+  >({
+    galleryAccess: userData.galleryAccess,
+    status: userData.status,
+    adminMemo: userData.adminMemo,
+  });
+
+  const isDirty =
+    formData.galleryAccess !== savedAt.galleryAccess ||
+    formData.status !== savedAt.status ||
+    formData.adminMemo !== savedAt.adminMemo;
+
+  const submittedRef = useRef<typeof formData | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isDirty) return;
 
-    // TODO: Supabase 연동하여 실제 수정 처리
+    submittedRef.current = { ...formData };
 
-    // TODO: Supabase 업데이트
-    // await supabase
-    //   .from('users')
-    //   .update({
-    //     gallery_access: formData.galleryAccess,
-    //     status: formData.status,
-    //     admin_memo: formData.adminMemo,
-    //   })
-    //   .eq('id', userData.id);
+    const fd = new FormData();
+    fd.append("galleryAccess", formData.galleryAccess ? "true" : "false");
+    fd.append(
+      "is_blocked",
+      formData.status === "suspended" ? "true" : "false",
+    );
+    fd.append("adminNote", formData.adminMemo);
 
-    alert("유저 정보가 수정되었습니다. (임시 메시지)");
-    navigate("/admin/users");
+    fetcher.submit(fd, { method: "POST" });
   };
 
-  /**
-   * 취소 핸들러
-   * 목록 페이지로 이동합니다.
-   */
+  useEffect(() => {
+    if (!fetcher.data) return;
+
+    if (fetcher.data.success === true) {
+      if (submittedRef.current) {
+        setSavedAt(submittedRef.current);
+        submittedRef.current = null;
+      }
+      toast.success("저장 완료");
+      return;
+    }
+
+    if (fetcher.data.success === false && fetcher.data.error) {
+      submittedRef.current = null;
+      toast.error("저장 실패", {
+        description: fetcher.data.error,
+      });
+    }
+  }, [fetcher.data]);
+
   const handleCancel = () => {
     navigate("/admin/users");
   };
 
   return (
     <div className="mx-auto flex w-full max-w-[1000px] flex-1 flex-col gap-6 p-4 pt-0">
-      {/* 페이지 헤더 */}
       <div>
         <h1 className="text-h5">유저 수정</h1>
         <p className="text-text-2 mt-2 text-sm">
@@ -90,10 +113,9 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
         </p>
       </div>
 
-      {/* 폼 영역 */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* 사용자 상세 - 기본 정보 섹션 */}
+          {/* 사용자 상세 - 기본 정보 (읽기 전용) */}
           <section className="space-y-4">
             <h2 className="text-h6 border-b border-white/10 pb-2">
               사용자 상세
@@ -102,7 +124,6 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
             <div className="space-y-4">
               <h3 className="text-text-1 text-sm font-semibold">기본 정보</h3>
 
-              {/* 이메일 (읽기 전용) */}
               <div className="space-y-2">
                 <Label htmlFor="email">이메일</Label>
                 <Input
@@ -113,7 +134,6 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                 />
               </div>
 
-              {/* 닉네임 (읽기 전용) */}
               <div className="space-y-2">
                 <Label htmlFor="nickname">닉네임</Label>
                 <Input
@@ -124,7 +144,6 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                 />
               </div>
 
-              {/* 가입일 (읽기 전용) */}
               <div className="space-y-2">
                 <Label htmlFor="createdAt">가입일</Label>
                 <Input
@@ -135,12 +154,15 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                 />
               </div>
 
-              {/* 최근 활동일 (읽기 전용) */}
               <div className="space-y-2">
                 <Label htmlFor="lastActiveAt">최근 활동일</Label>
                 <Input
                   id="lastActiveAt"
-                  value={userData.lastActiveAt ? formatDate(userData.lastActiveAt) : "-"}
+                  value={
+                    userData.lastActiveAt
+                      ? formatDate(userData.lastActiveAt)
+                      : "-"
+                  }
                   disabled
                   className="text-text-3 bg-white/5"
                 />
@@ -148,14 +170,13 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
 
-          {/* 권한 및 상태 설정 섹션 */}
+          {/* 권한 및 상태 설정 (수정 가능) */}
           <section className="space-y-4">
             <h2 className="text-h6 border-b border-white/10 pb-2">
               권한 및 상태 설정
             </h2>
 
             <div className="space-y-6">
-              {/* 포폴 접근 권한 */}
               <div className="flex items-center space-x-3">
                 <Checkbox
                   id="galleryAccess"
@@ -172,16 +193,14 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
                     htmlFor="galleryAccess"
                     className="cursor-pointer text-sm font-medium"
                   >
-                    포폴 접근 권한
+                    포폴 접근권한
                   </Label>
                   <p className="text-text-3 text-xs">
                     체크 시 갤러리(포트폴리오) 접근 권한이 부여됩니다.
-                    (gallery_access)
                   </p>
                 </div>
               </div>
 
-              {/* 계정 상태 변경 */}
               <div className="space-y-2">
                 <Label htmlFor="status">계정 상태</Label>
                 <Select
@@ -206,7 +225,7 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
 
-          {/* 관리자 메모 섹션 */}
+          {/* 관리자 메모 (수정 가능) */}
           <section className="space-y-4">
             <h2 className="text-h6 border-b border-white/10 pb-2">
               관리자 메모
@@ -233,12 +252,16 @@ export default function AdminUsersEdit({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
 
-          {/* 액션 버튼 */}
           <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
             <Button type="button" variant="outline" onClick={handleCancel}>
               취소
             </Button>
-            <Button type="submit">수정 완료</Button>
+            <Button
+              type="submit"
+              disabled={!isDirty || fetcher.state === "submitting"}
+            >
+              {fetcher.state === "submitting" ? "저장 중..." : "저장"}
+            </Button>
           </div>
         </form>
       </div>

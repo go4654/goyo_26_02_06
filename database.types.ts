@@ -612,7 +612,7 @@ export type Database = {
       news: {
         Row: {
           author_id: string | null
-          category: string
+          category: Database["public"]["Enums"]["news_category"]
           content_mdx: string
           cover_image_urls: string[]
           created_at: string
@@ -628,7 +628,7 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
-          category?: string
+          category?: Database["public"]["Enums"]["news_category"]
           content_mdx: string
           cover_image_urls?: string[]
           created_at?: string
@@ -644,7 +644,7 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
-          category?: string
+          category?: Database["public"]["Enums"]["news_category"]
           content_mdx?: string
           cover_image_urls?: string[]
           created_at?: string
@@ -774,6 +774,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          admin_note: string | null
           avatar_url: string | null
           blocked_reason: string | null
           created_at: string
@@ -787,6 +788,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          admin_note?: string | null
           avatar_url?: string | null
           blocked_reason?: string | null
           created_at?: string
@@ -800,6 +802,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          admin_note?: string | null
           avatar_url?: string | null
           blocked_reason?: string | null
           created_at?: string
@@ -979,7 +982,7 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      news_category: "notice" | "update" | "news"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1106,6 +1109,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      news_category: ["notice", "update", "news"],
+    },
   },
 } as const

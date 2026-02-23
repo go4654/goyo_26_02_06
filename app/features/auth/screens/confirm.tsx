@@ -17,6 +17,7 @@ import type { Route } from "./+types/confirm";
 import { data, redirect } from "react-router";
 import { z } from "zod";
 
+import { touchLastActiveAt } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 /**
@@ -92,12 +93,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // 이메일 변경 확인에 대한 특별 처리
   if (validData.type === "email_change") {
+    await touchLastActiveAt(client);
     return redirect(
       // @ts-ignore - Supabase는 이메일 변경에 대해 사용자 객체에 메시지를 반환합니다
       `${validData.next}?message=${encodeURIComponent(verifyOtpData.user.msg ?? "Your email has been updated")}`,
       { headers },
     );
   }
+
+  // 최근 활동일 갱신 (이메일/복구 확인 등 로그인에 해당하는 경우)
+  await touchLastActiveAt(client);
 
   // 헤더에 인증 쿠키가 있는 다음 URL로 리다이렉트
   return redirect(validData.next, { headers });

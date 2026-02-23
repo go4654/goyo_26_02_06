@@ -234,6 +234,24 @@ export async function checkUserBlocked(
 }
 
 /**
+ * 로그인(또는 세션 확정) 시 profiles.last_active_at 갱신
+ * 세션 클라이언트로 자신의 프로필만 업데이트하며, 실패 시 로그인을 막지 않음
+ */
+export async function touchLastActiveAt(
+  client: SupabaseClient,
+): Promise<void> {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) return;
+
+  await client
+    .from("profiles")
+    .update({ last_active_at: new Date().toISOString() })
+    .eq("profile_id", user.id);
+}
+
+/**
  * 라우트 action에 대해 특정 HTTP 메서드 요구
  * * 이 함수는 들어오는 요청이 지정된 HTTP 메서드를 사용하는지 확인하는 미들웨어를 반환합니다.
  * 일치하지 않는 경우 405 Method Not Allowed 응답을 throw합니다.

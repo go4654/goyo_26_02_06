@@ -32,7 +32,7 @@ import { InputOTPSeparator } from "~/core/components/ui/input-otp";
 import { InputOTPGroup } from "~/core/components/ui/input-otp";
 import { InputOTPSlot } from "~/core/components/ui/input-otp";
 import { InputOTP } from "~/core/components/ui/input-otp";
-import { checkUserBlocked } from "~/core/lib/guards.server";
+import { checkUserBlocked, touchLastActiveAt } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 /**
@@ -140,6 +140,9 @@ export async function action({ request }: Route.ActionArgs) {
       { headers },
     );
   }
+
+  // 최근 활동일 갱신 (로그인 시점)
+  await touchLastActiveAt(client);
 
   // 헤더에 인증 쿠키와 함께 홈 페이지로 리다이렉트
   return redirect(`/`, { headers });
