@@ -52,9 +52,19 @@ export default function DeleteAccountForm() {
               "계정 삭제"
             )}
           </Button>
-          {fetcher.data?.error ? (
-            <FormErrors errors={[fetcher.data.error]} />
-          ) : null}
+          {(() => {
+            const error = fetcher.data?.error;
+            if (!error) return null;
+
+            const message =
+              typeof error === "string"
+                ? error
+                : typeof error.message === "string"
+                  ? error.message
+                  : "계정 삭제 중 알 수 없는 오류가 발생했습니다.";
+
+            return <FormErrors errors={[message]} />;
+          })()}
         </fetcher.Form>
       </CardContent>
     </Card>

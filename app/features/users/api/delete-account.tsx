@@ -16,10 +16,19 @@
 import type { Route } from "./+types/delete-account";
 
 import { data, redirect } from "react-router";
+import { eq } from "drizzle-orm";
+import { authUsers } from "drizzle-orm/supabase";
 
 import { requireAuthentication, requireMethod } from "~/core/lib/guards.server";
 import adminClient from "~/core/lib/supa-admin-client.server";
 import makeServerClient from "~/core/lib/supa-client.server";
+import db from "~/core/db/drizzle-client.server";
+
+// Supabase 삭제 에러 메시지를 한글로 매핑
+const DELETE_ACCOUNT_ERROR_MESSAGES: Record<string, string> = {
+  "Database error deleting user":
+    "계정 삭제 중 데이터베이스 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+};
 
 /**
  * Action handler for processing account deletion requests
@@ -59,18 +68,63 @@ export async function action({ request }: Route.ActionArgs) {
     data: { user },
   } = await client.auth.getUser();
 
-  // Delete the user from Supabase Auth
-  const { error } = await adminClient.auth.admin.deleteUser(user!.id);
+  const userId = user!.id;
 
-  // Handle API errors
-  if (error) {
+  // 1) 결제 등 사용자 연관 데이터 정리 (FK 제약 조건으로 인한 삭제 실패 방지)
+  const { error: paymentsDeleteError } = await adminClient
+    .from("payments")
+    .delete()
+    .eq("user_id", userId);
+
+  if (paymentsDeleteError) {
+    const supabaseError = paymentsDeleteError as {
+      message: string;
+      code?: string;
+      details?: string;
+      hint?: string;
+    };
+
     return data(
       {
-        error: error.message,
+        error: {
+          message:
+            "계정 삭제 중 결제 이력 정리 과정에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+          code: supabaseError.code,
+          details: supabaseError.details,
+          originalMessage: supabaseError.message,
+        },
       },
+      { status: 500 },
+    );
+  }
+
+  // 2) Supabase Auth에서 사용자 삭제
+  //    - Admin API 대신 Drizzle을 사용해 auth.users를 직접 삭제
+  //    - e2e 테스트 헬퍼(deleteUser)와 동일한 패턴을 사용
+  try {
+    await db.delete(authUsers).where(eq(authUsers.id, userId));
+  } catch (error) {
+    const supabaseError = error as {
+      message?: string;
+      code?: string;
+      details?: string;
+    };
+
+    const originalMessage = supabaseError.message ?? "Unknown error";
+    const translatedMessage =
+      DELETE_ACCOUNT_ERROR_MESSAGES[originalMessage] ??
+      "계정 삭제 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
+
+    return data(
       {
-        status: 500,
+        error: {
+          message: translatedMessage,
+          code: supabaseError.code,
+          details: supabaseError.details,
+          originalMessage,
+        },
       },
+      { status: 500 },
     );
   }
 
