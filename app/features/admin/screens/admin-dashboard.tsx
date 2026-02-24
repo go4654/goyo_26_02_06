@@ -1,15 +1,14 @@
-import type { Database } from "database.types";
-
 import type { Route } from "./+types/admin-dashboard";
 
 import {
   BarChart3,
   Eye,
   EyeOff,
-  ImageIcon,
+  Heart,
   MessageCircle,
   Users,
 } from "lucide-react";
+import { Link } from "react-router";
 
 import {
   Card,
@@ -17,46 +16,24 @@ import {
   CardHeader,
   CardTitle,
 } from "~/core/components/ui/card";
-import { requireAdmin } from "~/core/lib/guards.server";
-import makeServerClient from "~/core/lib/supa-client.server";
 
-/** get_admin_dashboard_stats RPC 반환 타입 (database.types와 동기화) */
-export type AdminDashboardStats =
-  Database["public"]["Functions"]["get_admin_dashboard_stats"]["Returns"];
+import { adminDashboardLoader } from "./server/admin-dashboard.loader";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `대시보드 | ${import.meta.env.VITE_APP_NAME}` }];
 };
 
-/** 관리자 대시보드 통계 로더 — RPC 단일 호출로 전체 통계 반환 */
-export async function loader({ request }: Route.LoaderArgs) {
-  const [client] = makeServerClient(request);
-  await requireAdmin(client);
-
-  const { data, error } = await client.rpc("get_admin_dashboard_stats");
-
-  if (error) {
-    throw new Response("대시보드 통계를 불러오지 못했습니다.", { status: 500 });
-  }
-
-  if (data === null) {
-    throw new Response("대시보드 통계를 불러오지 못했습니다.", { status: 500 });
-  }
-
-  return { stats: data };
-}
+export const loader = adminDashboardLoader;
 
 function formatNumber(n: number): string {
   return n.toLocaleString("ko-KR");
 }
 
 export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
-  const stats = loaderData.stats;
+  const { stats, topLikedGalleries } = loaderData;
   const { traffic, users, class: classStats, comments, gallery } = stats;
 
-  // 갤러리 영역: RPC에 gallery가 있으면 사용, 없으면 빈 배열로 null 방어
-  const galleryTopSaved = gallery?.top_saved ?? [];
-  const galleryTopViewed = gallery?.top_viewed ?? [];
+  const galleryTopSaved = gallery.top_saved;
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -68,7 +45,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
       <div>
         <h2 className="text-small-title mb-4">전체 통계</h2>
         <div className="grid auto-rows-min gap-4 xl:grid-cols-3">
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 전체 방문 수
@@ -85,7 +62,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
             </CardContent>
           </Card>
 
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 총 회원 수
@@ -99,7 +76,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
             </CardContent>
           </Card>
 
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 오늘 가입자 수
@@ -123,7 +100,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
         <h2 className="text-small-title mt-8 mb-4">클래스 통계</h2>
         <div className="grid auto-rows-min gap-4 md:grid-cols-4">
           {/* 가장 많이 열람된 클래스 TOP 3 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 가장 많이 열람된 클래스 TOP 3
@@ -147,7 +124,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 저장 많은 클래스 TOP 3 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 저장 많은 클래스 TOP 3
@@ -171,7 +148,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 최근 7일 댓글 수 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 최근 7일 댓글 수
@@ -186,7 +163,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 숨김 댓글 수 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 숨김 댓글 수
@@ -206,26 +183,53 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
       <div>
         <h2 className="text-small-title mt-8 mb-4">갤러리 통계</h2>
         <div className="grid auto-rows-min gap-4 md:grid-cols-4">
-          {/* 갤러리 조회 수 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          {/* 좋아요 TOP 갤러리 (카드 1개 안에 3개 데이터) */}
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
-                갤러리 조회 수
+                좋아요 TOP 갤러리
               </CardTitle>
-              <ImageIcon className="text-muted-foreground h-4 w-4" />
+              <Heart className="text-muted-foreground h-4 w-4" />
             </CardHeader>
-            <CardContent>
-              <div className="text-h4 font-bold">
-                {formatNumber(traffic.gallery_views)}
-              </div>
-              <p className="text-muted-foreground mt-4 text-xs">
-                갤러리 뷰 이벤트 기준
-              </p>
+            <CardContent className="space-y-2 text-sm">
+              {topLikedGalleries.length === 0 ? (
+                <p className="text-muted-foreground text-xs">데이터 없음</p>
+              ) : (
+                <ul className="space-y-2">
+                  {topLikedGalleries.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        to={`/gallery/${item.id}`}
+                        className="hover:bg-muted/60 flex items-center gap-3 rounded-md p-1.5 transition-colors"
+                      >
+                        {item.thumbnail_url ? (
+                          <img
+                            src={item.thumbnail_url}
+                            alt={item.title}
+                            className="h-10 w-10 shrink-0 rounded object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="bg-muted h-10 w-10 shrink-0 rounded" />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">
+                            {item.title}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            좋아요 {formatNumber(item.like_count)}개
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </CardContent>
           </Card>
 
           {/* 가장 많이 저장된 갤러리 TOP 3 */}
-          <Card className="bg-muted/50 aspect-video rounded-xl">
+          <Card className="bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 가장 많이 저장된 갤러리 TOP 3

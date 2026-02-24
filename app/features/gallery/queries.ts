@@ -169,14 +169,22 @@ export async function getGalleryBySlug(
   client: SupabaseClient,
   slug: string,
 ): Promise<GalleryDetail | null> {
-  const { data: row, error } = await client
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      slug,
+    );
+
+  const baseQuery = client
     .from("galleries")
     .select(
       "id, title, slug, subtitle, description, caption, thumbnail_image_url, image_urls, like_count, save_count, created_at, gallery_tags(tags(name))",
     )
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .single();
+    .eq("is_published", true);
+
+  const { data: row, error } = await (isUuid
+    ? baseQuery.eq("id", slug)
+    : baseQuery.eq("slug", slug)
+  ).single();
 
   if (error || !row) {
     if (error?.code === "PGRST116") return null; // no rows

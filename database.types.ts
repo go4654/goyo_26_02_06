@@ -1017,6 +1017,15 @@ export type Database = {
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
       get_admin_dashboard_stats: { Args: never; Returns: Json }
+      get_top_galleries_by_likes: {
+        Args: never
+        Returns: {
+          id: string
+          title: string
+          thumbnail_url: string | null
+          like_count: number
+        }[]
+      }
       get_admin_inquiries_list: {
         Args: never
         Returns: {

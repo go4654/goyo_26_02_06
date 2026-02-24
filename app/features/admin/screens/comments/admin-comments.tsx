@@ -122,7 +122,8 @@ export default function AdminComments({ loaderData }: Route.ComponentProps) {
       if (data.failed && data.failed.length > 0) {
         toast.warning(`${data.count}개 ${operationText} 완료`, {
           description:
-            data.failed.map((f) => f.error).join("\n") || `실패: ${data.failed.length}건`,
+            data.failed.map((f) => f.error).join("\n") ||
+            `실패: ${data.failed.length}건`,
           duration: 5000,
         });
       } else {
@@ -149,7 +150,7 @@ export default function AdminComments({ loaderData }: Route.ComponentProps) {
   const isLoading = fetcher.state !== "idle";
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 p-4 pt-0">
+    <div className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col gap-4 p-4 pt-0">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-text-1 text-3xl font-bold">댓글 관리</h1>

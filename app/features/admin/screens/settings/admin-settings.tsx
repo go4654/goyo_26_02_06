@@ -6,6 +6,12 @@ import { useFetcher, useRevalidator } from "react-router";
 import { toast } from "sonner";
 
 import { Button } from "~/core/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/core/components/ui/card";
 import { Label } from "~/core/components/ui/label";
 import {
   Select,
@@ -102,84 +108,100 @@ export default function AdminSettings({ loaderData }: Route.ComponentProps) {
         />
         <input type="hidden" name="noticeVariant" value={noticeVariant} />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="maintenance-mode">점검 모드</Label>
-            <Switch
-              id="maintenance-mode"
-              checked={maintenanceMode}
-              onCheckedChange={setMaintenanceMode}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="maintenance-message">점검 메시지</Label>
-            <Textarea
-              id="maintenance-message"
-              name="maintenanceMessage"
-              value={maintenanceMessage}
-              onChange={(e) => setMaintenanceMessage(e.target.value)}
-              placeholder="점검 화면에 표시할 메시지를 입력하세요. (공지 배너와 별도)"
-              disabled={isSubmitting}
-              rows={2}
-              className="resize-none"
-            />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="signup-enabled">회원가입 허용</Label>
-            <Switch
-              id="signup-enabled"
-              checked={signupEnabled}
-              onCheckedChange={setSignupEnabled}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="notice-enabled">공지 배너 표시</Label>
-            <Switch
-              id="notice-enabled"
-              checked={noticeEnabled}
-              onCheckedChange={setNoticeEnabled}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
+        {/* 점검 모드 · 회원가입 · 공지 표시 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>점검 모드 · 회원가입 · 공지 표시</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-8">
+            <div className="flex items-center justify-between gap-4">
+              <Label htmlFor="maintenance-mode">점검 모드</Label>
+              <Switch
+                id="maintenance-mode"
+                checked={maintenanceMode}
+                onCheckedChange={setMaintenanceMode}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="maintenance-message">점검 메시지</Label>
+              <Textarea
+                id="maintenance-message"
+                name="maintenanceMessage"
+                value={maintenanceMessage}
+                onChange={(e) => setMaintenanceMessage(e.target.value)}
+                placeholder="점검 화면에 표시할 메시지를 입력하세요. (공지 배너와 별도)"
+                disabled={isSubmitting}
+                rows={2}
+                className="resize-none"
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <Label htmlFor="signup-enabled">회원가입 허용</Label>
+              <Switch
+                id="signup-enabled"
+                checked={signupEnabled}
+                onCheckedChange={setSignupEnabled}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <Label htmlFor="notice-enabled">공지 배너 표시</Label>
+              <Switch
+                id="notice-enabled"
+                checked={noticeEnabled}
+                onCheckedChange={setNoticeEnabled}
+                disabled={isSubmitting}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="notice-message">공지 메시지</Label>
-          <Textarea
-            id="notice-message"
-            name="noticeMessage"
-            value={noticeMessage}
-            onChange={(e) => setNoticeMessage(e.target.value)}
-            placeholder="배너에 표시할 메시지를 입력하세요."
-            disabled={isSubmitting}
-            rows={3}
-            className="resize-none"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="notice-variant">공지 유형</Label>
-          <Select
-            value={noticeVariant}
-            onValueChange={(v) =>
-              setNoticeVariant(v as "info" | "warning" | "event")
-            }
-            disabled={isSubmitting}
-          >
-            <SelectTrigger id="notice-variant" className="w-full max-w-[200px]">
-              <SelectValue placeholder="유형 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              {NOTICE_VARIANTS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* 공지 배너 설정 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>공지 배너</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="notice-message">공지 메시지</Label>
+              <Textarea
+                id="notice-message"
+                name="noticeMessage"
+                value={noticeMessage}
+                onChange={(e) => setNoticeMessage(e.target.value)}
+                placeholder="배너에 표시할 메시지를 입력하세요."
+                disabled={isSubmitting}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="notice-variant">공지 유형</Label>
+              <Select
+                value={noticeVariant}
+                onValueChange={(v) =>
+                  setNoticeVariant(v as "info" | "warning" | "event")
+                }
+                disabled={isSubmitting}
+              >
+                <SelectTrigger
+                  id="notice-variant"
+                  className="w-full max-w-[200px]"
+                >
+                  <SelectValue placeholder="유형 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {NOTICE_VARIANTS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
         {fetcher.data && "error" in fetcher.data && (
           <p className="text-destructive text-sm">{fetcher.data.error}</p>
