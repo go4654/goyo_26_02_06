@@ -78,7 +78,7 @@ const data = {
         },
         {
           title: "문의",
-          url: "/admin/inquiries",
+          url: "/admin/users/inquiries",
         },
       ],
     },

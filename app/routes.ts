@@ -202,6 +202,13 @@ export default [
           "/:username",
           "features/admin/screens/users/admin-users-edit.tsx",
         ),
+        ...prefix("/inquiries", [
+          index("features/admin/screens/inquiries/admin-inquiries.tsx"),
+          route(
+            "/:id",
+            "features/admin/screens/inquiries/admin-inquiries-detail.tsx",
+          ),
+        ]),
       ]),
 
       // 댓글 관리

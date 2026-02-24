@@ -1,10 +1,10 @@
+import type { InquiryDetailMessage } from "../server/inquiry-detail.loader";
 import type { Route } from "./+types/inquiry-detail";
 
-import { Link, useFetcher, useRevalidator } from "react-router";
-import { Loader2Icon, SendIcon } from "lucide-react";
+import { Loader2Icon, MoveLeft, SendIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Link, useFetcher, useRevalidator } from "react-router";
 
-import { cn } from "~/core/lib/utils";
 import { Badge } from "~/core/components/ui/badge";
 import { Button } from "~/core/components/ui/button";
 import {
@@ -15,17 +15,13 @@ import {
   CardTitle,
 } from "~/core/components/ui/card";
 import { Textarea } from "~/core/components/ui/textarea";
+import { cn } from "~/core/lib/utils";
 
 import { InquiryStatusBadge } from "../components/InquiryStatusBadge";
 import { formatInquiryDate } from "../lib/format-inquiry-date";
 import { INQUIRY_CATEGORY_LABELS } from "../lib/mock-inquiries";
-import type {
-  InquiryDetailMessage,
-} from "../server/inquiry-detail.loader";
-import {
-  inquiryDetailLoader,
-} from "../server/inquiry-detail.loader";
 import { inquiryDetailAction } from "../server/inquiry-detail.action";
+import { inquiryDetailLoader } from "../server/inquiry-detail.loader";
 
 export const meta: Route.MetaFunction = () => {
   return [{ title: `문의 상세 | ${import.meta.env.VITE_APP_NAME}` }];
@@ -34,6 +30,7 @@ export const meta: Route.MetaFunction = () => {
 export const loader = inquiryDetailLoader;
 export const action = inquiryDetailAction;
 
+// 메시지 말풍선
 function MessageBubble({
   message,
   isMine,
@@ -47,8 +44,8 @@ function MessageBubble({
         className={cn(
           "max-w-[85%] rounded-lg px-4 py-3 text-sm whitespace-pre-wrap shadow-xs",
           isMine
-            ? "ml-auto bg-primary text-primary-foreground"
-            : "mr-auto bg-muted text-foreground",
+            ? "bg-primary text-primary-foreground ml-auto"
+            : "bg-muted text-foreground mr-auto",
         )}
       >
         <div className="break-words">{message.content}</div>
@@ -65,6 +62,7 @@ function MessageBubble({
   );
 }
 
+// 메시지 전송 폼
 function SendMessageForm({
   isClosed,
   fetcher,
@@ -88,7 +86,7 @@ function SendMessageForm({
         value={content}
         onChange={(e) => onChangeContent(e.target.value)}
         disabled={isDisabled}
-        className="min-h-[120px]"
+        // className="min-h-[120px]"
         placeholder={
           isClosed
             ? "닫힌 문의는 추가 메시지를 보낼 수 없습니다."
@@ -109,6 +107,7 @@ function SendMessageForm({
   );
 }
 
+// 문의 상세 페이지
 export default function InquiryDetail({ loaderData }: Route.ComponentProps) {
   const { inquiry, messages, authUserId } = loaderData;
   const isClosed = inquiry.status === "closed";
@@ -124,10 +123,13 @@ export default function InquiryDetail({ loaderData }: Route.ComponentProps) {
   }, [fetcher.data, revalidator]);
 
   return (
-    <div className="mx-auto mt-20 w-full px-4 pb-40 xl:mt-25 xl:max-w-[1000px]">
+    <div className="mx-auto mt-20 w-full px-4 pb-40 xl:mt-25 xl:max-w-[800px]">
       <div className="mb-6 flex items-center justify-between">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/inquiries">목록으로</Link>
+          <Link to="/inquiries">
+            {" "}
+            <MoveLeft className="size-4" /> 목록으로
+          </Link>
         </Button>
       </div>
 

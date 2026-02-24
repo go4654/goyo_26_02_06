@@ -975,6 +975,18 @@ export type Database = {
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
       get_admin_dashboard_stats: { Args: never; Returns: Json }
+      get_admin_inquiries_list: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          nickname: string
+          status: string
+          title: string
+          updated_at: string
+        }[]
+      }
       get_admin_users_list: {
         Args: never
         Returns: {
