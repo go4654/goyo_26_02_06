@@ -987,6 +987,19 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_admin_inquiry_detail: {
+        Args: { p_inquiry_id: string }
+        Returns: {
+          author_email: string | null
+          author_nickname: string | null
+          category: string
+          created_at: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }[]
+      }
       get_admin_users_list: {
         Args: never
         Returns: {
