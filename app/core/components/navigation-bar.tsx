@@ -282,12 +282,15 @@ export function NavigationBar({
   avatarUrl,
   isAdmin,
   loading,
+  hasNoticeBanner = false,
 }: {
   name?: string;
   email?: string;
   avatarUrl?: string | null;
   isAdmin?: boolean;
   loading: boolean;
+  /** 공지 배너가 노출 중이면 true (헤더를 배너 아래로 내림) */
+  hasNoticeBanner?: boolean;
 }) {
   const { pathname } = useLocation();
   const [active, setActive] = useState<string | null>(null);
@@ -303,9 +306,10 @@ export function NavigationBar({
 
   return (
     <nav
-      className={
-        "fixed top-0 right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm"
-      }
+      className={cn(
+        "fixed right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm",
+        hasNoticeBanner ? "top-12" : "top-0",
+      )}
     >
       <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1640px]">
         {/* 로고 */}

@@ -20,6 +20,7 @@ import nProgressStyles from "nprogress/nprogress.css?url";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  data,
   Links,
   Meta,
   Outlet,
@@ -42,10 +43,17 @@ import { Toaster } from "sonner";
 
 import { Dialog } from "./core/components/ui/dialog";
 import { Sheet } from "./core/components/ui/sheet";
+import { getUserRole } from "./core/lib/guards.server";
 import i18next from "./core/lib/i18next.server";
+import makeServerClient from "./core/lib/supa-client.server";
 import { themeSessionResolver } from "./core/lib/theme-session.server";
 import { cn } from "./core/lib/utils";
 import NotFound from "./core/screens/404";
+import MaintenanceScreen from "./core/screens/maintenance";
+import {
+  getSiteSettings,
+  toSiteSettingsForApp,
+} from "./features/admin/screens/settings/queries";
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.ico" },
@@ -69,20 +77,11 @@ export const links: Route.LinksFunction = () => [
 /**
  * 루트 로더 함수
  *
- * 이 서버 사이드 함수는 모든 요청에서 실행되며 다음을 담당합니다:
- * 1. 필수 환경 변수가 모두 존재하는지 검증
- * 2. 세션에서 사용자의 테마 선호도 로드
- * 3. 사용자의 선호 로케일 감지
- *
- * 이 로더에서 반환된 데이터는 'root' ID를 가진 useRouteLoaderData 훅을 통해
- * 애플리케이션 전체에서 사용할 수 있습니다.
- *
- * @param request - 들어오는 HTTP 요청
- * @returns 테마 및 로케일 선호도를 포함하는 객체
+ * - 필수 환경 변수 검증, 테마/로케일 로드
+ * - site_settings 조회(전역 설정), 사용자/관리자 여부 조회
+ * - 반환 데이터는 useRouteLoaderData("root")로 앱 전역에서 사용
  */
 export async function loader({ request }: Route.LoaderArgs) {
-  // 필수 Supabase 환경 변수가 모두 존재하는지 검증
-  // 불완전한 설정으로 애플리케이션이 시작되는 것을 방지합니다
   if (
     !process.env.DATABASE_URL ||
     !process.env.SUPABASE_URL ||
@@ -96,16 +95,27 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw new Error("Missing Supabase environment variables");
   }
 
-  // 성능 향상을 위해 테마와 로케일 선호도를 동시에 로드
-  const [{ getTheme }, locale] = await Promise.all([
-    themeSessionResolver(request),
-    i18next.getLocale(request),
+  const [client, headers] = makeServerClient(request);
+
+  const [themeLocale, settingsRow, userRole] = await Promise.all([
+    Promise.all([
+      themeSessionResolver(request),
+      i18next.getLocale(request),
+    ]).then(([{ getTheme }, locale]) => ({ theme: getTheme(), locale })),
+    getSiteSettings(client).then(toSiteSettingsForApp),
+    getUserRole(client),
   ]);
 
-  return {
-    theme: getTheme(),
-    locale,
-  };
+  return data(
+    {
+      theme: themeLocale.theme,
+      locale: themeLocale.locale,
+      settings: settingsRow,
+      user: userRole.user,
+      isAdmin: userRole.isAdmin,
+    },
+    { headers },
+  );
 }
 
 /**
@@ -231,6 +241,18 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
  */
 export default function App() {
   const navigation = useNavigation();
+  const rootData = useRouteLoaderData("root") as
+    | {
+        theme?: string;
+        locale?: string;
+        settings?: {
+          maintenanceMode: boolean;
+          maintenanceMessage?: string | null;
+          noticeMessage?: string | null;
+        };
+        isAdmin?: boolean;
+      }
+    | undefined;
 
   // 네비게이션 중 더 나은 UX를 위해 스피너가 있는 NProgress 초기화
   useEffect(() => {
@@ -265,6 +287,18 @@ export default function App() {
       }
     }
   }, [searchParams]);
+
+  // 점검 모드: 관리자 제외 전체 점검 화면 (점검 메시지는 공지와 분리)
+  if (
+    rootData?.settings?.maintenanceMode === true &&
+    rootData?.isAdmin !== true
+  ) {
+    return (
+      <MaintenanceScreen
+        message={rootData.settings.maintenanceMessage ?? undefined}
+      />
+    );
+  }
 
   return (
     <Sheet>

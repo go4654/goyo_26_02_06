@@ -920,6 +920,48 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          created_at: string
+          id: string
+          maintenance_message: string | null
+          maintenance_mode: boolean
+          notice_enabled: boolean
+          notice_message: string | null
+          notice_variant: string
+          notice_version: number
+          signup_enabled: boolean
+          singleton_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
+          notice_enabled?: boolean
+          notice_message?: string | null
+          notice_variant?: string
+          notice_version?: number
+          signup_enabled?: boolean
+          singleton_key?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          maintenance_message?: string | null
+          maintenance_mode?: boolean
+          notice_enabled?: boolean
+          notice_message?: string | null
+          notice_variant?: string
+          notice_version?: number
+          signup_enabled?: boolean
+          singleton_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           created_at: string
@@ -990,8 +1032,8 @@ export type Database = {
       get_admin_inquiry_detail: {
         Args: { p_inquiry_id: string }
         Returns: {
-          author_email: string | null
-          author_nickname: string | null
+          author_email: string
+          author_nickname: string
           category: string
           created_at: string
           id: string

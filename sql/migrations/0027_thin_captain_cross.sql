@@ -1,0 +1,1 @@
+ALTER POLICY "select-site-settings" ON "site_settings" TO public USING ("site_settings"."singleton_key" = 'global');

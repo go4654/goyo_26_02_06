@@ -14,7 +14,7 @@ import type { Route } from "./+types/join";
 
 import { CheckCircle2Icon } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { Form, Link, data } from "react-router";
+import { Form, Link, data, redirect } from "react-router";
 import { z } from "zod";
 
 import FormButton from "~/core/components/form-button";
@@ -35,6 +35,8 @@ import { Checkbox } from "~/core/components/ui/checkbox";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
 import makeServerClient from "~/core/lib/supa-client.server";
+
+import { getSiteSettings } from "~/features/admin/screens/settings/queries";
 
 import { SignUpButtons } from "../components/auth-login-buttons";
 import { doesUserExist } from "../lib/queries.server";
@@ -82,6 +84,19 @@ const joinSchema = z
     message: "Passwords must match",
     path: ["confirmPassword"],
   });
+
+/**
+ * 회원가입 페이지 로더
+ * signupEnabled가 false면 홈으로 리다이렉트
+ */
+export async function loader({ request }: Route.LoaderArgs) {
+  const [client] = makeServerClient(request);
+  const settings = await getSiteSettings(client);
+  if (settings.signup_enabled === false) {
+    throw redirect("/", 302);
+  }
+  return {};
+}
 
 /**
  * 사용자 등록 폼 제출을 처리하는 서버 액션
