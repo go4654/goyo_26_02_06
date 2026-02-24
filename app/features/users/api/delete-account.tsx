@@ -74,13 +74,18 @@ export async function action({ request }: Route.ActionArgs) {
     );
   }
 
-  // Clean up user's avatar from storage
+  // Clean up user's avatar from storage (경로: {user_id}/avatar.{ext})
   // Note: We don't fail the request if this cleanup fails
   try {
-    await adminClient.storage.from("avatars").remove([user!.id]);
-  } catch (error) {
-    // We don't really care if this fails, as the main user deletion succeeded
-    // This is just cleanup of associated resources
+    const { data: files } = await adminClient.storage
+      .from("avatars")
+      .list(user!.id);
+    if (files?.length) {
+      const names = files.map((f) => `${user!.id}/${f.name}`);
+      await adminClient.storage.from("avatars").remove(names);
+    }
+  } catch {
+    // 메인 삭제는 완료됐으므로 cleanup 실패는 무시
   }
 
   // Redirect to home page after successful deletion

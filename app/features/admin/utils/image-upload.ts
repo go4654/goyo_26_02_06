@@ -10,7 +10,7 @@ import imageCompression from "browser-image-compression";
  * 이미지 압축 옵션
  */
 const COMPRESSION_OPTIONS = {
-  maxSizeMB: 1, // 최대 파일 크기 (MB)
+  maxSizeMB: 3, // 최대 파일 크기 (MB)
   maxWidthOrHeight: 1600, // 최대 너비 또는 높이
   useWebWorker: true, // 웹 워커 사용 (성능 향상)
   quality: 0.85, // 이미지 품질 (0-1)

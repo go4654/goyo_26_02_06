@@ -21,7 +21,7 @@ export default function Section1() {
 
       {/* 컨테이너 */}
       <Container>
-        <div className="relative flex h-screen flex-col items-start justify-center">
+        <div className="relative z-10 flex h-screen flex-col items-start justify-center">
           <h1 className="font-roboto text-[80px] leading-[70px] font-bold tracking-[-0.02em] md:text-[200px] md:leading-[180px]">
             Silent Growth <br />
             <AuroraText colors={["#7C4DFF", "#BB86FC", "#03DAC6"]} speed={2}>

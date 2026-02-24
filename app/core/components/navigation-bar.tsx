@@ -81,7 +81,10 @@ function UserMenu({
       {/* 아바타 드롭다운 트리거 */}
       <DropdownMenuTrigger asChild>
         <Avatar className="size-8 cursor-pointer rounded-full">
-          <AvatarImage src={avatarUrl ?? undefined} />
+          <AvatarImage
+            className="h-full w-full object-cover"
+            src={avatarUrl ?? undefined}
+          />
           <AvatarFallback className="text-sm">
             {name.slice(0, 2)}
           </AvatarFallback>

@@ -37,13 +37,31 @@ import makeServerClient from "~/core/lib/supa-client.server";
  */
 const changePasswordSchema = z
   .object({
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    password: z
+      .string()
+      .min(8, "비밀번호는 최소 8자 이상이어야 합니다."),
+    confirmPassword: z
+      .string()
+      .min(8, "비밀번호 확인은 최소 8자 이상이어야 합니다."),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
+    message: "비밀번호가 일치하지 않습니다.",
     path: ["confirmPassword"],
   });
+
+/** Supabase Auth 비밀번호 관련 영문 오류 메시지를 한글로 매핑 */
+const PASSWORD_ERROR_MESSAGES: Record<string, string> = {
+  "New password should be different from the old password.":
+    "새 비밀번호는 기존 비밀번호와 달라야 합니다.",
+  "Password should be at least 6 characters.":
+    "비밀번호는 최소 6자 이상이어야 합니다.",
+  "New password is too weak.": "비밀번호가 너무 약합니다. 더 강한 비밀번호를 사용해 주세요.",
+  "Unable to validate email address: invalid format":
+    "이메일 주소 형식이 올바르지 않습니다.",
+  "Invalid login credentials": "로그인 정보가 올바르지 않습니다.",
+  "Email not confirmed": "이메일 인증이 완료되지 않았습니다.",
+  "User not found": "사용자를 찾을 수 없습니다.",
+};
 
 /**
  * Action handler for processing password change requests
@@ -95,7 +113,10 @@ export async function action({ request }: Route.ActionArgs) {
 
   // Handle API errors
   if (updateError) {
-    return data({ error: updateError.message }, { status: 400 });
+    const errorMessage =
+      PASSWORD_ERROR_MESSAGES[updateError.message] ??
+      "비밀번호 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+    return data({ error: errorMessage }, { status: 400 });
   }
   
   // Return success response

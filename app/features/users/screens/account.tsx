@@ -28,11 +28,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   }
 
   const identities = client.auth.getUserIdentities();
-  
+
   // getUserProfile 함수가 내부적으로 userId 검증을 수행하므로
   // 다른 사용자의 프로필 조회 시도는 자동으로 차단됨
   const profile = getUserProfile(client, { userId: user.id });
-  
+
   return {
     user,
     identities,
@@ -46,7 +46,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
     (identity) => identity.provider === "email",
   );
   return (
-    <div className="flex w-full flex-col items-center gap-10 pt-24 pb-8 xl:py-40">
+    <div className="flex w-full flex-col items-center gap-10 pt-10 pb-8 xl:py-15">
       <Suspense
         fallback={
           <div className="bg-card animate-fast-pulse h-60 w-full max-w-screen-md rounded-xl border shadow-sm" />
@@ -74,9 +74,13 @@ export default function Account({ loaderData }: Route.ComponentProps) {
           }}
         </Await>
       </Suspense>
-      <ChangeEmailForm email={user?.email ?? ""} />
+
+      {/* <ChangeEmailForm email={user?.email ?? ""} /> */}
+
+      {/* 비밀번호 변경 폼 */}
       <ChangePasswordForm hasPassword={hasEmailIdentity ?? false} />
-      <Suspense
+
+      {/* <Suspense
         fallback={
           <div className="bg-card animate-fast-pulse h-60 w-full max-w-screen-md rounded-xl border shadow-sm" />
         }
@@ -108,7 +112,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
             );
           }}
         </Await>
-      </Suspense>
+      </Suspense> */}
       <DeleteAccountForm />
     </div>
   );
