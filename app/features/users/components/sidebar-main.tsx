@@ -28,6 +28,7 @@ export default function SidebarMain({
     items?: {
       title: string;
       url: string;
+      badgeCount?: number;
     }[];
   }[];
 }) {
@@ -55,8 +56,16 @@ export default function SidebarMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <Link to={subItem.url}>
+                        <Link to={subItem.url} className="relative flex items-center gap-2">
                           <span>{subItem.title}</span>
+                          {subItem.badgeCount != null && subItem.badgeCount > 0 && (
+                            <span
+                              className="ml-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white"
+                              aria-label={`미처리 문의 ${subItem.badgeCount}건`}
+                            >
+                              {subItem.badgeCount > 99 ? "99+" : subItem.badgeCount}
+                            </span>
+                          )}
                         </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>

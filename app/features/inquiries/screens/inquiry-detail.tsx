@@ -214,7 +214,7 @@ export default function InquiryDetail({ loaderData }: Route.ComponentProps) {
       <div className="mb-6 space-y-4">
         <h3 className="text-muted-foreground text-sm font-medium">문의 내용</h3>
         {displayMessages.length === 0 ? (
-          <p className="text-muted-foreground py-8 text-center text-sm">
+          <p className="text-muted-foreground py-8 text-center text-sm xl:text-base">
             아직 답변이 없습니다.
           </p>
         ) : (

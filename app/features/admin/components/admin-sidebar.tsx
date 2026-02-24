@@ -21,95 +21,54 @@ import { LOGO_URL } from "~/core/constant/imgUrls";
 import SidebarMain from "~/features/users/components/sidebar-main";
 import SidebarUser from "~/features/users/components/sidebar-user";
 
+const NAV_MAIN_BASE = [
+  {
+    title: "대시보드",
+    url: "#",
+    icon: LayoutDashboardIcon,
+    isActive: true,
+    items: [
+      { title: "개요", url: "/admin" },
+    ],
+  },
+  {
+    title: "콘텐츠 관리",
+    url: "#",
+    icon: BookOpenIcon,
+    isActive: true,
+    items: [
+      { title: "클래스", url: "/admin/classes" },
+      { title: "갤러리", url: "/admin/gallery" },
+      { title: "뉴스", url: "/admin/news" },
+    ],
+  },
+  {
+    title: "유저 관리",
+    url: "#",
+    icon: UsersIcon,
+    isActive: true,
+    items: [
+      { title: "회원 목록", url: "/admin/users" },
+      { title: "문의", url: "/admin/users/inquiries" },
+    ],
+  },
+  {
+    title: "댓글 관리",
+    url: "#",
+    icon: MessageCircleIcon,
+    isActive: true,
+    items: [{ title: "댓글 목록", url: "/admin/comments" }],
+  },
+  {
+    title: "설정",
+    url: "#",
+    icon: Settings2Icon,
+    items: [{ title: "사이트 설정", url: "/admin/settings" }],
+  },
+];
+
 const data = {
-  // teams: [
-  //   {
-  //     name: "관리자 CMS",
-  //     logo: LayoutDashboardIcon,
-  //     plan: "Admin",
-  //   },
-  // ],
-  navMain: [
-    {
-      title: "대시보드",
-      url: "#",
-      icon: LayoutDashboardIcon,
-      isActive: true,
-      items: [
-        {
-          title: "개요",
-          url: "/admin",
-        },
-        // {
-        //   title: "통계",
-        //   url: "/admin/analytics",
-        // },
-      ],
-    },
-    {
-      title: "콘텐츠 관리",
-      url: "#",
-      icon: BookOpenIcon,
-      isActive: true,
-      items: [
-        {
-          title: "클래스",
-          url: "/admin/classes",
-        },
-        {
-          title: "갤러리",
-          url: "/admin/gallery",
-        },
-        {
-          title: "뉴스",
-          url: "/admin/news",
-        },
-      ],
-    },
-    {
-      title: "유저 관리",
-      url: "#",
-      icon: UsersIcon,
-      isActive: true,
-      items: [
-        {
-          title: "회원 목록",
-          url: "/admin/users",
-        },
-        {
-          title: "문의",
-          url: "/admin/users/inquiries",
-        },
-      ],
-    },
-    {
-      title: "댓글 관리",
-      url: "#",
-      icon: MessageCircleIcon,
-      isActive: true,
-      items: [
-        {
-          title: "댓글 목록",
-          url: "/admin/comments",
-        },
-      ],
-    },
-    {
-      title: "설정",
-      url: "#",
-      icon: Settings2Icon,
-      items: [
-        {
-          title: "사이트 설정",
-          url: "/admin/settings",
-        },
-        // {
-        //   title: "통합",
-        //   url: "/admin/integrations",
-        // },
-      ],
-    },
-  ],
+  navMain: NAV_MAIN_BASE,
   projects: [
     {
       name: "클래스",
@@ -129,16 +88,33 @@ const data = {
   ],
 };
 
-export default function AdminSidebar({
-  user,
-  ...props
-}: React.ComponentProps<typeof Sidebar> & {
+export interface AdminSidebarProps
+  extends React.ComponentProps<typeof Sidebar> {
   user: {
     name: string;
     email: string;
     avatarUrl: string;
   };
-}) {
+  pendingInquiryCount: number;
+}
+
+export default function AdminSidebar({
+  user,
+  pendingInquiryCount,
+  ...props
+}: AdminSidebarProps) {
+  const navMain = NAV_MAIN_BASE.map((group) => {
+    if (group.title !== "유저 관리" || !group.items) return group;
+    return {
+      ...group,
+      items: group.items.map((sub) =>
+        sub.url === "/admin/users/inquiries"
+          ? { ...sub, badgeCount: pendingInquiryCount }
+          : sub,
+      ),
+    };
+  });
+
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
@@ -151,7 +127,7 @@ export default function AdminSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarMain items={data.navMain} />
+        <SidebarMain items={navMain} />
         {/* <SidebarProjects projects={data.projects} /> */}
       </SidebarContent>
 

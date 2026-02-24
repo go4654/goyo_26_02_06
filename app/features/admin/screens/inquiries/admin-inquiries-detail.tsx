@@ -312,7 +312,7 @@ export default function AdminInquiriesDetail({
           메시지 히스토리
         </h3>
         {displayMessages.length === 0 ? (
-          <p className="text-muted-foreground py-8 text-center text-sm">
+          <p className="text-muted-foreground py-8 text-center text-sm xl:text-base">
             아직 답변이 없습니다.
           </p>
         ) : (
