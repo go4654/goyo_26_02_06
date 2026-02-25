@@ -2,6 +2,8 @@ import type { Route } from "./+types/home";
 
 import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
+import makeServerClient from "~/core/lib/supa-client.server";
+import { getClasses } from "~/features/class/queries";
 
 import Gallery from "./sections/Gallery";
 import RecentLogs from "./sections/RecentLogs";
@@ -30,13 +32,29 @@ export const meta: Route.MetaFunction = ({ data }) => {
  * @returns Object with translated title and subtitle strings
  */
 export async function loader({ request }: Route.LoaderArgs) {
-  // Get a translation function for the user's locale from the request
+  // 사용자의 로케일에 맞는 번역 함수 가져오기
   const t = await i18next.getFixedT(request);
 
-  // Return translated strings for use in both the component and meta function
+  // Supabase 클라이언트 생성
+  const [client] = makeServerClient(request);
+
+  // 최신 클래스 5개 조회 (카테고리, 검색 필터 없이 전체에서 조회)
+  const { classes: recentClasses } = await getClasses(
+    client,
+    {
+      page: 1,
+      pageSize: 5,
+      category: null,
+      search: null,
+    },
+    null,
+  );
+
+  // 컴포넌트와 메타 함수에서 사용할 데이터 반환
   return {
     title: t("home.title"),
     subtitle: t("home.subtitle"),
+    recentClasses,
   };
 }
 
@@ -45,7 +63,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 
  * @returns JSX element representing the home page
  */
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { recentClasses } = loaderData;
+
   return (
     <>
       <Section1 />
@@ -53,7 +73,7 @@ export default function Home() {
       <Container>
         <SkillCategories />
 
-        <RecentLogs />
+        <RecentLogs recentClasses={recentClasses} />
 
         <Gallery />
 

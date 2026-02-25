@@ -41,7 +41,7 @@ export default function Category({ category }: { category: string | null }) {
                     to={`/class?category=${categoryValue}`}
                     className={`transition-colors ${
                       isActive
-                        ? "border-primary bg-primary/40 text-secondary rounded-full border-1 px-5 py-2 text-[18px]"
+                        ? "border-primary bg-primary/40 text-secondary rounded-full border-1 px-2 py-1 text-sm xl:px-5 xl:py-2 xl:text-[18px]"
                         : "xl:hover:text-secondary"
                     }`}
                   >

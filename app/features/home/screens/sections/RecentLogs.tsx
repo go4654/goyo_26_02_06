@@ -1,10 +1,15 @@
 import { Plus } from "lucide-react";
 import { Link } from "react-router";
 
-import HomeMoreBtn from "../../components/home-more-btn";
-import { CLASS_DATA } from "../../constants/home-data";
+import type { ClassListItem } from "~/features/class/queries";
 
-export default function RecentLogs() {
+import HomeMoreBtn from "../../components/home-more-btn";
+
+interface RecentLogsProps {
+  recentClasses: ClassListItem[];
+}
+
+export default function RecentLogs({ recentClasses }: RecentLogsProps) {
   return (
     <section className="flex flex-col items-start justify-between py-20 md:flex-row xl:py-32">
       {/* 오른쪽 타이틀 */}
@@ -15,26 +20,29 @@ export default function RecentLogs() {
         <HomeMoreBtn text="로그 보러가기" to="/class?category=figma" />
       </div>
 
-      {/* 왼쪽 로그 리스트 컨텐츠 */}
       <div className="mt-16 w-full xl:mt-0 xl:w-[60%]">
-        {CLASS_DATA.map((data) => (
+        {recentClasses.slice(0, 5).map((data, index) => (
           <Link
             key={data.id}
-            to={data.link}
+            to={`/class/${data.slug}`}
             className="mb-8 flex items-center justify-between"
           >
-            <p className="text-text-3/25 group-hover:text-primary text-h4 mr-4 font-light tracking-tighter xl:mr-10 xl:text-6xl">
-              0{data.id + 1}
+            <p
+              className={`text-text-3/25 group-hover:text-primary text-h4 mr-4 font-light tracking-tighter ${index === 0 ? "mr-6 xl:mr-15" : "xl:mr-12"} xl:text-6xl`}
+            >
+              0{index + 1}
             </p>
 
             <div className="group border-text-3/30 mt-2 flex w-full items-center justify-between border-b pb-6">
               <div>
-                <h3 className="text-h6 xl:text-h4 group-hover:text-primary font-medium">
+                <h3 className="text-h6 xl:text-h4 group-hover:text-primary line-clamp-1 font-medium">
                   {data.title}
                 </h3>
-                <p className="text-small xl:text-caption text-text-3 line-clamp-1 leading-6 font-light xl:leading-7">
-                  {data.description}
-                </p>
+                {data.description && (
+                  <p className="text-small xl:text-caption text-text-3 line-clamp-1 leading-6 font-light xl:leading-7">
+                    {data.description}
+                  </p>
+                )}
               </div>
               <Plus
                 className="group-hover:text-primary size-10 transition-transform duration-300 group-hover:rotate-90"
