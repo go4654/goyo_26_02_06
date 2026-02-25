@@ -17,7 +17,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "~/core/components/ui/sidebar";
-import { LOGO_URL } from "~/core/constant/imgUrls";
+import { LOGO_URL, LOGO_URL_WHITE } from "~/core/constant/imgUrls";
 import SidebarMain from "~/features/users/components/sidebar-main";
 import SidebarUser from "~/features/users/components/sidebar-user";
 
@@ -27,9 +27,7 @@ const NAV_MAIN_BASE = [
     url: "#",
     icon: LayoutDashboardIcon,
     isActive: true,
-    items: [
-      { title: "개요", url: "/admin" },
-    ],
+    items: [{ title: "개요", url: "/admin" }],
   },
   {
     title: "콘텐츠 관리",
@@ -118,7 +116,10 @@ export default function AdminSidebar({
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
-        <div className="pb-3">
+        <div className="flex items-center justify-between pb-3">
+          <Link to="/admin">
+            <img src={LOGO_URL_WHITE} alt="logo" width={100} height={100} />
+          </Link>
           <Link to="/">
             <img src={LOGO_URL} alt="logo" width={100} height={100} />
           </Link>
