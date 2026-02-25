@@ -16,6 +16,7 @@ import {
 } from "~/core/components/ui/select";
 import { Textarea } from "~/core/components/ui/textarea";
 
+import { MDX_EX_TEXT } from "../constants/mdx-ex-text";
 import MDXEditor from "./mdx-editor";
 
 /**
@@ -507,7 +508,7 @@ export default function AdminContentForm({
         <MDXEditor
           value={formData.content}
           onChange={(value) => updateField("content", value)}
-          placeholder="MDX 코드를 입력하세요..."
+          placeholder={MDX_EX_TEXT}
           error={errors.content}
           classId={classId}
           onPendingImagesChange={onPendingImagesChange}

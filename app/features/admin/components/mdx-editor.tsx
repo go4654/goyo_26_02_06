@@ -1,22 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-
 import { Image, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 import { Textarea } from "~/core/components/ui/textarea";
 
+import { MDX_EX_TEXT } from "../constants/mdx-ex-text";
 import { compressImageToWebp } from "../utils/image-upload";
 
 /**
  * MDX 에디터 컴포넌트
  * MDX 코드를 작성하고 미리보기를 제공합니다.
- * 
+ *
  * 기능:
  * - 이미지 업로드: Supabase storage에 업로드 후 MDX에 자동 삽입
  * - 커서 위치에 이미지 마크다운 삽입
  * - 업로드 중 상태 표시
- * 
+ *
  * 참고: 실제 MDX 컴파일은 서버 사이드에서 처리됩니다.
  * 미리보기는 기본 마크다운 렌더링으로 표시됩니다.
  */
@@ -42,13 +42,15 @@ interface MDXEditorProps {
   /** 클래스 ID (이미지 업로드용, 선택적) */
   classId?: string | null;
   /** 임시 이미지 파일들 변경 콜백 (클래스 생성 전 이미지용) */
-  onPendingImagesChange?: (updater: (prev: PendingImage[]) => PendingImage[]) => void;
+  onPendingImagesChange?: (
+    updater: (prev: PendingImage[]) => PendingImage[],
+  ) => void;
 }
 
 export default function MDXEditor({
   value,
   onChange,
-  placeholder = "MDX 코드를 입력하세요...",
+  placeholder = MDX_EX_TEXT,
   error,
   classId,
   onPendingImagesChange,
@@ -61,7 +63,7 @@ export default function MDXEditor({
 
   /**
    * 커서 위치에 텍스트를 삽입하는 함수
-   * 
+   *
    * @param text - 삽입할 텍스트
    */
   const insertTextAtCursor = (text: string) => {
@@ -87,10 +89,12 @@ export default function MDXEditor({
 
   /**
    * 이미지 파일 선택 핸들러
-   * 
+   *
    * @param event - 파일 입력 이벤트
    */
-  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -123,7 +127,7 @@ export default function MDXEditor({
         // 클래스 생성 전: 임시 이미지로 저장
         const tempId = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}`;
         const tempUrl = URL.createObjectURL(compressedFile);
-        
+
         const pendingImage: PendingImage = {
           file: compressedFile,
           tempId,
@@ -260,31 +264,30 @@ export default function MDXEditor({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="font-mono text-sm min-h-[400px]"
+            className="min-h-[400px] font-mono text-sm"
             aria-invalid={error ? "true" : undefined}
           />
 
-          {error && (
-            <p className="text-destructive text-sm">{error}</p>
-          )}
+          {error && <p className="text-destructive text-sm">{error}</p>}
           <p className="text-text-3 text-xs">
             💡 MDX 문법을 사용하여 콘텐츠를 작성할 수 있습니다. 미리보기 탭에서
-            결과를 확인하세요. 이미지 업로드 버튼을 클릭하여 이미지를 추가할 수 있습니다.
+            결과를 확인하세요. 이미지 업로드 버튼을 클릭하여 이미지를 추가할 수
+            있습니다.
           </p>
         </div>
       ) : (
-        <div className="min-h-[400px] rounded-md border border-white/10 bg-white/5 p-6 overflow-auto">
+        <div className="min-h-[400px] overflow-auto rounded-md border border-white/10 bg-white/5 p-6">
           {value.trim() ? (
             <div className="prose prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-text-2 font-mono">
+              <pre className="text-text-2 font-mono text-sm whitespace-pre-wrap">
                 {value}
               </pre>
-              <p className="text-text-3 text-xs mt-4">
+              <p className="text-text-3 mt-4 text-xs">
                 💡 실제 MDX 렌더링은 저장 후 상세 페이지에서 확인할 수 있습니다.
               </p>
             </div>
           ) : (
-            <div className="text-text-3 text-center py-12">
+            <div className="text-text-3 py-12 text-center">
               미리보기를 보려면 MDX 코드를 입력하세요.
             </div>
           )}

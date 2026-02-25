@@ -5,6 +5,7 @@ import i18next from "~/core/lib/i18next.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 import { getClasses } from "~/features/class/queries";
 import { getGalleries } from "~/features/gallery/queries";
+import { getNewsList } from "~/features/news/queries";
 
 import Gallery from "./sections/Gallery";
 import RecentLogs from "./sections/RecentLogs";
@@ -64,12 +65,19 @@ export async function loader({ request }: Route.LoaderArgs) {
       ? galleries
       : [...galleries].sort(() => 0.5 - Math.random()).slice(0, 4);
 
+  // 최신 뉴스 3개 조회
+  const { items: recentNews } = await getNewsList(client, {
+    page: 1,
+    pageSize: 3,
+  });
+
   // 컴포넌트와 메타 함수에서 사용할 데이터 반환
   return {
     title: t("home.title"),
     subtitle: t("home.subtitle"),
     recentClasses,
     highlightedGalleries,
+    recentNews,
   };
 }
 
@@ -79,7 +87,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * @returns JSX element representing the home page
  */
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { recentClasses, highlightedGalleries } = loaderData;
+  const { recentClasses, highlightedGalleries, recentNews } = loaderData;
 
   return (
     <>
@@ -94,7 +102,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
         <LogEverythingText />
 
-        <News />
+        <News recentNews={recentNews} />
       </Container>
     </>
   );

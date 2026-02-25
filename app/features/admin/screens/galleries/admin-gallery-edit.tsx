@@ -25,6 +25,7 @@ import {
 } from "~/features/gallery/constants";
 
 import MDXEditor, { type PendingImage } from "../../components/mdx-editor";
+import { MDX_EX_TEXT } from "../../constants/mdx-ex-text";
 import { compressImageToWebp } from "../../utils/image-upload";
 import { galleryDetailLoader } from "./server/galleries-detail.loader";
 import { galleriesUpdateAction } from "./server/galleries-update.action";
@@ -346,7 +347,7 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
             <MDXEditor
               value={formData.description}
               onChange={(value) => updateField("description", value)}
-              placeholder="MDX 코드를 입력하세요..."
+              placeholder={MDX_EX_TEXT}
               error={errors.description}
               onPendingImagesChange={(updater) =>
                 setPendingImages((prev) => updater(prev))
