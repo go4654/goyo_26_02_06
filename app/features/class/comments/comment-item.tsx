@@ -318,7 +318,10 @@ export function CommentItem({
     >
       {/* 아바타 */}
       <Avatar className={avatarSizeClass}>
-        <AvatarImage src={comment.userProfileImage ?? undefined} />
+        <AvatarImage
+          className="h-full w-full object-cover"
+          src={comment.userProfileImage ?? undefined}
+        />
         <AvatarFallback className="text-xs xl:text-sm">
           {comment.userName.slice(0, 2).toUpperCase()}
         </AvatarFallback>

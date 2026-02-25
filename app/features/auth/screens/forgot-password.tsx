@@ -38,7 +38,7 @@ import makeServerClient from "~/core/lib/supa-client.server";
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `Forgot Password | ${import.meta.env.VITE_APP_NAME}`,
+      title: `비밀번호 재설정 | ${import.meta.env.VITE_APP_NAME}`,
     },
   ];
 };
@@ -50,8 +50,20 @@ export const meta: Route.MetaFunction = () => {
  * Zod를 사용하여 이메일 필드 검증
  */
 const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email({ message: "유효한 이메일 주소를 입력해주세요." }),
 });
+
+/** 비밀번호 재설정 관련 영문 에러 메시지를 한글로 매핑 */
+const FORGOT_PASSWORD_ERROR_MESSAGES: Record<string, string> = {
+  "Email rate limit exceeded":
+    "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+  "For security purposes, you can only request this once every 60 seconds":
+    "보안을 위해 60초에 한 번만 요청할 수 있습니다.",
+};
+
+function getForgotPasswordErrorMessage(enMessage: string): string {
+  return FORGOT_PASSWORD_ERROR_MESSAGES[enMessage] ?? enMessage;
+}
 
 /**
  * 비밀번호 재설정 요청 폼 제출을 처리하는 서버 액션
@@ -87,9 +99,12 @@ export async function action({ request }: Route.ActionArgs) {
   // Supabase에서 비밀번호 재설정 이메일 요청
   const { error } = await client.auth.resetPasswordForEmail(result.data.email);
 
-  // 요청 실패 시 에러 반환
+  // 요청 실패 시 에러 반환 (한글 메시지로 변환)
   if (error) {
-    return data({ error: error.message }, { status: 400 });
+    return data(
+      { error: getForgotPasswordErrorMessage(error.message) },
+      { status: 400 },
+    );
   }
 
   // 성공 응답 반환
@@ -120,14 +135,14 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
     }
   }, [actionData]);
   return (
-    <div className="flex items-center justify-center">
-      <Card className="w-full max-w-md">
+    <div className="mt-10 flex items-center justify-center xl:mt-12">
+      <Card className="w-full max-w-md py-10">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">
-            Forgot your password?
+            비밀번호를 잊으셨나요?
           </CardTitle>
-          <CardDescription className="text-center text-base">
-            Enter your email and we&apos;ll send you a reset link.
+          <CardDescription className="text-center text-sm">
+            이메일을 입력하면 비밀번호 재설정 링크를 보내드립니다.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -138,7 +153,7 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
           >
             <div className="flex flex-col items-start space-y-2">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
@@ -146,6 +161,7 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
+                className="xl:h-12 xl:rounded-2xl"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -153,12 +169,19 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
                 <FormErrors errors={actionData.fieldErrors.email} />
               ) : null}
             </div>
-            <FormButton label="Send reset link" className="w-full" />
+            <FormButton
+              label="비밀번호 재설정 링크 보내기"
+              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+            />
             {actionData && "error" in actionData && actionData.error ? (
-              <FormErrors errors={[actionData.error]} />
+              <FormErrors
+                errors={[
+                  getForgotPasswordErrorMessage(String(actionData.error)),
+                ]}
+              />
             ) : null}
             {actionData && "success" in actionData && actionData.success ? (
-              <FormSuccess message="Check your email for a reset link, you can close this tab." />
+              <FormSuccess message="이메일을 확인하고 링크를 클릭하여 계속해주세요. " />
             ) : null}
           </Form>
         </CardContent>

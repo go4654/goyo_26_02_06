@@ -116,15 +116,15 @@ export async function action({ request }: Route.ActionArgs) {
  */
 export default function OtpStart({ actionData }: Route.ComponentProps) {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center py-12">
       <Card className="w-full max-w-md">
         {/* 제목과 설명이 있는 카드 헤더 */}
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">
-            Enter your email
+            이메일을 입력해주세요.
           </CardTitle>
-          <CardDescription className="text-center text-base">
-            We&apos;ll send you a verification code.
+          <CardDescription className="text-center text-sm">
+            인증 코드를 보내드립니다.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -133,7 +133,7 @@ export default function OtpStart({ actionData }: Route.ComponentProps) {
             {/* 이메일 입력 필드 */}
             <div className="flex flex-col items-start space-y-2">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
@@ -141,10 +141,14 @@ export default function OtpStart({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
+                className="xl:h-12 xl:rounded-2xl"
               />
             </div>
             {/* 제출 버튼 */}
-            <FormButton label="Send verification code" className="w-full" />
+            <FormButton
+              label="인증 코드 보내기"
+              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+            />
             {/* 에러 메시지 표시 */}
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors errors={[actionData.error]} />

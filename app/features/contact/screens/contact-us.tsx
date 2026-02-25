@@ -23,12 +23,12 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import FormButton from "~/core/components/form-button";
-import { logger } from "~/core/utils/logger";
 import FormErrors from "~/core/components/form-error";
 import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
 import { Textarea } from "~/core/components/ui/textarea";
 import resendClient from "~/core/lib/resend-client.server";
+import { logger } from "~/core/utils/logger";
 
 /**
  * 페이지 메타데이터 설정을 위한 함수
@@ -209,7 +209,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   // 관리자에게 문의 정보가 포함된 이메일 전송
   const { error } = await resendClient.emails.send({
-    from: "Goyo <hello@goyo.com>",
+    from: "Goyo <goyo@mail.goyos.kr>",
     to: [process.env.ADMIN_EMAIL!],
     subject: "Goyo에서 새로운 문의가 도착했습니다",
     html: `

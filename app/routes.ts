@@ -88,6 +88,10 @@ export default [
           "/forgot-password/reset",
           "features/auth/screens/forgot-password.tsx",
         ),
+        route(
+          "/forgot-password/create",
+          "features/auth/screens/new-password.tsx",
+        ),
         route("/magic-link", "features/auth/screens/magic-link.tsx"),
         ...prefix("/otp", [
           route("/start", "features/auth/screens/otp/start.tsx"),
@@ -136,10 +140,6 @@ export default [
     // 인증이 필요한 인증 관련 라우트
     layout("core/layouts/private.layout.tsx", { id: "private-auth" }, [
       ...prefix("/auth", [
-        route(
-          "/forgot-password/create",
-          "features/auth/screens/new-password.tsx",
-        ),
         route("/email-verified", "features/auth/screens/email-verified.tsx"),
       ]),
       route("/logout", "features/auth/screens/logout.tsx"),

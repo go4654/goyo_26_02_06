@@ -28,7 +28,7 @@ import makeServerClient from "~/core/lib/supa-client.server";
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `Confirm | ${import.meta.env.VITE_APP_NAME}`,
+      title: `이메일 확인 | ${import.meta.env.VITE_APP_NAME}`,
     },
   ];
 };
@@ -122,9 +122,9 @@ export async function loader({ request }: Route.LoaderArgs) {
  */
 export default function Confirm({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5">
+    <div className="flex flex-col items-center justify-center gap-2.5 py-12">
       {/* 에러 제목 표시 */}
-      <h1 className="text-2xl font-semibold">Confirmation failed</h1>
+      <h1 className="text-2xl font-semibold">이메일 확인 실패</h1>
       {/* Supabase의 특정 에러 메시지 표시 */}
       <p className="text-muted-foreground">{loaderData.error}</p>
     </div>

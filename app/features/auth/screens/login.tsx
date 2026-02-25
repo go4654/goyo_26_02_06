@@ -67,7 +67,8 @@ export const meta: Route.MetaFunction = () => {
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const signupSuccess = url.searchParams.get("registered") === "1";
-  return { signupSuccess };
+  const passwordUpdated = url.searchParams.get("passwordUpdated") === "1";
+  return { signupSuccess, passwordUpdated };
 }
 
 /**
@@ -186,7 +187,7 @@ export default function Login({
     });
   };
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-20">
+    <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 xl:py-20">
       <Card className="w-full max-w-md py-8">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">LOGIN</CardTitle>
@@ -207,6 +208,20 @@ export default function Login({
               <AlertTitle>계정이 생성되었습니다!</AlertTitle>
               <AlertDescription className="text-green-700 dark:text-green-600">
                 이메일 인증 후 로그인할 수 있습니다.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          {/* 비밀번호 변경 성공 알림 (비밀번호 재설정 후 리다이렉트된 경우) */}
+          {loaderData?.passwordUpdated ? (
+            <Alert className="bg-green-600/20 text-green-700 dark:bg-green-950/20 dark:text-green-600">
+              <CheckCircle2Icon
+                className="size-4"
+                color="oklch(0.627 0.194 149.214)"
+              />
+              <AlertTitle>비밀번호가 변경되었습니다.</AlertTitle>
+              <AlertDescription className="text-green-700 dark:text-green-600">
+                새 비밀번호로 다시 로그인해주세요.
               </AlertDescription>
             </Alert>
           ) : null}

@@ -92,15 +92,15 @@ function _SignInButtons() {
   return (
     <>
       <AuthLoginButton
-        logo={<LockIcon className="size-4 scale-110 dark:text-white" />}
-        label="OTP"
+        logo={<MailIcon className="size-4 scale-110 dark:text-white" />}
+        label="이메일"
         href="/auth/otp/start"
       />
-      <AuthLoginButton
+      {/* <AuthLoginButton
         logo={<MailIcon className="size-4 scale-110 dark:text-white" />}
         label="Magic Link"
         href="/auth/magic-link"
-      />
+      /> */}
     </>
   );
 }
@@ -164,7 +164,7 @@ export function SignInButtons() {
     <>
       <Divider />
       <SocialLoginButtons />
-      {/* <_SignInButtons /> */}
+      <_SignInButtons />
     </>
   );
 }

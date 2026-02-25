@@ -73,12 +73,12 @@ export function loader({ request }: Route.LoaderArgs) {
   const { success, data: validData } = paramsSchema.safeParse(
     Object.fromEntries(url.searchParams),
   );
-  
+
   // 이메일이 없거나 유효하지 않은 경우 시작 페이지로 리다이렉트
   if (!success) {
     return redirect("/auth/otp/start");
   }
-  
+
   // 검증된 이메일을 컴포넌트에 반환
   return { email: validData.email };
 }
@@ -171,23 +171,25 @@ export default function OtpComplete({
 }: Route.ComponentProps) {
   // 제출을 위한 폼 요소 참조
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   // 프로그래밍 방식으로 폼을 제출하기 위한 훅
   const submit = useSubmit();
-  
+
   // 모든 OTP 숫자가 입력되면 자동으로 폼을 제출하는 핸들러
   const handleComplete = () => {
     submit(formRef.current);
   };
-  
+
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center py-12">
       <Card className="w-full max-w-md">
         {/* 제목과 설명이 있는 카드 헤더 */}
         <CardHeader className="flex flex-col items-center">
-          <CardTitle className="text-2xl font-semibold">Confirm code</CardTitle>
-          <CardDescription className="text-center text-base">
-            Enter the code we sent you.
+          <CardTitle className="text-2xl font-semibold">
+            인증 코드를 입력해주세요.
+          </CardTitle>
+          <CardDescription className="text-center text-sm">
+            받은 인증 코드를 입력해주세요.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -206,10 +208,12 @@ export default function OtpComplete({
               type="email"
               defaultValue={loaderData.email}
               placeholder="이메일을 입력해주세요."
+              className="xl:h-12 xl:rounded-2xl"
             />
 
             {/* 6자리 슬롯이 있는 특수화된 OTP 입력 컴포넌트 */}
             <InputOTP
+              className="xl:h-12 xl:rounded-2xl"
               name="code"
               required
               maxLength={6}
@@ -231,7 +235,10 @@ export default function OtpComplete({
               </InputOTPGroup>
             </InputOTP>
             {/* 폴백으로 수동 제출 버튼 */}
-            <FormButton label="Submit" className="w-full" />
+            <FormButton
+              label="인증 코드 제출"
+              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+            />
             {/* 에러 메시지 표시 */}
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors errors={[actionData.error]} />

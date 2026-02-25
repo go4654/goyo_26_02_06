@@ -27,7 +27,7 @@ import makeServerClient from "~/core/lib/supa-client.server";
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `Confirm | ${import.meta.env.VITE_APP_NAME}`,
+      title: `인증 완료 | ${import.meta.env.VITE_APP_NAME}`,
     },
   ];
 };
@@ -69,30 +69,30 @@ const errorSchema = z.object({
 export async function loader({ request }: Route.LoaderArgs) {
   // URL에서 쿼리 매개변수 추출
   const { searchParams } = new URL(request.url);
-  
+
   // 성공적인 OAuth 콜백으로 매개변수 검증 시도
   const { success, data: validData } = searchParamsSchema.safeParse(
     Object.fromEntries(searchParams),
   );
-  
+
   // 성공적인 콜백이 아닌 경우 에러 콜백인지 확인
   if (!success) {
     const { data: errorData, success: errorSuccess } = errorSchema.safeParse(
       Object.fromEntries(searchParams),
     );
-    
+
     // 성공적인 콜백도 에러 콜백도 아닌 경우 일반 에러 반환
     if (!errorSuccess) {
       return data({ error: "Invalid code" }, { status: 400 });
     }
-    
+
     // 제공자로부터 에러 설명 반환
     return data({ error: errorData.error_description }, { status: 400 });
   }
 
   // 인증 쿠키를 위한 응답 헤더와 함께 Supabase 클라이언트 생성
   const [client, headers] = makeServerClient(request);
-  
+
   // OAuth 코드를 세션으로 교환
   const { error } = await client.auth.exchangeCodeForSession(validData.code);
 
@@ -131,9 +131,9 @@ export async function loader({ request }: Route.LoaderArgs) {
  */
 export default function Confirm({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5">
+    <div className="flex flex-col items-center justify-center gap-2.5 py-12">
       {/* 에러 제목 표시 */}
-      <h1 className="text-2xl font-semibold">Login failed</h1>
+      <h1 className="text-2xl font-semibold">로그인 실패</h1>
       {/* 제공자 또는 Supabase의 특정 에러 메시지 표시 */}
       <p className="text-muted-foreground">{loaderData.error}</p>
     </div>

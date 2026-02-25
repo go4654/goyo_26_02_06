@@ -87,10 +87,10 @@ export default function StartSocialLogin({ loaderData }: Route.ComponentProps) {
   const { error } = loaderData;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5">
+    <div className="flex flex-col items-center justify-center gap-2.5 py-12">
       {/* 에러 메시지 표시 */}
       <h1 className="text-2xl font-semibold">{error}</h1>
-      <p className="text-muted-foreground">Please try again.</p>
+      <p className="text-muted-foreground">다시 시도해주세요.</p>
     </div>
   );
 }

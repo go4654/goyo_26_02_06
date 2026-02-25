@@ -3,7 +3,7 @@
  *
  * 이 컴포넌트는 magic link를 통한 비밀번호 없는 인증을 처리합니다.
  * 사용자가 이메일을 입력하면 자동으로 로그인하는 링크를 받습니다.
- * 
+ *
  * 컴포넌트는 다음을 포함합니다:
  * - 검증이 포함된 이메일 입력 필드
  * - 폼 제출 처리
@@ -38,7 +38,7 @@ import makeServerClient from "~/core/lib/supa-client.server";
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `Magic Link | ${import.meta.env.VITE_APP_NAME}`,
+      title: `링크 전송 | ${import.meta.env.VITE_APP_NAME}`,
     },
   ];
 };
@@ -128,7 +128,7 @@ export async function action({ request }: Route.ActionArgs) {
 export default function MagicLink({ actionData }: Route.ComponentProps) {
   // 성공적인 제출 후 재설정을 위한 폼 요소 참조
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   // magic link가 성공적으로 전송되면 폼 재설정
   useEffect(() => {
     if (actionData && "success" in actionData && actionData.success) {
@@ -137,14 +137,14 @@ export default function MagicLink({ actionData }: Route.ComponentProps) {
     }
   }, [actionData]);
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">
-            Enter your email
+            이메일을 입력해주세요.
           </CardTitle>
-          <CardDescription className="text-center text-base">
-            We&apos;ll send you a verification code.
+          <CardDescription className="text-center text-sm">
+            링크를 전송해드립니다.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -155,7 +155,7 @@ export default function MagicLink({ actionData }: Route.ComponentProps) {
           >
             <div className="flex flex-col items-start space-y-2">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
@@ -163,14 +163,18 @@ export default function MagicLink({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
+                className="xl:h-12 xl:rounded-2xl"
               />
             </div>
-            <FormButton label="Send magic link" className="w-full" />
+            <FormButton
+              label="링크 전송"
+              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+            />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors errors={[actionData.error]} />
             ) : null}
             {actionData && "success" in actionData && actionData.success ? (
-              <FormSuccess message="Check your email and click the magic link to continue. You can close this tab." />
+              <FormSuccess message="이메일을 확인하고 링크를 클릭하여 계속해주세요. 이 탭을 닫을 수 있습니다." />
             ) : null}
           </Form>
         </CardContent>

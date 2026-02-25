@@ -13,7 +13,6 @@
  * - Integration with Supabase Auth API for password updates
  * - Detailed error handling for validation and API errors
  */
-
 import type { Route } from "./+types/change-password";
 
 import { data } from "react-router";
@@ -23,23 +22,21 @@ import { requireAuthentication, requireMethod } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
 /**
- * Validation schema for password change form data
+ * 비밀번호 변경 폼 데이터 유효성 검사 스키마
  *
- * This schema defines the required fields and validation rules:
- * - password: Required, must be at least 8 characters
- * - confirmPassword: Required, must be at least 8 characters
+ * 이 스키마는 필수 필드와 유효성 검사 규칙을 정의합니다:
+ * - password: 필수 항목, 최소 8자 이상이어야 함
+ * - confirmPassword: 필수 항목, 최소 8자 이상이어야 함
  *
- * Additionally, it includes a refinement to ensure both passwords match,
- * with a specific error message and path for the validation error.
+ * 추가로, 두 비밀번호가 일치하는지 확인하는 검증(Refinement) 과정을 포함하며,
+ * 일치하지 않을 경우 특정 에러 메시지와 해당 경로(Path)를 반환합니다.
  *
- * The schema is used with Zod's safeParse method to validate form submissions
- * before processing them further.
+ * 이 스키마는 폼 제출 데이터를 추가로 처리하기 전,
+ * Zod의 safeParse 메서드를 사용하여 유효성을 검증하는 데 사용됩니다.
  */
 const changePasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(8, "비밀번호는 최소 8자 이상이어야 합니다."),
+    password: z.string().min(8, "비밀번호는 최소 8자 이상이어야 합니다."),
     confirmPassword: z
       .string()
       .min(8, "비밀번호 확인은 최소 8자 이상이어야 합니다."),
@@ -55,7 +52,8 @@ const PASSWORD_ERROR_MESSAGES: Record<string, string> = {
     "새 비밀번호는 기존 비밀번호와 달라야 합니다.",
   "Password should be at least 6 characters.":
     "비밀번호는 최소 6자 이상이어야 합니다.",
-  "New password is too weak.": "비밀번호가 너무 약합니다. 더 강한 비밀번호를 사용해 주세요.",
+  "New password is too weak.":
+    "비밀번호가 너무 약합니다. 더 강한 비밀번호를 사용해 주세요.",
   "Unable to validate email address: invalid format":
     "이메일 주소 형식이 올바르지 않습니다.",
   "Invalid login credentials": "로그인 정보가 올바르지 않습니다.",
@@ -86,13 +84,13 @@ const PASSWORD_ERROR_MESSAGES: Record<string, string> = {
 export async function action({ request }: Route.ActionArgs) {
   // Validate request method (only allow POST)
   requireMethod("POST")(request);
-  
+
   // Create a server-side Supabase client with the user's session
   const [client] = makeServerClient(request);
-  
+
   // Verify the user is authenticated
   await requireAuthentication(client);
-  
+
   // Extract and validate form data
   const formData = await request.formData();
   const {
@@ -100,12 +98,12 @@ export async function action({ request }: Route.ActionArgs) {
     data: validData,
     error,
   } = changePasswordSchema.safeParse(Object.fromEntries(formData));
-  
+
   // Return field-specific validation errors if validation fails
   if (!success) {
     return data({ fieldErrors: error.flatten().fieldErrors }, { status: 400 });
   }
-  
+
   // Submit password change request to Supabase Auth API
   const { error: updateError } = await client.auth.updateUser({
     password: validData.password,
@@ -118,7 +116,7 @@ export async function action({ request }: Route.ActionArgs) {
       "비밀번호 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.";
     return data({ error: errorMessage }, { status: 400 });
   }
-  
+
   // Return success response
   return {
     success: true,

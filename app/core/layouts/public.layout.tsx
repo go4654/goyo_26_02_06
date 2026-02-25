@@ -9,7 +9,16 @@ export async function loader({ request }: Route.LoaderArgs) {
   const {
     data: { user },
   } = await client.auth.getUser();
-  if (user) {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+
+  // 비밀번호 재설정/이메일 확인 경로는 로그인 상태여도 접근 허용
+  const isPasswordResetPath =
+    pathname === "/auth/forgot-password/reset" ||
+    pathname === "/auth/forgot-password/create";
+  const isConfirmPath = pathname === "/auth/confirm";
+
+  if (user && !isPasswordResetPath && !isConfirmPath) {
     throw redirect("/");
   }
 
