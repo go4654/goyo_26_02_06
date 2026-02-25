@@ -7,7 +7,7 @@
  */
 import type { Route } from "./+types/login";
 
-import { AlertCircle, Loader2Icon } from "lucide-react";
+import { AlertCircle, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 import { useRef } from "react";
 import { Form, Link, data, redirect, useFetcher } from "react-router";
 import { z } from "zod";
@@ -34,6 +34,19 @@ import makeServerClient from "~/core/lib/supa-client.server";
 import FormErrors from "../../../core/components/form-error";
 import { SignInButtons } from "../components/auth-login-buttons";
 
+/** Supabase/인증 서버에서 오는 영문 에러 메시지를 한글로 매핑 */
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  "Email not confirmed": "이메일 인증이 필요합니다.",
+  "Invalid login credentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
+  "Too many requests": "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.",
+  "User not found": "이메일 또는 비밀번호가 올바르지 않습니다.",
+  "Invalid email or password": "이메일 또는 비밀번호가 올바르지 않습니다.",
+};
+
+function getAuthErrorMessage(enMessage: string): string {
+  return AUTH_ERROR_MESSAGES[enMessage] ?? enMessage;
+}
+
 /**
  * 로그인 페이지의 메타 함수
  *
@@ -42,10 +55,20 @@ import { SignInButtons } from "../components/auth-login-buttons";
 export const meta: Route.MetaFunction = () => {
   return [
     {
-      title: `Log in | ${import.meta.env.VITE_APP_NAME}`,
+      title: `로그인 | ${import.meta.env.VITE_APP_NAME}`,
     },
   ];
 };
+
+/**
+ * 로그인 페이지 로더
+ * 회원가입 후 리다이렉트된 경우(registered=1) signupSuccess 플래그 반환
+ */
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const signupSuccess = url.searchParams.get("registered") === "1";
+  return { signupSuccess };
+}
 
 /**
  * 로그인을 위한 폼 검증 스키마
@@ -57,10 +80,8 @@ export const meta: Route.MetaFunction = () => {
  * 사용자 피드백을 위한 에러 메시지가 제공됩니다
  */
 const loginSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters long" }),
+  email: z.string().email({ message: "유효한 이메일 주소를 입력해주세요." }),
+  password: z.string().min(8, { message: "비밀번호는 8자 이상이어야 합니다." }),
 });
 
 /**
@@ -133,8 +154,12 @@ export async function action({ request }: Route.ActionArgs) {
  * - 새 사용자를 위한 회원가입 링크
  *
  * @param actionData - 에러를 포함하는 폼 액션에서 반환된 데이터
+ * @param loaderData - 회원가입 성공 여부(signupSuccess) 등 로더 데이터
  */
-export default function Login({ actionData }: Route.ComponentProps) {
+export default function Login({
+  actionData,
+  loaderData,
+}: Route.ComponentProps) {
   // 폼 데이터에 액세스하기 위한 폼 요소 참조
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -161,28 +186,43 @@ export default function Login({ actionData }: Route.ComponentProps) {
     });
   };
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <Card className="w-full max-w-md">
+    <div className="flex flex-col items-center justify-center gap-4 py-20">
+      <Card className="w-full max-w-md py-8">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle className="text-2xl font-semibold">
-            Sign into your account
-          </CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-2xl font-semibold">LOGIN</CardTitle>
+          {/* <CardDescription className="text-base">
             Please enter your details
-          </CardDescription>
+          </CardDescription> */}
         </CardHeader>
+
+        {/* 로그인 폼 */}
         <CardContent className="grid gap-4">
+          {/* 회원가입 성공 알림 (join에서 리다이렉트된 경우) */}
+          {loaderData?.signupSuccess ? (
+            <Alert className="bg-green-600/20 text-green-700 dark:bg-green-950/20 dark:text-green-600">
+              <CheckCircle2Icon
+                className="size-4"
+                color="oklch(0.627 0.194 149.214)"
+              />
+              <AlertTitle>계정이 생성되었습니다!</AlertTitle>
+              <AlertDescription className="text-green-700 dark:text-green-600">
+                이메일 인증 후 로그인할 수 있습니다.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
           <Form
-            className="flex w-full flex-col gap-5"
+            className="flex w-full flex-col gap-8"
             method="post"
             ref={formRef}
           >
+            {/* 이메일 입력 필드 */}
             <div className="flex flex-col items-start space-y-2">
               <Label
                 htmlFor="email"
                 className="flex flex-col items-start gap-1"
               >
-                Email
+                이메일
               </Label>
               <Input
                 id="email"
@@ -190,6 +230,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
+                className="xl:h-12 xl:rounded-2xl"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -197,29 +238,35 @@ export default function Login({ actionData }: Route.ComponentProps) {
                 <FormErrors errors={actionData.fieldErrors.email} />
               ) : null}
             </div>
+
+            {/* 비밀번호 입력 필드 */}
             <div className="flex flex-col items-start space-y-2">
               <div className="flex w-full items-center justify-between">
                 <Label
                   htmlFor="password"
                   className="flex flex-col items-start gap-1"
                 >
-                  Password
+                  비밀번호
                 </Label>
+
                 <Link
                   to="/auth/forgot-password/reset"
                   className="text-muted-foreground text-underline hover:text-foreground self-end text-sm underline transition-colors"
                   tabIndex={-1}
                   viewTransition
                 >
-                  Forgot your password?
+                  비밀번호를 잊으셨나요?
                 </Link>
               </div>
+
+              {/* 비밀번호 입력 필드 */}
               <Input
                 id="password"
                 name="password"
                 required
                 type="password"
-                placeholder="Enter your password"
+                placeholder="비밀번호를 입력해주세요."
+                className="xl:h-12 xl:rounded-2xl"
               />
 
               {actionData &&
@@ -228,20 +275,27 @@ export default function Login({ actionData }: Route.ComponentProps) {
                 <FormErrors errors={actionData.fieldErrors.password} />
               ) : null}
             </div>
-            <FormButton label="Log in" className="w-full" />
-            {actionData && "error" in actionData ? (
+
+            {/* 로그인 버튼 */}
+            <FormButton
+              label="로그인"
+              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+            />
+
+            {/* 에러 메시지 (서버는 영문 반환, 표시는 한글로 변환) */}
+            {actionData && "error" in actionData && actionData.error ? (
               actionData.error === "Email not confirmed" ? (
                 <Alert variant="destructive" className="bg-destructive/10">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Email not confirmed</AlertTitle>
+                  <AlertTitle>이메일 인증이 필요합니다.</AlertTitle>
                   <AlertDescription className="flex flex-col items-start gap-2">
-                    Before signing in, please verify your email.
+                    로그인 전, 이메일 인증을 해주세요.
                     <Button
                       variant="outline"
                       className="text-foreground flex items-center justify-between gap-2"
                       onClick={onResendClick}
                     >
-                      Resend confirmation email
+                      인증 이메일 재전송
                       {fetcher.state === "submitting" ? (
                         <Loader2Icon
                           data-testid="resend-confirmation-email-spinner"
@@ -252,26 +306,30 @@ export default function Login({ actionData }: Route.ComponentProps) {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <FormErrors errors={[actionData.error]} />
+                <FormErrors errors={[getAuthErrorMessage(actionData.error)]} />
               )
             ) : null}
           </Form>
+
+          {/* 소셜 로그인 버튼 */}
           <SignInButtons />
         </CardContent>
+
+        {/* 회원가입 링크 */}
+        <div className="flex flex-col items-center justify-center text-sm">
+          <p className="text-text-3">
+            아직 계정이 없으신가요?{" "}
+            <Link
+              to="/join"
+              viewTransition
+              data-testid="form-signup-link"
+              className="hover:text-primary text-underline font-semibold text-white transition-colors"
+            >
+              회원가입
+            </Link>
+          </p>
+        </div>
       </Card>
-      <div className="flex flex-col items-center justify-center text-sm">
-        <p className="text-muted-foreground">
-          Don't have an account?{" "}
-          <Link
-            to="/join"
-            viewTransition
-            data-testid="form-signup-link"
-            className="text-muted-foreground hover:text-foreground text-underline underline transition-colors"
-          >
-            Sign up
-          </Link>
-        </p>
-      </div>
     </div>
   );
 }

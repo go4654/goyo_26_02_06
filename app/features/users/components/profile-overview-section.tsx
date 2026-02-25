@@ -43,7 +43,10 @@ export function ProfileOverviewSection({
 
         <div className="flex items-center gap-6 xl:mt-8">
           <Avatar className="size-28 xl:size-50">
-            <AvatarImage src={profile.avatar_url ?? undefined} />
+            <AvatarImage
+              className="h-full w-full object-cover"
+              src={profile.avatar_url ?? undefined}
+            />
             <AvatarFallback>{profile.name.slice(0, 2)}</AvatarFallback>
           </Avatar>
 
