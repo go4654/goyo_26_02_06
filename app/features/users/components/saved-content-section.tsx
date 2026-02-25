@@ -167,7 +167,9 @@ export function SavedContentSection({
         </>
       ) : activeTab === "class" ? (
         <div className="flex items-center justify-center py-20 xl:mt-[60px]">
-          <p className="text-text-2/60 text-h6">저장한 강의가 없습니다.</p>
+          <p className="text-text-2/60 text-small-title xl:text-h6">
+            저장한 강의가 없습니다.
+          </p>
         </div>
       ) : galleryList.length > 0 ? (
         <>
@@ -202,7 +204,9 @@ export function SavedContentSection({
         </>
       ) : (
         <div className="flex items-center justify-center py-20 xl:mt-[60px]">
-          <p className="text-text-2/60 text-h6">저장된 GALLERY가 없습니다.</p>
+          <p className="text-text-2/60 text-small-title xl:text-h6">
+            저장된 GALLERY가 없습니다.
+          </p>
         </div>
       )}
     </div>

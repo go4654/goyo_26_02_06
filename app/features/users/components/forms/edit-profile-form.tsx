@@ -181,6 +181,7 @@ export default function EditProfileForm({
                 type="text"
                 placeholder="이름을 입력해주세요."
                 defaultValue={name}
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {fetcher.data &&
               "fieldErrors" in fetcher.data &&
@@ -201,6 +202,7 @@ export default function EditProfileForm({
                 마케팅 이메일 수신 동의
               </Label>
             </div>
+
             {fetcher.data &&
             "fieldErrors" in fetcher.data &&
             fetcher.data.fieldErrors?.marketingConsent ? (
@@ -214,7 +216,7 @@ export default function EditProfileForm({
           <FetcherFormButton
             submitting={fetcher.state === "submitting"}
             label="프로필 저장"
-            className="w-full cursor-pointer"
+            className="h-12 w-full cursor-pointer rounded-2xl text-base"
           />
           {fetcher.data && "success" in fetcher.data && fetcher.data.success ? (
             <FormSuccess message="프로필 수정 완료" />

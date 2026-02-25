@@ -20,7 +20,7 @@ export default function Gallery() {
             </div>
 
             <div className="mt-2 flex flex-col items-start justify-between xl:flex-row">
-              <h3 className="text-small-title xl:text-h6 group-hover:text-secondary line-clamp-1 max-w-[70%] leading-7">
+              <h3 className="text-small-title xl:text-h6 group-hover:text-primary line-clamp-1 max-w-[70%] leading-7">
                 {data.title}
               </h3>
               <p className="text-small text-text-3">{data.date}</p>

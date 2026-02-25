@@ -20,11 +20,12 @@ export default function News() {
               {data.date}
             </span>
             <div className="w-full max-w-[380px]">
-              <h3 className="text-small-title xl:text-h6 group-hover:text-secondary leading-7">
+              <h3 className="text-small-title xl:text-h6 group-hover:text-primary leading-7">
                 {data.title}
               </h3>
               <p className="text-text-2 text-small mt-4 flex items-center gap-2 xl:text-base">
-                <span>Read More</span> <ArrowUpRight />
+                <span>Read More</span>{" "}
+                <ArrowUpRight className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </p>
             </div>
           </Link>

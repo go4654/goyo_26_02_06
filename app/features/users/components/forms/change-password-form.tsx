@@ -60,7 +60,14 @@ export default function ChangePasswordForm({
               >
                 새 비밀번호
               </Label>
-              <Input id="password" name="password" required type="password" />
+              <Input
+                id="password"
+                name="password"
+                required
+                type="password"
+                className="h-12 rounded-2xl placeholder:text-sm"
+                placeholder="새 비밀번호를 입력해주세요."
+              />
               {fetcher.data &&
               "fieldErrors" in fetcher.data &&
               fetcher.data.fieldErrors?.password ? (
@@ -79,6 +86,8 @@ export default function ChangePasswordForm({
                 name="confirmPassword"
                 required
                 type="password"
+                className="h-12 rounded-2xl placeholder:text-sm"
+                placeholder="새 비밀번호를 확인해주세요."
               />
               {fetcher.data &&
               "fieldErrors" in fetcher.data &&
@@ -93,7 +102,7 @@ export default function ChangePasswordForm({
         <CardFooter className="flex flex-col gap-4">
           <FetcherFormButton
             label={hasPassword ? "비밀번호 변경" : "비밀번호 추가"}
-            className="w-full cursor-pointer"
+            className="h-12 w-full cursor-pointer rounded-2xl text-base"
             submitting={fetcher.state === "submitting"}
           />
           {fetcher.data && "success" in fetcher.data && fetcher.data.success ? (

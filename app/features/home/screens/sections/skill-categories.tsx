@@ -13,10 +13,10 @@ export default function SkillCategories() {
         {CATEGORY_DATA.map((data) => (
           <Link
             to={data.link}
-            className="group space-between hover:text-secondary flex flex-col items-start gap-2 transition-colors md:gap-6"
+            className="group space-between hover:text-primary flex flex-col items-start gap-2 transition-colors md:gap-6"
             key={data.id}
           >
-            <div className="w-full overflow-hidden bg-gray-400 md:block md:max-h-[480px]">
+            <div className="w-full overflow-hidden rounded-2xl md:block md:max-h-[480px]">
               <img
                 src={data.image}
                 alt={data.name}
@@ -32,7 +32,7 @@ export default function SkillCategories() {
               <div className="mt-1 flex flex-wrap items-center gap-2 xl:mt-2">
                 {data.skills.map((skill) => (
                   <div
-                    className="border-text-3 text-text-3 rounded-full border px-2 py-1 text-xs"
+                    className="border-text-3/50 text-text-3/70 rounded-full border px-2 py-1 text-xs"
                     key={skill.id}
                   >
                     {skill.name}

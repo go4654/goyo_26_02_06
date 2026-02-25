@@ -48,7 +48,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
     recentViews.find((v) => v.type === "class" && v.slug) ?? null;
 
   return (
-    <div className="mx-auto max-w-[1280px] px-5 pt-20 pb-8 xl:px-0 xl:py-30">
+    <div className="mx-auto max-w-[1280px] px-4 py-6 pb-8 xl:px-0 xl:py-30">
       {/* 프로필 영역 */}
       <ProfileOverviewSection
         profile={loaderData.profile}

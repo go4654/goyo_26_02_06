@@ -17,7 +17,7 @@ import { Label } from "~/core/components/ui/label";
 export default function DeleteAccountForm() {
   const fetcher = useFetcher<Route.ComponentProps["actionData"]>();
   return (
-    <Card className="w-full max-w-screen-md bg-red-100 dark:bg-red-900/40">
+    <Card className="w-full max-w-screen-md bg-red-100 dark:bg-red-900/30">
       <CardHeader>
         <CardTitle>위험 영역</CardTitle>
       </CardHeader>
@@ -43,7 +43,7 @@ export default function DeleteAccountForm() {
           </Label>
           <Button
             variant={"destructive"}
-            className="w-full"
+            className="mt-4 h-12 w-full rounded-2xl text-base"
             disabled={fetcher.state === "submitting"}
           >
             {fetcher.state === "submitting" ? (

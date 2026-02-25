@@ -40,7 +40,9 @@ export default function Category({ category }: { category: string | null }) {
                   <Link
                     to={`/class?category=${categoryValue}`}
                     className={`transition-colors ${
-                      isActive ? "font-bold text-white" : "xl:hover:text-white"
+                      isActive
+                        ? "border-primary bg-primary/40 text-secondary rounded-full border-1 px-5 py-2 text-[18px]"
+                        : "xl:hover:text-secondary"
                     }`}
                   >
                     {skill.name}

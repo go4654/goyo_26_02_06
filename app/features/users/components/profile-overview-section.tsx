@@ -1,5 +1,6 @@
 import type { WeeklyLearningChartItem } from "./user-graph";
 
+import { UserIcon } from "lucide-react";
 import { Link } from "react-router";
 
 import {
@@ -41,35 +42,37 @@ export function ProfileOverviewSection({
       <div className="flex flex-col gap-8 rounded-[20px] bg-[#0F1117] p-4 xl:p-10">
         <h3 className="text-h5">Profile</h3>
 
-        <div className="flex items-center gap-6 xl:mt-8">
-          <Avatar className="size-28 xl:size-50">
+        <div className="flex flex-col items-center gap-6 xl:mt-8 xl:flex-row">
+          <Avatar className="size-40 xl:size-50">
             <AvatarImage
               className="h-full w-full object-cover"
               src={profile.avatar_url ?? undefined}
             />
-            <AvatarFallback>{profile.name.slice(0, 2)}</AvatarFallback>
+            <AvatarFallback>
+              <UserIcon className="size-10 opacity-30" strokeWidth={1.5} />
+            </AvatarFallback>
           </Avatar>
 
-          <div className="flex flex-col gap-0 xl:gap-1">
+          <div className="flex flex-col items-center xl:gap-2">
             <span className="text-small-title xl:text-h6">{profile.name}</span>
             <span className="text-muted-foreground text-small xl:text-sm">
               {email}
             </span>
 
-            <div className="flex flex-col">
-              <Button
-                asChild
-                className="dark:hover:bg-primary xl:text-md mt-3 border-1 py-3 text-xs font-medium xl:mt-6 xl:px-6 xl:py-4 xl:text-sm"
-              >
-                <Link to="/user/profile">프로필 수정 &rarr;</Link>
-              </Button>
-
+            <div className="flex flex-row gap-2 xl:flex-col">
               <Button
                 asChild
                 variant="outline"
                 className="dark:text-text-2 dark:hover:text-text-2 xl:text-md text-text-2 mt-3 border-1 py-3 text-xs font-medium xl:mt-2 xl:px-6 xl:py-4 xl:text-sm"
               >
                 <Link to="/inquiries">내 문의 보기</Link>
+              </Button>
+
+              <Button
+                asChild
+                className="dark:hover:bg-primary xl:text-md mt-3 border-1 py-3 text-xs font-medium xl:px-6 xl:py-4 xl:text-sm"
+              >
+                <Link to="/user/profile">프로필 수정 &rarr;</Link>
               </Button>
             </div>
           </div>
