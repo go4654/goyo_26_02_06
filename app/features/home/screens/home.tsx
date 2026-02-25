@@ -4,6 +4,7 @@ import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 import { getClasses } from "~/features/class/queries";
+import { getGalleries } from "~/features/gallery/queries";
 
 import Gallery from "./sections/Gallery";
 import RecentLogs from "./sections/RecentLogs";
@@ -50,11 +51,25 @@ export async function loader({ request }: Route.LoaderArgs) {
     null,
   );
 
+  // 최신 갤러리 20개 조회 후 서버에서 랜덤 4개 선택
+  const { galleries } = await getGalleries(client, {
+    page: 1,
+    pageSize: 20,
+    category: null,
+    search: null,
+  });
+
+  const highlightedGalleries =
+    galleries.length <= 4
+      ? galleries
+      : [...galleries].sort(() => 0.5 - Math.random()).slice(0, 4);
+
   // 컴포넌트와 메타 함수에서 사용할 데이터 반환
   return {
     title: t("home.title"),
     subtitle: t("home.subtitle"),
     recentClasses,
+    highlightedGalleries,
   };
 }
 
@@ -64,7 +79,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * @returns JSX element representing the home page
  */
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { recentClasses } = loaderData;
+  const { recentClasses, highlightedGalleries } = loaderData;
 
   return (
     <>
@@ -75,7 +90,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
         <RecentLogs recentClasses={recentClasses} />
 
-        <Gallery />
+        <Gallery highlightedGalleries={highlightedGalleries} />
 
         <LogEverythingText />
 
