@@ -141,13 +141,13 @@ export default function OtpStart({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
             </div>
             {/* 제출 버튼 */}
             <FormButton
               label="인증 코드 보내기"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
             {/* 에러 메시지 표시 */}
             {actionData && "error" in actionData && actionData.error ? (

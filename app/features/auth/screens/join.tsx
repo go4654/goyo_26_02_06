@@ -81,10 +81,12 @@ const joinSchema = z
 /** 회원가입 관련 영문 에러 메시지를 한글로 매핑 */
 const JOIN_ERROR_MESSAGES: Record<string, string> = {
   "You must agree to the terms of service": "서비스 약관에 동의해주세요.",
-  "There is an account with this email already.": "이미 사용 중인 이메일입니다.",
+  "There is an account with this email already.":
+    "이미 사용 중인 이메일입니다.",
   "User already registered": "이미 가입된 이메일입니다.",
   "Signup requires a valid password": "유효한 비밀번호를 입력해주세요.",
-  "Password should be at least 6 characters": "비밀번호는 6자 이상이어야 합니다.",
+  "Password should be at least 6 characters":
+    "비밀번호는 6자 이상이어야 합니다.",
 };
 
 function getJoinErrorMessage(enMessage: string): string {
@@ -135,20 +137,14 @@ export async function action({ request }: Route.ActionArgs) {
 
   // 서비스 약관 동의 확인
   if (!validData.terms) {
-    return data(
-      { error: "서비스 약관에 동의해주세요." },
-      { status: 400 },
-    );
+    return data({ error: "서비스 약관에 동의해주세요." }, { status: 400 });
   }
 
   // 제공된 이메일을 가진 사용자가 이미 존재하는지 확인
   const userExists = await doesUserExist(validData.email);
 
   if (userExists) {
-    return data(
-      { error: "이미 사용 중인 이메일입니다." },
-      { status: 400 },
-    );
+    return data({ error: "이미 사용 중인 이메일입니다." }, { status: 400 });
   }
 
   // Supabase 클라이언트 생성 및 사용자 등록 시도
@@ -196,7 +192,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-10">
+    <div className="flex flex-col items-center justify-center gap-4 px-4 pt-4 pb-20 xl:px-0">
       <Card className="w-full max-w-md py-8">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold" role="heading">
@@ -213,7 +209,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
             ref={formRef}
           >
             {/* 이름 입력 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
                 이름
               </Label>
@@ -223,7 +219,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 required
                 type="text"
                 placeholder="이름을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -233,7 +229,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
             </div>
 
             {/* 이메일 입력 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label
                 htmlFor="email"
                 className="flex flex-col items-start gap-1"
@@ -246,7 +242,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -256,7 +252,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
             </div>
 
             {/* 비밀번호 입력 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label
                 htmlFor="password"
                 className="flex flex-col items-start gap-1"
@@ -272,7 +268,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 required
                 type="password"
                 placeholder="비밀번호를 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -282,7 +278,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
             </div>
 
             {/* 비밀번호 확인 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label
                 htmlFor="confirmPassword"
                 className="flex flex-col items-start gap-1"
@@ -295,7 +291,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
                 required
                 type="password"
                 placeholder="비밀번호를 확인해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -307,7 +303,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
             {/* 회원가입 버튼 */}
             <FormButton
               label="회원가입"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors

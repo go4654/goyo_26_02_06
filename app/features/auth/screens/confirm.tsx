@@ -14,9 +14,10 @@
  */
 import type { Route } from "./+types/confirm";
 
-import { data, redirect } from "react-router";
+import { Link, data, redirect } from "react-router";
 import { z } from "zod";
 
+import { Button } from "~/core/components/ui/button";
 import { touchLastActiveAt } from "~/core/lib/guards.server";
 import makeServerClient from "~/core/lib/supa-client.server";
 
@@ -122,11 +123,14 @@ export async function loader({ request }: Route.LoaderArgs) {
  */
 export default function Confirm({ loaderData }: Route.ComponentProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5 py-12">
+    <div className="flex flex-col items-center justify-center gap-2.5 py-12 xl:p-20">
       {/* 에러 제목 표시 */}
       <h1 className="text-2xl font-semibold">이메일 확인 실패</h1>
       {/* Supabase의 특정 에러 메시지 표시 */}
       <p className="text-muted-foreground">{loaderData.error}</p>
+      <Button variant={"link"} asChild className="text-success underline">
+        <Link to="/">홈으로 돌아가기 &rarr;</Link>
+      </Button>
     </div>
   );
 }

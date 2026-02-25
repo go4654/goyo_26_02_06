@@ -163,12 +163,12 @@ export default function MagicLink({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
             </div>
             <FormButton
               label="링크 전송"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors errors={[actionData.error]} />

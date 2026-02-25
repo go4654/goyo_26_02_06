@@ -151,7 +151,7 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
             method="post"
             ref={formRef}
           >
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label htmlFor="name" className="flex flex-col items-start gap-1">
                 이메일
               </Label>
@@ -161,7 +161,7 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -171,7 +171,7 @@ export default function ForgotPassword({ actionData }: Route.ComponentProps) {
             </div>
             <FormButton
               label="비밀번호 재설정 링크 보내기"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl"
             />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors

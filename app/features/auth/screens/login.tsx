@@ -187,7 +187,7 @@ export default function Login({
     });
   };
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-4 py-8 xl:py-20">
+    <div className="flex flex-col items-center justify-center gap-4 px-4 pt-4 pb-10 xl:py-20">
       <Card className="w-full max-w-md py-8">
         <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-2xl font-semibold">LOGIN</CardTitle>
@@ -232,7 +232,7 @@ export default function Login({
             ref={formRef}
           >
             {/* 이메일 입력 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <Label
                 htmlFor="email"
                 className="flex flex-col items-start gap-1"
@@ -245,7 +245,7 @@ export default function Login({
                 required
                 type="email"
                 placeholder="이메일을 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -255,7 +255,7 @@ export default function Login({
             </div>
 
             {/* 비밀번호 입력 필드 */}
-            <div className="flex flex-col items-start space-y-2">
+            <div className="flex flex-col items-start space-y-3">
               <div className="flex w-full items-center justify-between">
                 <Label
                   htmlFor="password"
@@ -281,7 +281,7 @@ export default function Login({
                 required
                 type="password"
                 placeholder="비밀번호를 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
 
               {actionData &&
@@ -294,7 +294,7 @@ export default function Login({
             {/* 로그인 버튼 */}
             <FormButton
               label="로그인"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
 
             {/* 에러 메시지 (서버는 영문 반환, 표시는 한글로 변환) */}

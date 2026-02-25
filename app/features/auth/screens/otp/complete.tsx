@@ -208,12 +208,12 @@ export default function OtpComplete({
               type="email"
               defaultValue={loaderData.email}
               placeholder="이메일을 입력해주세요."
-              className="xl:h-12 xl:rounded-2xl"
+              className="h-12 rounded-2xl placeholder:text-sm"
             />
 
             {/* 6자리 슬롯이 있는 특수화된 OTP 입력 컴포넌트 */}
             <InputOTP
-              className="xl:h-12 xl:rounded-2xl"
+              className="h-12 rounded-2xl placeholder:text-sm"
               name="code"
               required
               maxLength={6}
@@ -237,7 +237,7 @@ export default function OtpComplete({
             {/* 폴백으로 수동 제출 버튼 */}
             <FormButton
               label="인증 코드 제출"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
             {/* 에러 메시지 표시 */}
             {actionData && "error" in actionData && actionData.error ? (

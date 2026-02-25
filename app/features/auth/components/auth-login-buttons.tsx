@@ -13,14 +13,12 @@
  * 이 모듈식 접근 방식은 주요 인증 화면을 수정하지 않고도 인증 방법을 쉽게 추가하거나
  * 제거할 수 있게 합니다.
  */
-import { LockIcon, MailIcon, PhoneIcon } from "lucide-react";
+import { MailIcon } from "lucide-react";
 import { Link } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 
-import { AppleLogo } from "./logos/apple";
 import { GithubLogo } from "./logos/github";
-import { GoogleLogo } from "./logos/google";
 import { KakaoLogo } from "./logos/kakao";
 
 /**

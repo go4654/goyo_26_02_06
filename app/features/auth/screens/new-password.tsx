@@ -193,7 +193,7 @@ export default function ChangePassword({ actionData }: Route.ComponentProps) {
                 required
                 type="password"
                 placeholder="새 비밀번호를 입력해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -211,7 +211,7 @@ export default function ChangePassword({ actionData }: Route.ComponentProps) {
                 required
                 type="password"
                 placeholder="새 비밀번호를 확인해주세요."
-                className="xl:h-12 xl:rounded-2xl"
+                className="h-12 rounded-2xl placeholder:text-sm"
               />
               {actionData &&
               "fieldErrors" in actionData &&
@@ -221,7 +221,7 @@ export default function ChangePassword({ actionData }: Route.ComponentProps) {
             </div>
             <FormButton
               label="비밀번호 변경"
-              className="w-full cursor-pointer xl:h-12 xl:rounded-2xl"
+              className="h-12 w-full cursor-pointer rounded-2xl text-base"
             />
             {actionData && "error" in actionData && actionData.error ? (
               <FormErrors
