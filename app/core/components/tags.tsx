@@ -13,7 +13,7 @@ export default function Tags({
         <div
           className={cn(
             "border-text-3 text-text-3 rounded-full border px-2 py-1 text-xs",
-            borderColor ? `border-${borderColor}` : "border-text-3",
+            borderColor ? `border-${borderColor}` : "border-text-3/50",
           )}
           key={index}
         >

@@ -1,14 +1,14 @@
 import { SearchIcon } from "lucide-react";
-import { Form, useNavigate } from "react-router";
 import { useState } from "react";
+import { Form, useNavigate } from "react-router";
 import { z } from "zod";
 
+import { Input } from "~/core/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "~/core/components/ui/input-group";
-import { Input } from "~/core/components/ui/input";
 
 /**
  * 갤러리 검색 폼 검증 스키마
@@ -22,7 +22,7 @@ const searchSchema = z.object({
     .string()
     .max(100, { message: "검색어는 100자 이하여야 합니다." })
     .optional()
-    .transform((val) => (val?.trim() || "")),
+    .transform((val) => val?.trim() || ""),
   category: z.string().optional(),
 });
 
@@ -66,12 +66,12 @@ export default function SearchForm({
   };
 
   return (
-    <div className="mt-4 w-full xl:mt-0 xl:w-[500px]">
+    <div className="order-1 mt-4 w-full xl:order-2 xl:mt-0 xl:w-[500px]">
       <Form method="get" onSubmit={handleSubmit}>
         {/* 카테고리 파라미터 유지 (검색 시 페이지는 1로 리셋) */}
         <Input type="hidden" name="category" value={category || ""} />
 
-        <InputGroup className="h-[40px] rounded-full px-2 xl:h-[50px]">
+        <InputGroup className="h-12 rounded-full px-2">
           <InputGroupInput
             type="text"
             name="search"
@@ -95,4 +95,3 @@ export default function SearchForm({
     </div>
   );
 }
-

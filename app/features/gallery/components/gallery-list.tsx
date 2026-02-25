@@ -83,7 +83,7 @@ export default function GalleryList({
 
       {/* 클래스와 동일한 Shadcn 페이지네이션: 2페이지 이상일 때만 표시 */}
       {pagination.totalPages > 1 && (
-        <div className="mt-12 flex justify-center xl:mt-16">
+        <div className="flex justify-center py-20">
           <PaginationUI
             page={pagination.currentPage}
             totalPages={pagination.totalPages}
@@ -207,38 +207,43 @@ export function GalleryCard({
         />
       </div>
 
-      <div className="flex items-center justify-between xl:mt-4">
-        <h3 className="text-small xl:text-small-title line-clamp-1 font-[600]">
+      {showActions && (
+        <div className="flex items-center gap-3 py-2">
+          <button
+            type="button"
+            onClick={handleLikeClick}
+            className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
+          >
+            <Heart
+              className={`size-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+            />
+            <span className="text-base">
+              {likeCount === 0 ? "" : likeCount}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveClick}
+            className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
+          >
+            <Bookmark
+              className={`size-5 ${isSaved ? "fill-success text-success" : ""}`}
+            />
+            <span className="text-base">
+              {saveCount === 0 ? "" : saveCount}
+            </span>
+          </button>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        {/* 타이틀 */}
+        <h3 className="xl:text-small-title line-clamp-1 text-base font-[600]">
           {item.title}
         </h3>
-
-        {showActions && (
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleLikeClick}
-              className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
-            >
-              <Heart
-                className={`size-4 md:size-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
-              />
-              <span className="text-sm md:text-base">{likeCount}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveClick}
-              className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
-            >
-              <Bookmark
-                className={`size-4 md:size-5 ${isSaved ? "fill-success text-success" : ""}`}
-              />
-              <span className="text-sm md:text-base">{saveCount}</span>
-            </button>
-          </div>
-        )}
       </div>
 
-      <Tags tags={item.tags} borderColor="primary" />
+      <Tags tags={item.tags} borderColor="text-3/50" />
     </Link>
   );
 }

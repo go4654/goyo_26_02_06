@@ -1,7 +1,13 @@
 import type { Route } from "./+types/gallery";
 
 import { useEffect } from "react";
-import { Link, useLocation, useNavigate, useRevalidator, useSearchParams } from "react-router";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useRevalidator,
+  useSearchParams,
+} from "react-router";
 
 import GalleryList from "../components/gallery-list";
 import SearchForm from "../components/search-form";
@@ -32,9 +38,8 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
     likedGalleries,
     savedGalleries,
     pagination,
-  } =
-    loaderData;
-  const [searchParams] = useSearchParams();
+  } = loaderData;
+
   const location = useLocation();
   const navigate = useNavigate();
   const revalidator = useRevalidator();
@@ -49,7 +54,13 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
       replace: true,
       state: null,
     });
-  }, [location.state, location.pathname, location.search, navigate, revalidator]);
+  }, [
+    location.state,
+    location.pathname,
+    location.search,
+    navigate,
+    revalidator,
+  ]);
 
   // 권한이 없으면 지정 문구로 차단 화면 노출
   if (!hasGalleryAccess) {
@@ -69,10 +80,10 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-40">
+    <div className="mx-auto w-full max-w-[1680px] px-5 py-10 xl:py-20">
       <div className="flex flex-col items-start justify-between gap-6 xl:flex-row xl:items-center">
         {/* 카테고리 탭: 현재 선택값과 일치하면 밑줄 표시 */}
-        <ul className="xl:text-h6 flex items-center gap-10">
+        <ul className="xl:text-h6 order-2 flex items-center gap-10 xl:order-1">
           {GALLERY_CATEGORIES.map(({ slug, label }) => {
             const isActive = (category ?? "all") === slug;
 
@@ -86,7 +97,9 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
                 <Link
                   to={to}
                   className={
-                    isActive ? undefined : "text-text-2/60 hover:text-text-2"
+                    isActive
+                      ? undefined
+                      : "text-text-2/60 hover:text-text-2 font-light"
                   }
                 >
                   {label}
@@ -103,7 +116,7 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
         <SearchForm category={category} search={search} />
       </div>
 
-      <div className="text-text-2/60 pt-14 pb-4 text-sm">
+      <div className="text-text-2/60 pt-10 pb-4 text-xs xl:pt-14 xl:text-sm">
         이 작업물들은 학생들의 포트폴리오로, 교육적 목적으로 제작되었으며 상업적
         이득을 취하지 않습니다
       </div>
@@ -117,8 +130,8 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
         category={category}
         search={search}
         categoryLabel={
-          GALLERY_CATEGORIES.find((c) => c.slug === (category ?? "all"))?.label ??
-          "All"
+          GALLERY_CATEGORIES.find((c) => c.slug === (category ?? "all"))
+            ?.label ?? "All"
         }
       />
     </div>

@@ -135,7 +135,7 @@ export default function ClassList({
 
       {/* 페이지네이션 */}
       {pagination.totalPages > 1 && (
-        <div className="mt-12 flex justify-center xl:mt-16">
+        <div className="flex justify-center py-20">
           <PaginationUI
             page={pagination.currentPage}
             totalPages={pagination.totalPages}
