@@ -13,7 +13,7 @@ const SKELETON_COUNT = 12;
  */
 export default function GallerySkeleton() {
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-5 py-10 xl:py-20">
+    <div className="mx-auto w-full max-w-[1680px] px-5 py-2 xl:py-10">
       {/* 카테고리 탭 + 검색 폼 영역 */}
       <div className="flex flex-col items-start justify-between gap-6 xl:flex-row xl:items-center">
         <ul className="xl:text-h6 order-2 flex items-center gap-10 xl:order-1">

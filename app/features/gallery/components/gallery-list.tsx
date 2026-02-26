@@ -199,15 +199,16 @@ export function GalleryCard({
   };
 
   return (
-    <Link to={`/gallery/${item.slug}`} key={item.id}>
+    <Link to={`/gallery/${item.slug}`} key={item.id} className="group">
       <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[500px] lg:h-[500px]">
         <img
           src={item.thumbnail_image_url ?? ""}
           alt={item.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
         />
       </div>
 
+      {/* 좋아요, 저장 버튼 */}
       {showActions && (
         <div className="flex items-center gap-3 py-2">
           <motion.button
@@ -243,14 +244,19 @@ export function GalleryCard({
         </div>
       )}
 
+      {/* 타이틀 */}
       <div className="flex items-center justify-between">
-        {/* 타이틀 */}
-        <h3 className="xl:text-small-title line-clamp-1 text-base font-[600]">
+        <h3 className="xl:text-small-title group-hover:text-primary line-clamp-1 text-base font-[600] transition-colors duration-300">
           {item.title}
         </h3>
       </div>
 
-      <Tags tags={item.tags} borderColor="text-3/50" />
+      <Tags
+        tags={item.tags}
+        borderColor="text-3/50"
+        maxVisible={2}
+        showOverflowCount
+      />
     </Link>
   );
 }
