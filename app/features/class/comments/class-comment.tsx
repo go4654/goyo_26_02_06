@@ -164,7 +164,7 @@ export default function ClassComment({
             <Badge className="mt-1">{totalTopLevel}</Badge>
           </div>
 
-          {/* 정렬 메뉴 */}
+          {/* 정렬 메뉴 최신순, 인기순 선택 */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

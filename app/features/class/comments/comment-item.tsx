@@ -1,10 +1,11 @@
+import { motion } from "framer-motion";
 import {
   ChevronDown,
   ChevronUp,
   EllipsisVertical,
   Eye,
+  Loader2,
   MessageCircle,
-  Moon,
   Pencil,
   ThumbsUp,
   Trash,
@@ -328,7 +329,14 @@ export function CommentItem({
     if (res?.success) {
       onDeleteSuccess?.(comment.id, comment.parentId ?? null);
     }
-  }, [fetcher.state, fetcher.data, lastAction, onDeleteSuccess, comment.id, comment.parentId]);
+  }, [
+    fetcher.state,
+    fetcher.data,
+    lastAction,
+    onDeleteSuccess,
+    comment.id,
+    comment.parentId,
+  ]);
 
   return (
     <div
@@ -464,7 +472,11 @@ export function CommentItem({
                 onClick={handleEditSave}
                 disabled={fetcher.state === "submitting" || !draft.trim()}
               >
-                {fetcher.state === "submitting" ? "저장 중..." : "저장"}
+                {fetcher.state === "submitting" ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "저장"
+                )}
               </Button>
             </div>
           </div>
@@ -476,12 +488,15 @@ export function CommentItem({
             </p>
             {/* 좋아요, 댓글 달기, 답글 더보기 버튼 */}
             <div className="mt-2 flex items-center gap-6">
-              <button
+              <motion.button
                 type="button"
                 className={`group hover:text-primary flex cursor-pointer items-center gap-1 ${
                   liked ? "text-white" : "text-text-2"
                 } text-sm xl:text-base`}
                 onClick={handleLikeClick}
+                whileTap={{ scale: 0.5 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
                 <ThumbsUp
                   className="group-hover:text-primary size-3 xl:size-4"
@@ -490,7 +505,7 @@ export function CommentItem({
                 <span className="group-hover:text-primary text-sm xl:text-base">
                   {likeCount}
                 </span>
-              </button>
+              </motion.button>
 
               {!isReply && (
                 <div className="group flex items-center gap-4">

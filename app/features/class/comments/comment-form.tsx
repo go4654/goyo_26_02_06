@@ -20,10 +20,7 @@ interface CommentFormProps {
  * 새로운 댓글을 작성하는 폼입니다.
  * 서버 액션을 통해 실제 데이터베이스에 저장됩니다.
  */
-export function CommentForm({
-  classId,
-  onOptimisticCreate,
-}: CommentFormProps) {
+export function CommentForm({ classId, onOptimisticCreate }: CommentFormProps) {
   const [newComment, setNewComment] = useState("");
   const [newCommentError, setNewCommentError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -84,7 +81,7 @@ export function CommentForm({
             type="text"
             name="content"
             placeholder="댓글을 입력해주세요."
-            className="h-[50px]"
+            className="h-12 rounded-2xl"
             value={newComment}
             onChange={(event) => {
               setNewComment(event.target.value);
@@ -116,7 +113,7 @@ export function CommentForm({
         <Button
           type="submit"
           disabled={!newComment.trim() || isSubmitting}
-          className="h-[50px] px-6"
+          className={"h-12 rounded-2xl px-6"}
         >
           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "등록"}
         </Button>
