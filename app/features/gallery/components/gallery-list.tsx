@@ -1,5 +1,6 @@
 import type { GalleryListItem } from "../queries";
 
+import { motion } from "framer-motion";
 import { Bookmark, Heart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
@@ -209,9 +210,12 @@ export function GalleryCard({
 
       {showActions && (
         <div className="flex items-center gap-3 py-2">
-          <button
+          <motion.button
             type="button"
             onClick={handleLikeClick}
+            whileTap={{ scale: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
           >
             <Heart
@@ -220,10 +224,13 @@ export function GalleryCard({
             <span className="text-base">
               {likeCount === 0 ? "" : likeCount}
             </span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
             onClick={handleSaveClick}
+            whileTap={{ scale: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
           >
             <Bookmark
@@ -232,7 +239,7 @@ export function GalleryCard({
             <span className="text-base">
               {saveCount === 0 ? "" : saveCount}
             </span>
-          </button>
+          </motion.button>
         </div>
       )}
 

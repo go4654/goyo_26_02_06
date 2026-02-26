@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Bookmark, Heart, Image } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFetcher } from "react-router";
@@ -136,7 +137,7 @@ export default function LectureCard({
         {showActions && (
           <div className="absolute top-0 right-0 h-full w-full">
             <div className="absolute top-2 right-2 flex items-center gap-2 xl:top-3 xl:right-3">
-              <button
+              {/* <button
                 type="button"
                 onClick={handleLikeClick}
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
@@ -146,18 +147,39 @@ export default function LectureCard({
                 }`}
               >
                 <Heart className="size-3.5 xl:size-5" />
-              </button>
-              <button
+              </button> */}
+              <motion.button
+                type="button"
+                onClick={handleLikeClick}
+                whileTap={{ scale: 0.5 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
+                  isLiked
+                    ? "bg-primary text-white"
+                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
+                }`}
+              >
+                <Heart
+                  className={`size-3.5 xl:size-5 ${isLiked ? "fill-current" : ""}`}
+                />
+              </motion.button>
+              <motion.button
                 type="button"
                 onClick={handleSaveClick}
+                whileTap={{ scale: 0.5 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isSaved
                     ? "bg-primary text-white"
                     : "hover:bg-primary bg-gray-500/30 hover:text-white"
                 }`}
               >
-                <Bookmark className="size-3.5 xl:size-5" />
-              </button>
+                <Bookmark
+                  className={`size-3.5 xl:size-5 ${isSaved ? "fill-current" : ""}`}
+                />
+              </motion.button>
             </div>
           </div>
         )}

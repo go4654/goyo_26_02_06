@@ -1,5 +1,6 @@
 import type { Route } from "./+types/class-detail";
 
+import { motion } from "framer-motion";
 import { Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
@@ -159,9 +160,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
         <div className="text-small xl:text-small-title text-text-3 flex items-center gap-2">
           <span>{displayDate}</span>
           <span className="text-text-3/50">•</span>
-          <button
+          <motion.button
             type="button"
             onClick={handleLikeClick}
+            whileTap={{ scale: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
             <Heart
@@ -171,11 +175,16 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
               )}
             />
             <span>{likeCount}</span>
-          </button>
+          </motion.button>
+
           <span className="text-text-3/50">•</span>
-          <button
+
+          <motion.button
             type="button"
             onClick={handleSaveClick}
+            whileTap={{ scale: 0.5 }}
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
             <Bookmark
@@ -185,7 +194,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
               )}
             />
             <span>{saveCount}</span>
-          </button>
+          </motion.button>
         </div>
 
         <div className="mt-4">
@@ -232,9 +241,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 
           {/* 좋아요, 북마크 버튼 (갤러리와 동일: 활성 시 빨간 하트 / success 색상) */}
           <div className="text-small-title text-text-3 flex items-center gap-2">
-            <button
+            <motion.button
               type="button"
               onClick={handleLikeClick}
+              whileTap={{ scale: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
               <Heart
@@ -244,11 +256,16 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
                 )}
               />
               <span className="text-sm xl:text-base">{likeCount}</span>
-            </button>
+            </motion.button>
+
             <span className="text-text-3/50">•</span>
-            <button
+
+            <motion.button
               type="button"
               onClick={handleSaveClick}
+              whileTap={{ scale: 0.5 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
               <Bookmark
@@ -258,7 +275,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
                 )}
               />
               <span className="text-sm xl:text-base">{saveCount}</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>

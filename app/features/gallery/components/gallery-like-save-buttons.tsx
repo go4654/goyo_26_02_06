@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Bookmark, Heart } from "lucide-react";
 
 import { cn } from "~/core/lib/utils";
@@ -34,9 +35,12 @@ export default function GalleryLikeSaveButtons({
         className,
       )}
     >
-      <button
+      <motion.button
         type="button"
         onClick={onLikeClick}
+        whileTap={{ scale: 0.5 }}
+        whileHover={{ scale: 1.1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
         className="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-inherit transition-colors"
       >
         <Heart
@@ -46,11 +50,14 @@ export default function GalleryLikeSaveButtons({
           )}
         />
         <span className="text-sm xl:text-base">{likeCount}</span>
-      </button>
+      </motion.button>
       <span className="text-text-3/50">•</span>
-      <button
+      <motion.button
         type="button"
         onClick={onSaveClick}
+        whileTap={{ scale: 0.5 }}
+        whileHover={{ scale: 1.1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
         className="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-inherit transition-colors"
       >
         <Bookmark
@@ -60,7 +67,7 @@ export default function GalleryLikeSaveButtons({
           )}
         />
         <span className="text-sm xl:text-base">{saveCount}</span>
-      </button>
+      </motion.button>
     </div>
   );
 }
