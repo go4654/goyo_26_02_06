@@ -487,7 +487,7 @@ export function CommentItem({
               {renderContentWithMentions(value)}
             </p>
             {/* 좋아요, 댓글 달기, 답글 더보기 버튼 */}
-            <div className="mt-2 flex items-center gap-6">
+            <div className="mt-2 flex items-center gap-4">
               <motion.button
                 type="button"
                 className={`group hover:text-primary flex cursor-pointer items-center gap-1 ${
@@ -499,7 +499,7 @@ export function CommentItem({
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
                 <ThumbsUp
-                  className="group-hover:text-primary size-3 xl:size-4"
+                  className="group-hover:text-primary size-4"
                   fill={liked ? "currentColor" : "none"}
                 />
                 <span className="group-hover:text-primary text-sm xl:text-base">
@@ -514,7 +514,7 @@ export function CommentItem({
                     className="text-text-2 group-hover:text-primary flex cursor-pointer items-center gap-1 text-sm xl:text-base"
                     onClick={onReplyClick}
                   >
-                    <MessageCircle className="size-3 xl:size-4" />
+                    <MessageCircle className="size-4" />
                     <span className="group-hover:text-primary text-sm xl:text-base">
                       답글
                     </span>

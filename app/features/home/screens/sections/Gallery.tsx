@@ -10,27 +10,6 @@ interface GalleryProps {
   highlightedGalleries: GalleryListItem[];
 }
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.07,
-    },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 24 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1] as any,
-    },
-  },
-};
-
 export default function Gallery({ highlightedGalleries }: GalleryProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 

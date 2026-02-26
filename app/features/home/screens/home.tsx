@@ -1,5 +1,7 @@
 import type { Route } from "./+types/home";
 
+import { useRouteLoaderData } from "react-router";
+
 import Container from "~/core/layouts/container";
 import i18next from "~/core/lib/i18next.server";
 import makeServerClient from "~/core/lib/supa-client.server";
@@ -88,6 +90,10 @@ export async function loader({ request }: Route.LoaderArgs) {
  */
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { recentClasses, highlightedGalleries, recentNews } = loaderData;
+  const rootData = useRouteLoaderData("root") as
+    | { user?: unknown }
+    | undefined;
+  const isLoggedIn = Boolean(rootData?.user);
 
   return (
     <>
@@ -98,7 +104,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
         <RecentLogs recentClasses={recentClasses} />
 
-        <Gallery highlightedGalleries={highlightedGalleries} />
+        {isLoggedIn && (
+          <Gallery highlightedGalleries={highlightedGalleries} />
+        )}
 
         <LogEverythingText />
 
