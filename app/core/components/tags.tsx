@@ -2,13 +2,13 @@ import { cn } from "../lib/utils";
 
 export default function Tags({
   tags,
-  borderColor = "text-3",
+  borderColor = "text-3/50",
 }: {
   tags: string[];
   borderColor?: string;
 }) {
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-2">
+    <div className="mt-1 flex flex-wrap items-center gap-2">
       {tags.map((tag, index) => (
         <div
           className={cn(

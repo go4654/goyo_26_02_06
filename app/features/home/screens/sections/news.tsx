@@ -24,12 +24,12 @@ export default function News({ recentNews }: NewsProps) {
     <section className="pt-0 pb-40 xl:pt-40 xl:pb-80">
       <SectionTitle pointText="GOYO." title="NEWS" link="/news" />
 
-      <div className="grid grid-cols-1 gap-12 xl:grid-cols-3 xl:gap-8">
+      <div className="grid grid-cols-1 gap-8 xl:grid-cols-3 xl:gap-8">
         {items.map((data) => (
           <Link
             key={data.id}
             to={`/news/${encodeURIComponent(data.slug)}`}
-            className="group relative flex flex-col justify-between transition-all duration-300 hover:-translate-y-1"
+            className="group relative flex flex-col justify-between border-b pb-6 transition-all duration-300 hover:-translate-y-1 xl:border-0 xl:pb-0"
           >
             {/* 날짜 */}
             <span className="text-text-2 xl:text-small-title text-[12px] font-light tracking-tighter">
@@ -37,7 +37,7 @@ export default function News({ recentNews }: NewsProps) {
             </span>
 
             {/* 타이틀 */}
-            <div className="mt-4 w-full max-w-[380px]">
+            <div className="mt-2 w-full max-w-[380px] xl:mt-4">
               <h3 className="text-small-title xl:text-h6 group-hover:text-primary relative leading-7">
                 <span className="relative z-10 transition-colors duration-300">
                   {data.title}

@@ -5,7 +5,6 @@ import { Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
 
-import Tags from "~/core/components/tags";
 import { Separator } from "~/core/components/ui/separator";
 import { cn } from "~/core/lib/utils";
 
@@ -154,7 +153,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   );
 
   return (
-    <div className="mx-auto w-full max-w-[800px] px-5 py-24 xl:py-40">
+    <div className="mx-auto w-full max-w-[800px] px-5 py-6 xl:py-24">
       {/* 타이틀 영역 */}
       <div>
         <div className="text-small xl:text-small-title text-text-3 flex items-center gap-2">
@@ -215,7 +214,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
             <img
               src={classData.thumbnail_image_url}
               alt={classData.title}
-              className="aspect-[16/7] w-full rounded-2xl object-cover"
+              className="w-full rounded-2xl object-cover"
             />
           </div>
         )}

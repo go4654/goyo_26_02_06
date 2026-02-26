@@ -5,11 +5,13 @@ import {
   Link,
   useLocation,
   useNavigate,
+  useNavigation,
   useRevalidator,
   useSearchParams,
 } from "react-router";
 
 import GalleryList from "../components/gallery-list";
+import GallerySkeleton from "../components/gallery-skeleton";
 import SearchForm from "../components/search-form";
 import { galleryAction } from "../server/gallery.action";
 import { galleryLoader } from "../server/gallery.loader";
@@ -42,7 +44,13 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const navigation = useNavigation();
   const revalidator = useRevalidator();
+
+  // 갤러리 목록 로딩 중(카테고리/검색/페이지 변경)일 때만 스켈레톤 표시
+  const isLoadingGallery =
+    navigation.state === "loading" &&
+    navigation.location?.pathname === "/gallery";
 
   // 상세 페이지에서 목록으로 돌아올 때, 카운트가 즉시 반영되도록 목록 로더를 1회 재검증
   useEffect(() => {
@@ -61,6 +69,11 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
     navigate,
     revalidator,
   ]);
+
+  // 로딩 중이면 스켈레톤 표시 (다른 경로로 나가는 중일 때는 스켈레톤 미표시)
+  if (isLoadingGallery) {
+    return <GallerySkeleton />;
+  }
 
   // 권한이 없으면 지정 문구로 차단 화면 노출
   if (!hasGalleryAccess) {

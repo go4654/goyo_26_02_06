@@ -38,20 +38,13 @@ export default function ClassList({
   const likedClassesSet = new Set(likedClasses || []);
   const savedClassesSet = new Set(savedClasses || []);
 
-  // 검색 결과가 나왔을 때 부드럽게 스크롤
+  // 검색 시 결과 영역으로 부드럽게 스크롤 (결과 유무와 관계없이)
   useEffect(() => {
-    // 검색어가 변경되었고, 검색 결과가 있는 경우에만 스크롤
     const hasSearchChanged = prevSearchRef.current !== search;
-    const hasResults = classes && classes.length > 0;
     const isInitialLoad = prevSearchRef.current === null && search === null;
 
-    // 초기 로드가 아니고, 검색어가 변경되었으며, 검색 결과가 있는 경우에만 스크롤
-    if (
-      !isInitialLoad &&
-      hasSearchChanged &&
-      hasResults &&
-      resultsRef.current
-    ) {
+    // 초기 로드가 아니고 검색어가 변경되었으면 결과 영역으로 스크롤
+    if (!isInitialLoad && hasSearchChanged && resultsRef.current) {
       // 약간의 지연을 두어 DOM이 완전히 렌더링된 후 스크롤
       const timeoutId = setTimeout(() => {
         if (resultsRef.current) {
@@ -74,7 +67,7 @@ export default function ClassList({
 
     // 이전 검색어 업데이트
     prevSearchRef.current = search;
-  }, [search, classes]);
+  }, [search, classes?.length]);
 
   /**
    * 페이지네이션 URL 생성 함수
@@ -95,8 +88,11 @@ export default function ClassList({
 
   if (!classes || classes.length === 0) {
     return (
-      <div className="flex items-center justify-center py-20 xl:mt-[160px]">
-        <p className="text-text-2/60 text-h6">
+      <div
+        ref={resultsRef}
+        className="flex items-center justify-center py-20 xl:mt-[160px]"
+      >
+        <p className="text-text-2/60 xl:text-h6 text-base">
           {search
             ? "검색 결과가 없습니다."
             : category && category.length > 0
@@ -135,7 +131,7 @@ export default function ClassList({
 
       {/* 페이지네이션 */}
       {pagination.totalPages > 1 && (
-        <div className="flex justify-center py-20">
+        <div className="flex justify-center py-10 xl:py-20">
           <PaginationUI
             page={pagination.currentPage}
             totalPages={pagination.totalPages}

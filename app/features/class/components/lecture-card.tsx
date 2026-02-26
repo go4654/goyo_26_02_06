@@ -115,7 +115,8 @@ export default function LectureCard({
   return (
     <Link
       to={linkTo}
-      className="group space-between flex flex-col items-start transition-colors xl:gap-4"
+      viewTransition
+      className="group space-between flex flex-col items-start transition-all duration-150 active:scale-[0.88] active:opacity-95 xl:gap-1"
     >
       {/* img 영역 */}
       <div className="group relative h-full max-h-[200px] min-h-[200px] w-full overflow-hidden rounded-xl bg-gray-400 xl:block xl:max-h-[250px] xl:min-h-[250px] xl:rounded-[20px]">
@@ -137,17 +138,6 @@ export default function LectureCard({
         {showActions && (
           <div className="absolute top-0 right-0 h-full w-full">
             <div className="absolute top-2 right-2 flex items-center gap-2 xl:top-3 xl:right-3">
-              {/* <button
-                type="button"
-                onClick={handleLikeClick}
-                className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
-                  isLiked
-                    ? "bg-primary text-white"
-                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
-                }`}
-              >
-                <Heart className="size-3.5 xl:size-5" />
-              </button> */}
               <motion.button
                 type="button"
                 onClick={handleLikeClick}
@@ -186,8 +176,8 @@ export default function LectureCard({
       </div>
 
       {/* 타이틀 영역 */}
-      <div className="flex flex-col gap-1 xl:gap-2">
-        <h3 className="text-small xl:text-small-title group-hover:text-primary line-clamp-1 font-[600] xl:text-[20px]">
+      <div className="flex flex-col xl:gap-2">
+        <h3 className="text-small xl:text-small-title group-hover:text-primary mt-1.5 line-clamp-1 font-[600] xl:text-[20px]">
           {lecture.title}
         </h3>
 

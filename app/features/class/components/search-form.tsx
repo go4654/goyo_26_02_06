@@ -1,6 +1,6 @@
 import { SearchIcon } from "lucide-react";
-import { Form, useNavigate } from "react-router";
 import { useState } from "react";
+import { Form, useNavigate } from "react-router";
 import { z } from "zod";
 
 import { Input } from "~/core/components/ui/input";
@@ -22,7 +22,7 @@ const searchSchema = z.object({
     .string()
     .max(100, { message: "검색어는 100자 이하여야 합니다." })
     .optional()
-    .transform((val) => (val?.trim() || "")),
+    .transform((val) => val?.trim() || ""),
   category: z.string().optional(),
 });
 
@@ -87,22 +87,20 @@ export default function SearchForm({
             name="search"
             defaultValue={search || ""}
             placeholder="찾고싶은 기록이 있으신가요?"
-            className="placeholder:text-text-2/40 text-sm"
+            className="placeholder:text-text-2/40 text-[16px]"
             maxLength={100}
           />
           <InputGroupAddon>
             <button
               type="submit"
-              className="flex items-center justify-center cursor-pointer"
+              className="flex cursor-pointer items-center justify-center"
             >
               <SearchIcon className="size-5" />
             </button>
           </InputGroupAddon>
         </InputGroup>
       </Form>
-      {error && (
-        <p className="mt-2 text-sm text-red-500">{error}</p>
-      )}
+      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
     </div>
   );
 }
