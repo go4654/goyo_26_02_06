@@ -993,19 +993,16 @@ export type Database = {
           avatar_url: string | null
           name: string | null
           profile_id: string | null
-          role: string | null
         }
         Insert: {
           avatar_url?: string | null
           name?: string | null
           profile_id?: string | null
-          role?: string | null
         }
         Update: {
           avatar_url?: string | null
           name?: string | null
           profile_id?: string | null
-          role?: string | null
         }
         Relationships: []
       }
@@ -1017,15 +1014,6 @@ export type Database = {
       }
       generate_slug: { Args: { input_text: string }; Returns: string }
       get_admin_dashboard_stats: { Args: never; Returns: Json }
-      get_top_galleries_by_likes: {
-        Args: never
-        Returns: {
-          id: string
-          title: string
-          thumbnail_url: string | null
-          like_count: number
-        }[]
-      }
       get_admin_inquiries_list: {
         Args: never
         Returns: {
@@ -1155,6 +1143,15 @@ export type Database = {
           saved_at: string
           slug: string
           thumbnail_image_url: string
+          title: string
+        }[]
+      }
+      get_top_galleries_by_likes: {
+        Args: never
+        Returns: {
+          id: string
+          like_count: number
+          thumbnail_url: string
           title: string
         }[]
       }

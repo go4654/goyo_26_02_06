@@ -54,11 +54,16 @@ export default function ClassComment({
     useState<CommentWithProfile[]>(initialComments);
   const [totalTopLevel, setTotalTopLevel] = useState(initialTotal);
   const replaceOnNextData = useRef(false);
+  const currentSortOrder = useRef<CommentSortOrder>("latest");
 
   const fetcher = useFetcher<CommentsPageResponse>();
 
   // 로더 리밸리데이션 시 초기 상태로 동기화
+  // 단, 정렬이 latest가 아닌 경우는 무시 (fetcher로 관리 중)
   useEffect(() => {
+    if (currentSortOrder.current !== "latest") {
+      return;
+    }
     setAccumulatedComments(initialComments);
     setTotalTopLevel(initialTotal);
   }, [initialComments, initialTotal]);
@@ -72,7 +77,12 @@ export default function ClassComment({
       setAccumulatedComments(data.comments);
       replaceOnNextData.current = false;
     } else {
-      setAccumulatedComments((prev) => [...prev, ...data.comments]);
+      setAccumulatedComments((prev) => {
+        // 중복 방지: 이미 존재하는 댓글 ID는 제외
+        const existingIds = new Set(prev.map((c) => c.id));
+        const newComments = data.comments.filter((c) => !existingIds.has(c.id));
+        return [...prev, ...newComments];
+      });
     }
     setTotalTopLevel(data.totalTopLevel);
   }, [fetcher.data]);
@@ -102,7 +112,7 @@ export default function ClassComment({
         profile_id: currentUserId,
         name: "나",
         avatar_url: null,
-        role: isAdmin ? "admin" : undefined,
+        // role: isAdmin ? "admin" : undefined,
       },
       likes_count: 0,
       is_liked: false,
@@ -131,6 +141,7 @@ export default function ClassComment({
   const handleSortChange = (newOrder: CommentSortOrder) => {
     if (newOrder === sortOrder) return;
     setSortOrder(newOrder);
+    currentSortOrder.current = newOrder;
     replaceOnNextData.current = true;
     fetcher.load(
       `/api/class/comments?classId=${classId}&offset=0&limit=${COMMENTS_PAGE_SIZE}&sortOrder=${newOrder}`,
@@ -153,13 +164,14 @@ export default function ClassComment({
             <Badge className="mt-1">{totalTopLevel}</Badge>
           </div>
 
+          {/* 정렬 메뉴 */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 className="text-text-3 flex cursor-pointer items-center gap-2 text-base"
               >
-                <span className="text-sm xl:text-base">
+                <span className="text-sm">
                   {COMMENT_SORT_LABELS[sortOrder]}
                 </span>
                 <ArrowUpDown className="size-4 xl:size-5" />
@@ -182,11 +194,13 @@ export default function ClassComment({
           </DropdownMenu>
         </div>
 
+        {/* 댓글 작성 폼 */}
         <CommentForm
           classId={classId}
           onOptimisticCreate={handleOptimisticCreate}
         />
 
+        {/* 댓글 목록 */}
         <CommentList
           comments={accumulatedComments}
           classId={classId}
@@ -195,6 +209,7 @@ export default function ClassComment({
           onDeleteSuccess={handleDeleteSuccess}
         />
 
+        {/* 댓글 더보기 버튼 */}
         {hasMore && (
           <div className="mt-10 flex justify-center">
             <Button
