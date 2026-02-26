@@ -2,6 +2,7 @@ import type { Route } from "./+types/admin-classes-edit";
 
 import { useEffect, useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import AdminContentForm, {
   type ContentFormData,
@@ -55,7 +56,7 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
           const compressed = await compressImageToWebp(thumbnailFile);
           formData.append("thumbnail", compressed);
         } catch (error) {
-          alert(
+          toast.error(
             error instanceof Error
               ? error.message
               : "이미지 압축에 실패했습니다. 다시 시도해주세요.",
@@ -75,18 +76,21 @@ export default function ClassesEdit({ loaderData }: Route.ComponentProps) {
         encType: "multipart/form-data",
       });
     } catch {
-      alert("클래스 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      toast.error("클래스 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
       setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
     if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
+      toast.success("클래스가 성공적으로 수정되었습니다.");
       navigate("/admin/classes");
     }
     if (fetcher.data && "error" in fetcher.data && fetcher.data.error) {
       if (!isSubmitting) setIsSubmitting(false);
-      alert(fetcher.data.error);
+      toast.error("클래스 수정 실패", {
+        description: fetcher.data.error,
+      });
     }
   }, [fetcher.data, isSubmitting, navigate]);
 

@@ -399,7 +399,10 @@ export default function AdminContentForm({
                   }
                 }}
               >
-                <SelectTrigger id="mainCategory" className="w-full">
+                <SelectTrigger
+                  id="mainCategory"
+                  className="!h-12 w-full text-base"
+                >
                   <SelectValue placeholder="대분류를 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
@@ -423,8 +426,11 @@ export default function AdminContentForm({
                   }
                 }}
               >
-                <SelectTrigger id="subCategory" className="w-full">
-                  <SelectValue placeholder="소분류를 선택하세요" />
+                <SelectTrigger id="subCategory" className="!h-12 w-full">
+                  <SelectValue
+                    placeholder="소분류를 선택하세요"
+                    className="text-base"
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORY_SUBCATEGORIES[mainCategory].map((sub) => (
@@ -453,6 +459,7 @@ export default function AdminContentForm({
           onChange={(e) => updateField("title", e.target.value)}
           placeholder="예: 비전공자도 칭찬받는 폰트 위계 잡기"
           aria-invalid={errors.title ? "true" : undefined}
+          className="h-12 !text-base"
         />
         {errors.title && (
           <p className="text-destructive text-sm">{errors.title}</p>
@@ -465,12 +472,12 @@ export default function AdminContentForm({
           <Label htmlFor="description">
             설명 <span className="text-destructive">*</span>
           </Label>
-          <Textarea
+          <Input
             id="description"
             value={formData.description}
             onChange={(e) => updateField("description", e.target.value)}
             placeholder="예: 왜 내가 만든 디자인은 가독성이 떨어질까? 그 해답은 폰트의 크기가 아니라 '위계'에 있습니다."
-            rows={3}
+            className="h-12 !text-base"
             aria-invalid={errors.description ? "true" : undefined}
           />
           {errors.description && (
@@ -493,6 +500,7 @@ export default function AdminContentForm({
             value={formData.tags}
             onChange={(e) => updateField("tags", e.target.value)}
             placeholder="예: design, uxui"
+            className="h-12 !text-base"
           />
           <p className="text-text-3 text-xs">
             태그를 쉼표로 구분하여 입력하세요. (예: design, uxui, frontend)
@@ -505,6 +513,7 @@ export default function AdminContentForm({
         <Label htmlFor="content">
           콘텐츠 (MDX) <span className="text-destructive">*</span>
         </Label>
+
         <MDXEditor
           value={formData.content}
           onChange={(value) => updateField("content", value)}

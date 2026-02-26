@@ -2,6 +2,7 @@ import type { Route } from "./+types/admin-classes-new";
 
 import { useEffect, useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 import AdminContentForm, {
   type ContentFormData,
@@ -70,7 +71,7 @@ export default function ClassesNew() {
           const compressedFile = await compressImageToWebp(thumbnailFile);
           formData.append("thumbnail", compressedFile);
         } catch (error) {
-          alert(
+          toast.error(
             error instanceof Error
               ? error.message
               : "이미지 압축에 실패했습니다. 다시 시도해주세요.",
@@ -94,7 +95,7 @@ export default function ClassesNew() {
         encType: "multipart/form-data",
       });
     } catch {
-      alert("클래스 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      toast.error("클래스 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
       setIsSubmitting(false);
     }
   };
@@ -102,6 +103,7 @@ export default function ClassesNew() {
   useEffect(() => {
     // 액션 결과 처리
     if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
+      toast.success("클래스가 성공적으로 등록되었습니다.");
       // 성공 시 목록 페이지로 이동
       navigate("/admin/classes");
     }
@@ -110,7 +112,9 @@ export default function ClassesNew() {
     if (fetcher.data && "error" in fetcher.data) {
       const errorMessage = fetcher.data.error;
       if (errorMessage && !isSubmitting) {
-        alert(errorMessage);
+        toast.error("클래스 등록 실패", {
+          description: errorMessage,
+        });
         setIsSubmitting(false);
       }
     }

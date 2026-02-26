@@ -195,7 +195,7 @@ export default function MDXEditor({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="relative space-y-2">
       {/* 탭 버튼 */}
       <div className="flex gap-2 border-b border-white/10">
         <Button
@@ -261,10 +261,22 @@ export default function MDXEditor({
           {/* 텍스트 에리어 */}
           <Textarea
             ref={textareaRef}
+            defaultValue={MDX_EX_TEXT}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (
+                (e.metaKey || e.ctrlKey) &&
+                e.shiftKey &&
+                e.key.toLowerCase() === "i"
+              ) {
+                // Cmd+Shift+I (mac) 또는 Ctrl+Shift+I (윈도우)로 이미지 업로드 트리거
+                e.preventDefault();
+                handleUploadClick();
+              }
+            }}
             placeholder={placeholder}
-            className="min-h-[400px] font-mono text-sm"
+            className="text-text-3 min-h-[400px] font-mono !text-base"
             aria-invalid={error ? "true" : undefined}
           />
 
@@ -292,6 +304,25 @@ export default function MDXEditor({
             </div>
           )}
         </div>
+      )}
+
+      {/* 편집 탭에서 언제나 접근 가능한 플로팅 이미지 업로드 버튼 */}
+      {activeTab === "edit" && (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleUploadClick}
+          disabled={isUploading}
+          className="!border-primary fixed right-6 bottom-6 z-40 cursor-pointer md:absolute md:right-10 md:bottom-20"
+          title="이미지 업로드 (Cmd/Ctrl + Shift + I)"
+        >
+          {isUploading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Image className="size-4" />
+          )}
+        </Button>
       )}
     </div>
   );

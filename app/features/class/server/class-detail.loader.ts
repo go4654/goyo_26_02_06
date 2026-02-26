@@ -96,21 +96,33 @@ export async function classDetailLoader({ request, params }: Route.LoaderArgs) {
   };
 
   // MDX 콘텐츠 번들링 (CPU 집약적 작업이므로 별도 처리)
-  const { code } = await bundleMDX({
-    source: classDetail.content_mdx,
-    mdxOptions(options) {
-      options.remarkPlugins = [...(options.remarkPlugins ?? [])];
-      options.rehypePlugins = [
-        ...(options.rehypePlugins ?? []),
-        [rehypePrettyCode, { theme: "github-dark" }],
-      ];
-      return options;
-    },
-  });
+  // 번들 실패 시 상세 에러 메시지가 클라이언트에 노출되지 않도록
+  // 안전한 기본 컴포넌트 코드로 대체하고, 서버 로그에만 기록
+  let code = "export default function MDXContent(){return null;}"; // 안전한 기본 코드
+  let hasMdxError = false;
+
+  try {
+    const result = await bundleMDX({
+      source: classDetail.content_mdx,
+      mdxOptions(options) {
+        options.remarkPlugins = [...(options.remarkPlugins ?? [])];
+        options.rehypePlugins = [
+          ...(options.rehypePlugins ?? []),
+          [rehypePrettyCode, { theme: "github-dark" }],
+        ];
+        return options;
+      },
+    });
+    code = result.code;
+  } catch (error) {
+    logger.error("클래스 MDX 번들링 실패:", error);
+    hasMdxError = true;
+  }
 
   return {
     class: classDetailWithCounts,
     code,
+    hasMdxError,
     navigation,
     comments: commentsPage.comments,
     totalTopLevelComments: commentsPage.totalTopLevel,

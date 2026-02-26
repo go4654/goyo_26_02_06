@@ -57,10 +57,12 @@ export async function getOrCreateTag(
   }
 
   // slug는 name을 기반으로 생성 (소문자, 공백을 하이픈으로)
+  // 한글/비ASCII도 그대로 유지하여 서로 다른 태그가 같은 slug를 갖지 않도록 함
   const slug = tagName
+    .trim()
     .toLowerCase()
     .replace(/\s+/g, "-")
-    .replace(/[^\w-]/g, "");
+    .replace(/-+/g, "-");
 
   // 같은 slug를 가진 태그가 이미 있으면 해당 id 반환 (Design / design 등으로 slug 중복 방지)
   const { data: existingBySlug, error: slugSelectError } = await client
@@ -110,13 +112,20 @@ export async function linkTagsToClass(
     return;
   }
 
+  // 동일 태그 중복 연결 방지를 위해 ID를 한 번 더 유니크 처리
+  const uniqueTagIds = Array.from(new Set(tagIds));
+
   // class_tags 테이블에 연결 데이터 삽입
-  const classTagsData = tagIds.map((tagId) => ({
+  const classTagsData = uniqueTagIds.map((tagId) => ({
     class_id: classId,
     tag_id: tagId,
   }));
 
-  const { error } = await client.from("class_tags").insert(classTagsData);
+  // (class_id, tag_id) 조합은 유니크 인덱스(class_tags_unique)로 제약되어 있으므로
+  // upsert + onConflict로 중복 시 업데이트만 수행하고 에러는 발생하지 않도록 처리
+  const { error } = await client
+    .from("class_tags")
+    .upsert(classTagsData, { onConflict: "class_id,tag_id" });
 
   if (error) {
     throw new Error(`태그 연결 실패: ${error.message}`);
@@ -188,12 +197,16 @@ export async function linkTagsToGallery(
     return;
   }
 
-  const galleryTagsData = tagIds.map((tagId) => ({
+  const uniqueTagIds = Array.from(new Set(tagIds));
+
+  const galleryTagsData = uniqueTagIds.map((tagId) => ({
     gallery_id: galleryId,
     tag_id: tagId,
   }));
 
-  const { error } = await client.from("gallery_tags").insert(galleryTagsData);
+  const { error } = await client
+    .from("gallery_tags")
+    .upsert(galleryTagsData, { onConflict: "gallery_id,tag_id" });
 
   if (error) {
     throw new Error(`갤러리 태그 연결 실패: ${error.message}`);

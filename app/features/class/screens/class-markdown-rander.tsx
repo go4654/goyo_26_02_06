@@ -54,15 +54,27 @@ export default function MDXRenderer({ code }: { code: string }) {
           h2: (props) => <h2 className="text-h5 xl:text-h3 mt-18" {...props} />,
 
           /** 타이틀 문단 */
-          // h3: (props) => (
-          //   <h3
-          //     className="text-h5 text-text-2 mt-12 font-semibold"
-          //     {...props}
-          //   />
-          // ),
+          h3: (props) => (
+            <h3 className="text-h6 xl:text-h5 mt-12 font-semibold" {...props} />
+          ),
 
           h4: (props) => (
-            <h4 className="text-h6 text-text-3 mt-12" {...props} />
+            <h4
+              className="xl:text-small-title mt-12 text-base font-semibold"
+              {...props}
+            />
+          ),
+
+          h5: (props) => (
+            <h5 className="mt-10 text-base font-light" {...props} />
+          ),
+
+          // 갤러리 설명
+          h6: (props) => (
+            <h6
+              className="text-text-3 font-regular mt-8 text-[24px] leading-10 tracking-wide"
+              {...props}
+            />
           ),
 
           /** 일반 본문 텍스트 */

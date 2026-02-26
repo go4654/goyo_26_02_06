@@ -39,6 +39,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
     class: classData,
     code,
     navigation,
+    hasMdxError,
     currentUserId,
     isAdmin,
     isLiked: initialLiked,
@@ -155,7 +156,7 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   return (
     <div className="mx-auto w-full max-w-[800px] px-5 py-6 xl:py-24">
       {/* 타이틀 영역 */}
-      <div>
+      <div className="border-b pb-6">
         <div className="text-small xl:text-small-title text-text-3 flex items-center gap-2">
           <span>{displayDate}</span>
           <span className="text-text-3/50">•</span>
@@ -197,10 +198,10 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div className="mt-4">
-          <h1 className="text-h4 xl:text-h2">{classData.title}</h1>
+          <h1 className="text-h4 xl:text-h3">{classData.title}</h1>
 
           {classData.description && (
-            <p className="xl:text-h6 text-text-2/80 mt-2 text-base">
+            <p className="xl:text-small-title text-text-2/80 mt2 text-base xl:mt-6">
               {classData.description}
             </p>
           )}
@@ -210,18 +211,24 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
       {/* 썸네일 영역 */}
       {classData.thumbnail_image_url &&
         classData.thumbnail_image_url.trim() !== "" && (
-          <div className="mt-12">
+          <div className="mt-12 flex justify-center">
             <img
               src={classData.thumbnail_image_url}
               alt={classData.title}
-              className="w-full rounded-2xl object-cover"
+              className="rounded-2xl object-cover"
             />
           </div>
         )}
 
       {/* ✅ 여기부터가 새로 추가된 "본문 MDX 영역" */}
       <div>
-        <MDXRenderer code={loaderData.code} />
+        {hasMdxError ? (
+          <p className="text-text-3 mt-24 text-sm">
+            콘텐츠를 불러오는 중 오류가 발생했습니다.
+          </p>
+        ) : (
+          <MDXRenderer code={loaderData.code} />
+        )}
       </div>
 
       <Separator className="mt-26 mb-6" />
