@@ -297,6 +297,15 @@ export function NavigationBar({
 }) {
   const { pathname } = useLocation();
   const [active, setActive] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  // 스크롤 위치 추적 (맨 위일 때 투명 배경용)
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     if (pathname.includes("/")) {
@@ -307,11 +316,18 @@ export function NavigationBar({
     }
   }, [pathname]);
 
+  // 배너 있을 때: 배너 높이(48px) 이하 스크롤까지 투명, 없을 때: 스크롤 0일 때만 투명
+  const isTransparent =
+    hasNoticeBanner ? scrollY < 48 : scrollY === 0;
+
   return (
     <nav
       className={cn(
-        "fixed right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between border-b border-white/5 bg-black/60 px-5 backdrop-blur-sm",
+        "fixed right-0 left-0 z-50 mx-auto flex h-16 w-full items-center justify-between border-b px-5 transition-colors duration-200",
         hasNoticeBanner ? "top-12" : "top-0",
+        isTransparent
+          ? "border-transparent bg-transparent backdrop-blur-none"
+          : "border-white/5 bg-black/60 backdrop-blur-sm",
       )}
     >
       <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1640px]">
