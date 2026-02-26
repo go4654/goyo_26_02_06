@@ -20,12 +20,13 @@ import nProgressStyles from "nprogress/nprogress.css?url";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  data,
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  data,
   isRouteErrorResponse,
   useLocation,
   useNavigate,
@@ -326,44 +327,55 @@ export default function App() {
  * @param error - React Router에 의해 포착된 에러
  */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    // 라우트 에러 처리 (404, 500 등)
-    if (error.status === 404) {
-      // "찾을 수 없음" 에러에 대한 커스텀 404 페이지 표시
-      return <NotFound />;
-    }
-    message = "Error";
-    details = error.statusText || details;
-  } else if (error && error instanceof Error) {
-    // JavaScript 에러 처리
-    if (
-      import.meta.env.VITE_SENTRY_DSN &&
-      import.meta.env.MODE === "production"
-    ) {
-      // 프로덕션 환경에서 Sentry로 에러 보고
-      Sentry.captureException(error);
-    }
-    if (import.meta.env.DEV) {
-      // 개발 환경에서 상세한 에러 정보 표시
-      details = error.message;
-      stack = error.stack;
-    }
+  // 라우트 에러 중 404는 별도 NotFound 화면으로 처리
+  if (isRouteErrorResponse(error) && error.status === 404) {
+    return <NotFound />;
   }
 
-  // 사용 가능한 정보로 간단한 에러 페이지 렌더링
+  // JavaScript 에러 및 기타 라우트 에러는 공통 처리
+  if (
+    import.meta.env.VITE_SENTRY_DSN &&
+    import.meta.env.MODE === "production" &&
+    error instanceof Error
+  ) {
+    // 프로덕션 환경에서만 Sentry로 에러 보고
+    Sentry.captureException(error);
+  }
+
+  // 개발 환경에서는 콘솔에만 상세 에러를 남기고, UI에는 노출하지 않음
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  }
+
+  // 보안 및 UX 요구사항을 만족하는 전역 에러 화면
+  // - HTTP 상태 코드나 내부 에러 메시지를 노출하지 않음
+  // - 다크 테마에 어울리는 최소한의 중앙 정렬 레이아웃
+  // - 사용자를 홈으로 돌려보내는 기본 액션 제공
   return (
-    <main className="container mx-auto p-4 pt-16">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full overflow-x-auto p-4">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+    <div className="bg-background text-text-1 relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+      {/* subtle glow */}
+      <div className="bg-primary/15 absolute top-1/3 -left-32 h-[400px] w-[400px] rounded-full blur-3xl" />
+      <div className="bg-primary/10 absolute right-[-200px] bottom-[-150px] h-[500px] w-[500px] rounded-full blur-3xl" />
+
+      <div className="relative z-10 max-w-md space-y-6 text-center">
+        <h1 className="text-3xl font-semibold tracking-tight xl:text-4xl">
+          문제가 발생했습니다
+        </h1>
+
+        <p className="text-text-2 text-sm xl:text-base">
+          일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주세요.
+        </p>
+
+        <div className="pt-4">
+          <Link
+            to="/"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-full px-8 py-3 text-sm font-medium transition-all duration-300 hover:shadow-[0_20px_60px_-15px_rgba(124,77,255,0.5)]"
+          >
+            홈으로 돌아가기 →
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
