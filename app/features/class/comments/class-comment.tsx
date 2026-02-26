@@ -82,6 +82,52 @@ export default function ClassComment({
   ).length;
   const hasMore = loadedTopCount < totalTopLevel;
 
+  // 새 댓글 낙관적 추가
+  const handleOptimisticCreate = (content: string) => {
+    if (!currentUserId) return;
+
+    const now = new Date().toISOString();
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const optimisticComment: CommentWithProfile = {
+      id: tempId,
+      class_id: classId,
+      user_id: currentUserId,
+      parent_id: null,
+      content,
+      created_at: now,
+      updated_at: now,
+      is_visible: true,
+      profile: {
+        profile_id: currentUserId,
+        name: "나",
+        avatar_url: null,
+        role: isAdmin ? "admin" : undefined,
+      },
+      likes_count: 0,
+      is_liked: false,
+    };
+
+    setAccumulatedComments((prev) => [optimisticComment, ...prev]);
+    setTotalTopLevel((prev) => prev + 1);
+  };
+
+  // 댓글 삭제 후 로컬 상태에서 제거 (대댓글 포함)
+  const handleDeleteSuccess = (deletedId: string, parentId: string | null) => {
+    setAccumulatedComments((prev) =>
+      prev.filter((c) => {
+        if (c.id === deletedId) return false;
+        // 최상위 댓글 삭제 시, 그 댓글에 달린 대댓글도 함께 제거
+        if (parentId === null && c.parent_id === deletedId) return false;
+        return true;
+      }),
+    );
+
+    if (parentId === null) {
+      setTotalTopLevel((prev) => Math.max(0, prev - 1));
+    }
+  };
+
   const handleSortChange = (newOrder: CommentSortOrder) => {
     if (newOrder === sortOrder) return;
     setSortOrder(newOrder);
@@ -136,13 +182,17 @@ export default function ClassComment({
           </DropdownMenu>
         </div>
 
-        <CommentForm classId={classId} />
+        <CommentForm
+          classId={classId}
+          onOptimisticCreate={handleOptimisticCreate}
+        />
 
         <CommentList
           comments={accumulatedComments}
           classId={classId}
           currentUserId={currentUserId}
           isAdmin={isAdmin}
+          onDeleteSuccess={handleDeleteSuccess}
         />
 
         {hasMore && (

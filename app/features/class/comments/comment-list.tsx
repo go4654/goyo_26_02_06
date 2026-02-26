@@ -14,6 +14,8 @@ interface CommentListProps {
   currentUserId?: string | null;
   /** 관리자 여부 */
   isAdmin?: boolean;
+  /** 댓글 삭제 성공 시 상위 상태 업데이트 콜백 */
+  onDeleteSuccess?: (commentId: string, parentId: string | null) => void;
 }
 
 /**
@@ -27,6 +29,7 @@ export function CommentList({
   classId,
   currentUserId,
   isAdmin = false,
+  onDeleteSuccess,
 }: CommentListProps) {
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<
@@ -85,6 +88,7 @@ export function CommentList({
             classId={classId}
             currentUserId={currentUserId}
             isAdmin={isAdmin}
+            onDeleteSuccess={onDeleteSuccess}
             onReplyClick={() =>
               setReplyingToId((current) =>
                 current === comment.id ? null : comment.id,
@@ -112,6 +116,7 @@ export function CommentList({
                     classId={classId}
                     currentUserId={currentUserId}
                     isAdmin={isAdmin}
+                    onDeleteSuccess={onDeleteSuccess}
                   />
                 ))}
               </div>
@@ -144,7 +149,6 @@ function convertToCommentData(comment: CommentWithProfile): CommentData {
     userProfileImage: comment.profile?.avatar_url || null,
     likes: comment.likes_count,
     isLiked: comment.is_liked,
-    role: comment.profile?.role,
     isVisible: comment.is_visible,
   };
 }

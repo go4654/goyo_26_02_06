@@ -1,5 +1,6 @@
-import { data, redirect } from "react-router";
 import type { Route } from "../screens/+types/class-detail";
+
+import { data, redirect } from "react-router";
 
 import { getUserRole } from "~/core/lib/guards.server";
 import { requireAuthentication } from "~/core/lib/guards.server";
@@ -82,7 +83,7 @@ export async function classCommentAction({
           );
         }
 
-        await createComment(
+        const createdId = await createComment(
           client,
           classId,
           user.id,
@@ -90,8 +91,11 @@ export async function classCommentAction({
           parentId || null,
         );
 
-        // 성공 시 현재 페이지로 리다이렉트 (댓글 목록 새로고침)
-        throw redirect(redirectPath, { status: 303 });
+        // 페이지 리다이렉트 없이 성공 여부와 생성된 댓글 ID만 반환
+        return data(
+          { success: true, commentId: createdId },
+          { status: 201 },
+        );
       }
 
       case "update": {
@@ -104,8 +108,8 @@ export async function classCommentAction({
 
         await updateComment(client, commentId, user.id, content.trim());
 
-        // 성공 시 현재 페이지로 리다이렉트 (댓글 목록 새로고침)
-        throw redirect(redirectPath, { status: 303 });
+        // 리다이렉트 없이 성공 여부만 반환
+        return data({ success: true }, { status: 200 });
       }
 
       case "delete": {
@@ -125,8 +129,8 @@ export async function classCommentAction({
           return data({ error: errorMessage }, { status: 500 });
         }
 
-        // 성공 시 현재 페이지로 리다이렉트 (댓글 목록 새로고침)
-        throw redirect(redirectPath, { status: 303 });
+        // 리다이렉트 없이 성공 여부만 반환
+        return data({ success: true }, { status: 200 });
       }
 
       case "toggleLike": {
@@ -224,9 +228,11 @@ export async function classCommentAction({
     if (error instanceof Response) {
       throw error;
     }
-    
+
     const errorMessage =
-      error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+      error instanceof Error
+        ? error.message
+        : "알 수 없는 오류가 발생했습니다.";
     return data({ error: errorMessage }, { status: 500 });
   }
 }

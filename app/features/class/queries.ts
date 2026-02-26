@@ -291,7 +291,7 @@ export async function incrementClassView(
 
 /**
  * 프로필 정보를 포함한 댓글 데이터
- * profile은 public_profiles 뷰 기준 (profile_id, name, avatar_url, role)
+ * profile은 public_profiles 뷰 기준 (profile_id, name, avatar_url)
  */
 export interface CommentWithProfile {
   id: string;
@@ -306,7 +306,6 @@ export interface CommentWithProfile {
     profile_id: string;
     name: string;
     avatar_url: string | null;
-    role?: string;
   } | null;
   likes_count: number;
   is_liked?: boolean;
@@ -362,7 +361,7 @@ export async function getClassComments(
       // 공개 프로필 정보 일괄 조회 (로그인 유저 모두 조회 가능)
       client
         .from("public_profiles")
-        .select("profile_id, name, avatar_url, role")
+        .select("profile_id, name, avatar_url")
         .in("profile_id", userIds),
       // 댓글 좋아요 수 조회
       client
@@ -383,7 +382,6 @@ export async function getClassComments(
         profile_id: profile.profile_id as string,
         name: profile.name as string,
         avatar_url: profile.avatar_url as string | null,
-        role: profile.role as string | undefined,
       },
     ]),
   );
@@ -510,7 +508,7 @@ export async function getClassCommentsPage(
   const [profilesResult, likesDataResult, userLikesResult] = await Promise.all([
     client
       .from("public_profiles")
-      .select("profile_id, name, avatar_url, role")
+      .select("profile_id, name, avatar_url")
       .in("profile_id", userIds),
     client
       .from("comment_likes")
@@ -528,7 +526,6 @@ export async function getClassCommentsPage(
         profile_id: p.profile_id as string,
         name: p.name as string,
         avatar_url: p.avatar_url as string | null,
-        role: p.role as string | undefined,
       },
     ]),
   );

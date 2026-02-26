@@ -4,7 +4,7 @@
 --
 -- 요약:
 -- - profiles 테이블 RLS는 변경하지 않음 (본인/관리자만 profiles 직접 조회)
--- - 공개용 최소 필드만 제공: profile_id, name, avatar_url, role
+-- - 공개용 최소 필드만 제공: profile_id, name, avatar_url
 -- - VIEW는 security_invoker = false(기본)로 definer 권한 실행 → 뷰 소유자가 profiles 읽음
 -- - GRANT로 authenticated만 뷰 SELECT 허용 → 로그인 유저는 뷰를 통해 모든 행의 공개 필드만 조회
 --
@@ -23,12 +23,11 @@ AS
 SELECT
   profile_id,
   name,
-  avatar_url,
-  role
+  avatar_url
 FROM public.profiles;
 
 COMMENT ON VIEW public.public_profiles IS
-  '공개용 프로필: profile_id, name, avatar_url, role. authenticated만 SELECT 가능.';
+  '공개용 프로필: profile_id, name, avatar_url. authenticated만 SELECT 가능.';
 
 -- 로그인한 유저만 뷰 조회 허용 (profiles RLS는 변경하지 않음)
 GRANT SELECT ON public.public_profiles TO authenticated;

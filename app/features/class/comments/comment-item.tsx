@@ -54,7 +54,6 @@ export interface CommentData {
   userProfileImage: string | null;
   likes: number;
   isLiked?: boolean; // 현재 사용자가 좋아요를 눌렀는지 여부
-  role?: string; // 작성자 역할 (admin일 때 뱃지 표시)
   /** 가시성 (관리자만 숨김 댓글 조회 가능, RLS로 필터링됨) */
   isVisible?: boolean;
 }
@@ -73,6 +72,8 @@ interface CommentItemProps {
   currentUserId?: string | null;
   /** 관리자 여부 */
   isAdmin?: boolean;
+  /** 삭제 성공 시 상위 상태 업데이트 콜백 */
+  onDeleteSuccess?: (commentId: string, parentId: string | null) => void;
 }
 
 export const commentSchema = z.object({
@@ -163,6 +164,7 @@ export function CommentItem({
   classId,
   currentUserId,
   isAdmin = false,
+  onDeleteSuccess,
 }: CommentItemProps) {
   const [value, setValue] = useState(comment.content);
   const [draft, setDraft] = useState(comment.content);
@@ -175,6 +177,9 @@ export function CommentItem({
   const likeFetcher = useFetcher<{ success: boolean; isLiked: boolean }>();
   const prevFetcherState = useRef(fetcher.state);
   const lastVisibilityResponseRef = useRef<unknown>(null);
+  const [lastAction, setLastAction] = useState<
+    "update" | "delete" | "toggleVisibility" | null
+  >(null);
 
   // 본인 댓글 또는 관리자 여부 확인 (수정/삭제 권한)
   const isOwnComment = currentUserId === comment.userId;
@@ -194,6 +199,7 @@ export function CommentItem({
     if (!classId) return;
 
     // 서버 액션으로 댓글 수정
+    setLastAction("update");
     fetcher.submit(
       {
         action: "update",
@@ -214,12 +220,14 @@ export function CommentItem({
       (prev === "submitting" || prev === "loading") && fetcher.state === "idle";
     if (!justFinished) return;
 
+    if (lastAction !== "update") return;
+
     const hasError = fetcher.data && (fetcher.data as { error?: string }).error;
     if (!hasError) {
       setValue(draft);
       setIsEditing(false);
     }
-  }, [fetcher.state, fetcher.data, draft]);
+  }, [fetcher.state, fetcher.data, draft, lastAction]);
 
   const handleLikeClick = () => {
     if (!classId || !currentUserId) return;
@@ -264,6 +272,7 @@ export function CommentItem({
     if (!classId) return;
 
     // 서버 액션으로 댓글 삭제
+    setLastAction("delete");
     fetcher.submit(
       {
         action: "delete",
@@ -285,6 +294,7 @@ export function CommentItem({
 
   const handleToggleVisibility = () => {
     if (!classId) return;
+    setLastAction("toggleVisibility");
     fetcher.submit(
       {
         action: "toggleVisibility",
@@ -298,6 +308,7 @@ export function CommentItem({
   // 숨김/복구 액션 응답: 성공 시에만 revalidate 1회 (redirect 없음, 낙관적 UI 없음)
   useEffect(() => {
     if (fetcher.state !== "idle" || !fetcher.data) return;
+    if (lastAction !== "toggleVisibility") return;
     const res = fetcher.data as
       | { success?: boolean; error?: string }
       | undefined;
@@ -305,7 +316,19 @@ export function CommentItem({
     if (lastVisibilityResponseRef.current === fetcher.data) return;
     lastVisibilityResponseRef.current = fetcher.data;
     revalidator.revalidate();
-  }, [fetcher.state, fetcher.data, revalidator]);
+  }, [fetcher.state, fetcher.data, revalidator, lastAction]);
+
+  // 삭제 액션 응답: 성공 시 상위 콜백 호출
+  useEffect(() => {
+    if (fetcher.state !== "idle" || !fetcher.data) return;
+    if (lastAction !== "delete") return;
+    const res = fetcher.data as
+      | { success?: boolean; error?: string }
+      | undefined;
+    if (res?.success) {
+      onDeleteSuccess?.(comment.id, comment.parentId ?? null);
+    }
+  }, [fetcher.state, fetcher.data, lastAction, onDeleteSuccess, comment.id, comment.parentId]);
 
   return (
     <div
@@ -343,12 +366,7 @@ export function CommentItem({
           <div className="flex items-center gap-2">
             {/* 유저 이름 */}
             <span className="text-text-2 text-sm">@{comment.userName}</span>
-            {/* 관리자 뱃지 */}
-            {comment.role === "admin" && (
-              <Badge variant="default" className="text-xs">
-                <Moon className="size-3" /> <span>고요</span>
-              </Badge>
-            )}
+            {/* 관리자 뱃지: 현재는 공개 프로필에서 role 정보를 제공하지 않으므로 비활성화 */}
             {/* 댓글 작성 시간 */}
             <span className="text-text-3/50 text-sm">
               {formatRelativeDate(comment.createdAt)}

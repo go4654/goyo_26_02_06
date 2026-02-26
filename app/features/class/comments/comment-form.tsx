@@ -10,6 +10,8 @@ import { type CommentFormValues, commentSchema } from "./comment-item";
 interface CommentFormProps {
   /** 클래스 ID */
   classId: string;
+  /** 낙관적 댓글 추가 콜백 (선택) */
+  onOptimisticCreate?: (content: string) => void;
 }
 
 /**
@@ -18,7 +20,10 @@ interface CommentFormProps {
  * 새로운 댓글을 작성하는 폼입니다.
  * 서버 액션을 통해 실제 데이터베이스에 저장됩니다.
  */
-export function CommentForm({ classId }: CommentFormProps) {
+export function CommentForm({
+  classId,
+  onOptimisticCreate,
+}: CommentFormProps) {
   const [newComment, setNewComment] = useState("");
   const [newCommentError, setNewCommentError] = useState<string | null>(null);
   const navigation = useNavigation();
@@ -53,6 +58,12 @@ export function CommentForm({ classId }: CommentFormProps) {
         result.error.issues[0]?.message ?? "유효하지 않은 댓글입니다.";
       setNewCommentError(message);
       return;
+    }
+
+    // 낙관적 UI: 서버로 제출하기 전에 상위 컴포넌트에 신규 댓글 내용 전달
+    const trimmed = newComment.trim();
+    if (trimmed) {
+      onOptimisticCreate?.(trimmed);
     }
 
     // 서버 액션이 처리하므로 폼은 제출됨
