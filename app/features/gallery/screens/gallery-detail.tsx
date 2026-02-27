@@ -139,14 +139,23 @@ export default function GalleryDetail({ loaderData }: Route.ComponentProps) {
   );
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-5 py-24 xl:py-30">
+    <div className="mx-auto w-full max-w-[1680px] px-5 py-8 xl:py-10">
       {/* ---------- 1. 대표 이미지 (없으면 "이미지 없음" 표기) ---------- */}
-      <div className="relative xl:h-[1000px]">
+      <div className="relative xl:h-[850px]">
         {mainImageUrl ? (
-          <div
-            className="aspect-[16/12] h-full w-full bg-cover bg-fixed bg-top xl:aspect-[16/7]"
-            style={{ backgroundImage: `url(${mainImageUrl})` }}
-          />
+          // <div
+          //   className="aspect-[16/12] h-full w-full bg-contain bg-fixed bg-no-repeat xl:aspect-[16/7]"
+          //   style={{
+          //     backgroundImage: `url(${mainImageUrl}); background-position:center 100px;`,
+          //   }}
+          // />
+          <div className="relative aspect-[16/12] h-full w-full overflow-hidden bg-contain bg-fixed bg-no-repeat xl:aspect-[16/7]">
+            <img
+              src={mainImageUrl}
+              alt={gallery.title}
+              className="absolute inset-0 w-full object-cover"
+            />
+          </div>
         ) : (
           <div className="flex aspect-[16/12] h-full w-full items-center justify-center bg-gray-500 xl:aspect-[16/7]">
             <span className="text-text-2/70 text-h6">이미지 없음</span>
@@ -155,9 +164,81 @@ export default function GalleryDetail({ loaderData }: Route.ComponentProps) {
         <div className="absolute inset-x-0 top-[60%] bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
       </div>
 
-      {/* ---------- 2. 좋아요·저장 카운트 + 클릭 시 토글 (빨간 하트 / success 색상) ---------- */}
-      <div className="mt-12 flex flex-col gap-3 xl:max-w-[70%]">
-        <GalleryLikeSaveButtons
+      <div className="mx-auto xl:max-w-[70%]">
+        {/* ---------- 2. 좋아요·저장 카운트 + 클릭 시 토글 (빨간 하트 / success 색상) ---------- */}
+        <div className="mt-12 flex flex-col gap-3">
+          <GalleryLikeSaveButtons
+            likeCount={likeCount}
+            saveCount={saveCount}
+            isLiked={isLiked}
+            isSaved={isSaved}
+            onLikeClick={handleLikeClick}
+            onSaveClick={handleSaveClick}
+          />
+
+          {/* ---------- 3. 서브타이틀 (타이틀) ---------- */}
+          <h1 className="text-h4 xl:text-h2">{gallery.title}</h1>
+          {gallery.subtitle ? (
+            <p className="xl:text-h6 text-text-2/80 text-base font-light">
+              {gallery.subtitle}
+            </p>
+          ) : null}
+
+          {/* ---------- 4. 실제 저장된 태그 ---------- */}
+          <div className="mt-4 xl:mt-8">
+            <Tags tags={gallery.tags} borderColor="border-primary" />
+          </div>
+        </div>
+
+        <Separator className="my-10" />
+
+        {/* ---------- 5. Description (MDX) ---------- */}
+        {descriptionCode ? (
+          <div className="my-0 xl:my-12">
+            <MDXContent code={descriptionCode} className="" />
+          </div>
+        ) : null}
+
+        {/* ---------- 6. 상세 이미지들 (구현 예정없음) (image_urls) ---------- */}
+        {gallery.image_urls.length > 0 ? (
+          <div className="flex flex-col gap-6 xl:mt-20">
+            {gallery.image_urls.map((url: string, index: number) => (
+              <img
+                key={`${gallery.id}-img-${index}`}
+                src={url}
+                alt={`${gallery.title} - ${index + 1}`}
+                className="w-full rounded-lg object-cover"
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {/* ---------- 7. Caption (MDX) ---------- */}
+        {/* 프로젝트를 통해 배운점 */}
+        {captionCode ? (
+          <div className="mx-auto mt-[150px] w-full text-center xl:max-w-[80%]">
+            <DubleQuote className="mx-auto size-10 opacity-10 xl:size-20" />
+            <MDXContent code={captionCode} />
+            <DubleQuote className="mx-auto mt-15 size-10 rotate-180 opacity-10 xl:size-20" />
+          </div>
+        ) : null}
+
+        <Separator className="mt-26 mb-6" />
+
+        {/* ---------- 8. 목록으로 가기, 이전/다음, 좋아요·저장 (동일 동작) ---------- */}
+        <FloatingActionBar
+          listHref="/gallery"
+          listState={{ revalidateGalleryList: true }}
+          prevHref={
+            adjacent?.prevSlug
+              ? `/gallery/${encodeURIComponent(adjacent.prevSlug)}`
+              : null
+          }
+          nextHref={
+            adjacent?.nextSlug
+              ? `/gallery/${encodeURIComponent(adjacent.nextSlug)}`
+              : null
+          }
           likeCount={likeCount}
           saveCount={saveCount}
           isLiked={isLiked}
@@ -165,76 +246,7 @@ export default function GalleryDetail({ loaderData }: Route.ComponentProps) {
           onLikeClick={handleLikeClick}
           onSaveClick={handleSaveClick}
         />
-
-        {/* ---------- 3. 서브타이틀 (타이틀) ---------- */}
-        <h1 className="text-h4 xl:text-h2">{gallery.title}</h1>
-        {gallery.subtitle ? (
-          <p className="xl:text-h6 text-text-2/80 text-base font-light">
-            {gallery.subtitle}
-          </p>
-        ) : null}
-
-        {/* ---------- 4. 실제 저장된 태그 ---------- */}
-        <div className="mt-4 xl:mt-8">
-          <Tags tags={gallery.tags} borderColor="primary" />
-        </div>
       </div>
-
-      <Separator className="my-10" />
-
-      {/* ---------- 5. Description (MDX) ---------- */}
-      {descriptionCode ? (
-        <div className="my-12 xl:max-w-[40%]">
-          <MDXContent code={descriptionCode} className="" />
-        </div>
-      ) : null}
-
-      {/* ---------- 6. 상세 이미지들 (image_urls) ---------- */}
-      {gallery.image_urls.length > 0 ? (
-        <div className="flex flex-col gap-6 xl:mt-20">
-          {gallery.image_urls.map((url: string, index: number) => (
-            <img
-              key={`${gallery.id}-img-${index}`}
-              src={url}
-              alt={`${gallery.title} - ${index + 1}`}
-              className="w-full rounded-lg object-cover"
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {/* ---------- 7. Caption (MDX) ---------- */}
-      {captionCode ? (
-        <div className="mx-auto mt-[150px] w-full text-center xl:max-w-[50%]">
-          <DubleQuote className="mx-auto size-20 opacity-10" />
-          <MDXContent code={captionCode} />
-          <DubleQuote className="mx-auto mt-15 size-20 rotate-180 opacity-10" />
-        </div>
-      ) : null}
-
-      <Separator className="mt-26 mb-6" />
-
-      {/* ---------- 8. 목록으로 가기, 이전/다음, 좋아요·저장 (동일 동작) ---------- */}
-      <FloatingActionBar
-        listHref="/gallery"
-        listState={{ revalidateGalleryList: true }}
-        prevHref={
-          adjacent?.prevSlug
-            ? `/gallery/${encodeURIComponent(adjacent.prevSlug)}`
-            : null
-        }
-        nextHref={
-          adjacent?.nextSlug
-            ? `/gallery/${encodeURIComponent(adjacent.nextSlug)}`
-            : null
-        }
-        likeCount={likeCount}
-        saveCount={saveCount}
-        isLiked={isLiked}
-        isSaved={isSaved}
-        onLikeClick={handleLikeClick}
-        onSaveClick={handleSaveClick}
-      />
     </div>
   );
 }

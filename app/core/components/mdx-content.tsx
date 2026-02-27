@@ -3,6 +3,8 @@ import type { MDXContentProps } from "mdx-bundler/client";
 import { getMDXComponent } from "mdx-bundler/client";
 import { useMemo } from "react";
 
+import { MDXGalleryGrid } from "~/features/gallery/components/mdx-gallery-text";
+
 interface MDXContentComponentProps {
   /** bundleMDX로 컴파일된 코드 문자열 */
   code: string;
@@ -14,7 +16,7 @@ interface MDXContentComponentProps {
 
 /**
  * bundleMDX로 컴파일된 MDX 코드를 React로 렌더링하는 공통 컴포넌트.
- * 뉴스 본문, 갤러리 description/caption 등 MDX 저장 필드 출력용.
+ * 갤러리, 뉴스 본문,  description/caption 등 MDX 저장 필드 출력용.
  */
 export function MDXContent({
   code,
@@ -27,6 +29,8 @@ export function MDXContent({
     <div className={className}>
       <Component
         components={{
+          MDXGalleryGrid,
+
           h1: (props) => (
             <h1
               className="text-h1 xl:text-h2 font-semibold tracking-tight"
@@ -37,7 +41,7 @@ export function MDXContent({
 
           // 갤러리 캔션
           h3: (props) => (
-            <h3 className="text-h3 font-regular mt-12" {...props} />
+            <h3 className="text-h5 xl:text-h3 font-regular mt-12" {...props} />
           ),
 
           h4: (props) => (
@@ -49,18 +53,18 @@ export function MDXContent({
           // 갤러리 설명
           h6: (props) => (
             <h6
-              className="text-text-3 font-regular mt-8 text-[24px] leading-10 tracking-wide"
+              className="text-text-3/60 font-regular xl:text-small-title text-base leading-relaxed tracking-wide"
               {...props}
             />
           ),
 
           /** 일반 본문 텍스트 */
-          p: (props) => (
-            <p
-              className="text-text-2 mt-4 text-base leading-relaxed font-medium"
-              {...props}
-            />
-          ),
+          // p: (props) => (
+          //   <p
+          //     className="text-text-2 mt-4 text-base leading-relaxed font-medium"
+          //     {...props}
+          //   />
+          // ),
 
           pre: (props) => (
             <pre
@@ -97,7 +101,7 @@ export function MDXContent({
 
           /** 이미지 */
           img: (props) => (
-            <img className="my-8 rounded-2xl shadow-xl" {...props} />
+            <img className="my-8 w-full rounded-2xl shadow-xl" {...props} />
           ),
 
           a: (props) => (

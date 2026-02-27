@@ -54,3 +54,23 @@ export const MDX_EX_TEXT = `
 ## [마무리 멘트나 결론 입력]
 [마지막으로 유저에게 전하고 싶은 메시지를 작성하세요.]
 `;
+
+export const MDX_GALLERY_EX_TEXT = `
+  <MDXGalleryGrid 
+    title="포트폴리오 제목"
+    description="설명"
+    studentName="학생 이름"
+    imageUrl="이미지 경로"
+    responsiveImageUrl="반응형 이미지 경로"
+  >
+
+  <MDXGalleryGrid.Item title="01. 항목 제목">
+    항목 설명
+  </MDXGalleryGrid.Item>
+  
+  <MDXGalleryGrid.Item title="02. 항목 제목">
+    항목 설명
+  </MDXGalleryGrid.Item>
+  
+</MDXGalleryGrid>
+`;

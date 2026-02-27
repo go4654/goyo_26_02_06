@@ -45,13 +45,15 @@ export default function GalleryLikeSaveButtons({
       >
         <Heart
           className={cn(
-            "size-4 xl:size-5",
+            "xl:size-5",
             isLiked ? "fill-red-500 text-red-500" : "",
           )}
         />
-        <span className="text-sm xl:text-base">{likeCount}</span>
+        <span className="text-base">{likeCount === 0 ? "" : likeCount}</span>
       </motion.button>
-      <span className="text-text-3/50">•</span>
+
+      {likeCount > 0 && <span className="text-text-3/50">•</span>}
+
       <motion.button
         type="button"
         onClick={onSaveClick}
@@ -62,11 +64,11 @@ export default function GalleryLikeSaveButtons({
       >
         <Bookmark
           className={cn(
-            "size-4 xl:size-5",
+            "xl:size-5",
             isSaved ? "fill-success text-success" : "",
           )}
         />
-        <span className="text-sm xl:text-base">{saveCount}</span>
+        <span className="xl:text-base">{saveCount === 0 ? "" : saveCount}</span>
       </motion.button>
     </div>
   );

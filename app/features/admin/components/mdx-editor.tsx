@@ -5,7 +5,7 @@ import { useFetcher } from "react-router";
 import { Button } from "~/core/components/ui/button";
 import { Textarea } from "~/core/components/ui/textarea";
 
-import { MDX_EX_TEXT } from "../constants/mdx-ex-text";
+import { MDX_GALLERY_EX_TEXT } from "../constants/mdx-ex-text";
 import { compressImageToWebp } from "../utils/image-upload";
 
 /**
@@ -50,7 +50,7 @@ interface MDXEditorProps {
 export default function MDXEditor({
   value,
   onChange,
-  placeholder = MDX_EX_TEXT,
+  placeholder = MDX_GALLERY_EX_TEXT,
   error,
   classId,
   onPendingImagesChange,
@@ -261,7 +261,7 @@ export default function MDXEditor({
           {/* 텍스트 에리어 */}
           <Textarea
             ref={textareaRef}
-            defaultValue={MDX_EX_TEXT}
+            defaultValue={MDX_GALLERY_EX_TEXT}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {

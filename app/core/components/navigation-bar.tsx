@@ -28,6 +28,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 
 import { LOGO_URL } from "../constant/imgUrls";
 import { cn } from "../lib/utils";
+import ThemeSwitcher from "./theme-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -317,8 +318,7 @@ export function NavigationBar({
   }, [pathname]);
 
   // 배너 있을 때: 배너 높이(48px) 이하 스크롤까지 투명, 없을 때: 스크롤 0일 때만 투명
-  const isTransparent =
-    hasNoticeBanner ? scrollY < 48 : scrollY === 0;
+  const isTransparent = hasNoticeBanner ? scrollY < 48 : scrollY === 0;
 
   return (
     <nav
@@ -327,7 +327,7 @@ export function NavigationBar({
         hasNoticeBanner ? "top-12" : "top-0",
         isTransparent
           ? "border-transparent bg-transparent backdrop-blur-none"
-          : "border-white/5 bg-black/60 backdrop-blur-sm",
+          : "border-white/5 bg-white/15 backdrop-blur-sm dark:bg-black/15",
       )}
     >
       <div className="mx-auto flex h-full w-full items-center justify-between py-3 md:max-w-[1640px]">
@@ -371,13 +371,18 @@ export function NavigationBar({
           ) : (
             <>
               {name ? (
-                // 인증 상태 유저 메뉴
-                <UserMenu
-                  name={name}
-                  email={email}
-                  avatarUrl={avatarUrl}
-                  isAdmin={isAdmin}
-                />
+                <div className="flex items-center gap-5">
+                  {/* 테마 스위처 컴포넌트 (라이트/다크 모드) */}
+                  <ThemeSwitcher />
+
+                  {/* 인증 상태 유저 메뉴 */}
+                  <UserMenu
+                    name={name}
+                    email={email}
+                    avatarUrl={avatarUrl}
+                    isAdmin={isAdmin}
+                  />
+                </div>
               ) : (
                 // 비인증 상태 인증 버튼
                 <AuthButtons />
@@ -436,6 +441,8 @@ export function NavigationBar({
                   <div className="col-span-2 flex w-full justify-between">
                     {/* 인증 상태 세팅/디버그 드롭다운 메뉴 */}
                     {isAdmin && <Actions />}
+                    {/* 테마 스위처 컴포넌트 (라이트/다크 모드) */}
+                    <ThemeSwitcher />
                   </div>
                   <div className="flex justify-end">
                     <UserMenu

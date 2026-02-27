@@ -8,12 +8,15 @@ import imageCompression from "browser-image-compression";
 
 /**
  * 이미지 압축 옵션
+ *
+ * - 썸네일/콘텐츠 이미지가 과도하게 흐려지지 않도록
+ *   해상도와 품질을 여유 있게 유지한다.
  */
 const COMPRESSION_OPTIONS = {
   maxSizeMB: 3, // 최대 파일 크기 (MB)
-  maxWidthOrHeight: 1600, // 최대 너비 또는 높이
+  maxWidthOrHeight: 7000, // 최대 너비 또는 높이
   useWebWorker: true, // 웹 워커 사용 (성능 향상)
-  quality: 0.85, // 이미지 품질 (0-1)
+  quality: 0.95, // 이미지 품질 (0-1, 거의 무손실에 가깝게 설정)
   fileType: "image/webp" as const, // webp 형식으로 변환
 };
 
@@ -24,9 +27,7 @@ const COMPRESSION_OPTIONS = {
  * @returns 압축된 webp 형식의 File 객체
  * @throws 이미지 압축 실패 시 에러
  */
-export async function compressImageToWebp(
-  file: File,
-): Promise<File> {
+export async function compressImageToWebp(file: File): Promise<File> {
   try {
     // 이미지 파일인지 확인
     if (!file.type.startsWith("image/")) {
@@ -39,10 +40,14 @@ export async function compressImageToWebp(
     // webp 형식으로 변환되었는지 확인
     if (compressedFile.type !== "image/webp") {
       // webp로 변환되지 않은 경우, 이름만 변경
-      return new File([compressedFile], compressedFile.name.replace(/\.[^.]+$/, ".webp"), {
-        type: "image/webp",
-        lastModified: compressedFile.lastModified,
-      });
+      return new File(
+        [compressedFile],
+        compressedFile.name.replace(/\.[^.]+$/, ".webp"),
+        {
+          type: "image/webp",
+          lastModified: compressedFile.lastModified,
+        },
+      );
     }
 
     return compressedFile;

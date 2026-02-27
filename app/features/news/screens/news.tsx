@@ -35,7 +35,7 @@ export default function News({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-5 py-24 xl:py-40">
+    <div className="mx-auto w-full max-w-[1080px] px-5 py-6 xl:py-16">
       {/* 상단 타이틀 */}
       <div className="flex items-end justify-between">
         <h1 className="text-h4 xl:text-h1 max-w-[600px]">
@@ -49,26 +49,32 @@ export default function News({ loaderData }: Route.ComponentProps) {
       </div>
 
       {/* 뉴스 목록 */}
-      <div className="mt-10 xl:mt-20">
+      <div className="mt-6 xl:mt-18">
         {items.length === 0 ? (
-          <p className="text-text-2/60 py-12 text-center text-h6">
+          <p className="text-text-2/60 text-h6 py-12 text-center">
             등록된 뉴스가 없습니다.
           </p>
         ) : (
-          items.map((item) => (
+          items.map((item, index) => (
             <Link
               key={item.id}
               to={`/news/${encodeURIComponent(item.slug)}`}
-              className="border-text-3/25 flex items-center gap-6 border-t py-8 last:border-b xl:gap-20"
+              className={`group border-text-3/25 relative flex items-center gap-6 border-t py-4 transition-colors last:border-b xl:gap-20 xl:py-8 ${
+                index === 0 ? "border-t-0" : ""
+              }`}
             >
-              <p className="text-text-2 text-small font-extralight xl:text-[32px]">
+              <p className="text-text-2 text-small group-hover:text-text-1 font-extralight transition-colors duration-300 xl:text-[32px]">
                 {formatNewsDate(item.published_at)}
               </p>
-              <div>
-                <span className="text-secondary text-small xl:text-small-title xl:text-base">
+
+              <div className="transition-transform duration-300 group-hover:translate-x-1">
+                <span className="text-secondary text-small xl:text-base">
                   {item.category}
                 </span>
-                <h3 className="xl:text-h5 font-medium">{item.title}</h3>
+
+                <h3 className="xl:text-h5 group-hover:text-primary text-small-title font-[500] transition-colors duration-300">
+                  {item.title}
+                </h3>
               </div>
             </Link>
           ))

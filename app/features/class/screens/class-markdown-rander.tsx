@@ -7,12 +7,12 @@ import { ThreeColumns } from "../components/three-columns";
  * MDXRenderer
  *
  * 역할:
+ * - 클래스 상세 페이지에서 사용되는 MDX 코드를 렌더링하는 컴포넌트
  * - DB 또는 loader에서 받아온 MDX 코드 문자열을
  *   실제 React 컴포넌트로 변환해서 화면에 렌더링하는 컴포넌트
  *
  * 주의:
- * - 이 컴포넌트는 "본문 전용"
- * - 상단 타이틀 / 메타 정보 / 썸네일 영역과는 완전히 분리됨
+ * - 이 컴포넌트는 "본문 전용"이며, 상단 타이틀 / 메타 정보 / 썸네일 영역과는 완전히 분리됨
  */
 export default function MDXRenderer({ code }: { code: string }) {
   /**

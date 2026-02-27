@@ -64,7 +64,7 @@ export default function GalleryList({
         : "등록된 갤러리가 없습니다.";
     return (
       <div className="flex min-h-[200px] items-center justify-center py-20">
-        <p className="text-text-2/60 text-h6">{emptyMessage}</p>
+        <p className="text-text-2/60 xl:text-h6 text-base">{emptyMessage}</p>
       </div>
     );
   }
@@ -251,12 +251,7 @@ export function GalleryCard({
         </h3>
       </div>
 
-      <Tags
-        tags={item.tags}
-        borderColor="text-3/50"
-        maxVisible={2}
-        showOverflowCount
-      />
+      <Tags tags={item.tags} maxVisible={2} showOverflowCount />
     </Link>
   );
 }

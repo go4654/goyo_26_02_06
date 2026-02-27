@@ -97,7 +97,10 @@ export async function uploadGalleryContentImagesAndGetMap(
   return { urlMap: imageUrlMap, uploadedPaths };
 }
 
-/** 문자열 내 TEMP_IMAGE_xxx를 urlMap으로 치환 */
+/**
+ * 문자열 내 TEMP_IMAGE_xxx를 urlMap으로 치환
+ * 갤러리 전용: 마크다운 이미지 문법 ![alt](TEMP_IMAGE_xxx) → 순수 URL만 추출
+ */
 export function replaceTempInContent(
   content: string,
   urlMap: Map<string, string>,
@@ -107,6 +110,13 @@ export function replaceTempInContent(
   urlMap.forEach((publicUrl, tempId) => {
     const tempPattern = `TEMP_IMAGE_${tempId}`;
     const escaped = tempPattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    
+    // 마크다운 이미지 패턴: ![alt](TEMP_IMAGE_xxx) → 순수 URL만
+    // imageUrl= 또는 responsiveImageUrl= 같은 prop에 사용될 때 마크다운 문법 제거
+    const mdPattern = new RegExp(`!\\[[^\\]]*\\]\\(${escaped}\\)`, "g");
+    updated = updated.replace(mdPattern, publicUrl);
+    
+    // 남은 일반 TEMP_IMAGE_xxx → URL (마크다운 아닌 경우 대비)
     updated = updated.replace(new RegExp(escaped, "g"), publicUrl);
   });
   return updated;

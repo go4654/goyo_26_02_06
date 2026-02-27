@@ -26,8 +26,8 @@ import { LOGO_URL } from "../constant/imgUrls";
  */
 export default function Footer() {
   return (
-    <footer className="mt-auto pt-14 pb-5 dark:bg-[#0F1117]">
-      <div className="mx-auto flex h-full w-full flex-col items-center justify-center md:max-w-[1680px]">
+    <footer className="mt-15 bg-[#F5F5F5] pt-10 pb-5 dark:bg-[#0F1117]">
+      <div className="mx-auto flex h-full w-full flex-col items-center justify-center px-5 md:max-w-[1680px]">
         <div className="grid w-full grid-cols-1 items-center xl:grid-cols-3">
           {/* 로고 */}
           <Link
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         {/* 카피라이트 */}
-        <div className="text-text-2 order-2 mt-5 text-sm md:order-none xl:mt-20">
+        <div className="text-text-2/50 order-2 mt-5 text-sm font-light md:order-none xl:mt-20">
           <p>
             &copy; {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME}.
             All rights reserved.
