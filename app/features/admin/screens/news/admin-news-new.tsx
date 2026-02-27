@@ -13,17 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/core/components/ui/select";
+import {
+  NEWS_CATEGORIES,
+  NEWS_CATEGORY_LABELS,
+  type NewsCategory,
+} from "~/features/news/constants/news-categories";
 
 import AdminContentForm, {
   type ContentFormData,
   type PendingImage,
 } from "../../components/admin-content-form";
 import { compressImageToWebp } from "../../utils/image-upload";
-import {
-  NEWS_CATEGORIES,
-  NEWS_CATEGORY_LABELS,
-  type NewsCategory,
-} from "~/features/news/constants/news-categories";
 import { newsCreateAction } from "./server/news-create.action";
 
 export const meta: Route.MetaFunction = () => {
@@ -32,9 +32,7 @@ export const meta: Route.MetaFunction = () => {
 
 export const action = newsCreateAction;
 
-type ActionResponse =
-  | { success: true; newsId: string }
-  | { error: string };
+type ActionResponse = { success: true; newsId: string } | { error: string };
 
 /**
  * 뉴스 등록 페이지
@@ -179,7 +177,7 @@ export default function NewsNew() {
         />
 
         {/* 커버 이미지 (선택) */}
-        <div className="mt-6 space-y-2 border-t border-white/10 pt-6">
+        {/* <div className="mt-6 space-y-2 border-t border-white/10 pt-6">
           <Label>커버 이미지 (선택)</Label>
           <div className="flex flex-col gap-3">
             {coverPreview ? (
@@ -243,7 +241,7 @@ export default function NewsNew() {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

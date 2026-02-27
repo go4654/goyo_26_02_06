@@ -2,6 +2,7 @@ import type { PendingImage } from "./mdx-editor";
 
 import { Image, Loader2, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { Form } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 import { Checkbox } from "~/core/components/ui/checkbox";
@@ -294,7 +295,7 @@ export default function AdminContentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <Form method="post" onSubmit={handleSubmit} className="space-y-6">
       {/* 썸네일 이미지 */}
       <div className="space-y-2">
         <Label htmlFor="thumbnail">썸네일 이미지</Label>
@@ -302,7 +303,7 @@ export default function AdminContentForm({
           {/* 미리보기 영역 */}
           {thumbnailPreview ? (
             <div className="relative inline-block">
-              <div className="relative h-48 w-48 overflow-hidden rounded-lg border border-white/10">
+              <div className="relative h-48 w-48 overflow-hidden rounded-lg border border-black/10 dark:border-white/10">
                 <img
                   src={thumbnailPreview}
                   alt="썸네일 미리보기"
@@ -321,7 +322,10 @@ export default function AdminContentForm({
               </Button>
             </div>
           ) : (
-            <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5">
+            <div
+              onClick={handleThumbnailUploadClick}
+              className="flex h-48 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-black/10 bg-white/5 dark:border-white/10"
+            >
               <div className="flex flex-col items-center gap-2">
                 <Image className="text-text-3 size-8" />
                 <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
@@ -347,6 +351,7 @@ export default function AdminContentForm({
               variant="outline"
               onClick={handleThumbnailUploadClick}
               disabled={isLoading}
+              className="cursor-pointer"
             >
               <Image className="mr-2 size-4" />
               {thumbnailPreview ? "이미지 변경" : "이미지 선택"}
@@ -357,6 +362,7 @@ export default function AdminContentForm({
                 variant="outline"
                 onClick={handleThumbnailRemove}
                 disabled={isLoading}
+                className="cursor-pointer"
               >
                 <X className="mr-2 size-4" />
                 제거
@@ -379,12 +385,15 @@ export default function AdminContentForm({
       {/* 카테고리 선택 (클래스/갤러리용 대분류·소분류, 뉴스는 미노출) */}
       {variant !== "news" && (
         <div className="space-y-2">
-          <Label>
+          <Label className="cursor-pointer">
             카테고리 <span className="text-destructive">*</span>
           </Label>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="mainCategory" className="text-text-3 text-xs">
+              <Label
+                htmlFor="mainCategory"
+                className="text-text-3 cursor-pointer text-xs"
+              >
                 대분류
               </Label>
               <Select
@@ -413,7 +422,10 @@ export default function AdminContentForm({
               </Select>
             </div>
             <div className="flex-1 space-y-2">
-              <Label htmlFor="subCategory" className="text-text-3 text-xs">
+              <Label
+                htmlFor="subCategory"
+                className="text-text-3 cursor-pointer text-xs"
+              >
                 소분류
               </Label>
               <Select
@@ -450,7 +462,7 @@ export default function AdminContentForm({
 
       {/* 타이틀 */}
       <div className="space-y-2">
-        <Label htmlFor="title">
+        <Label htmlFor="title" className="cursor-pointer">
           타이틀 <span className="text-destructive">*</span>
         </Label>
         <Input
@@ -469,7 +481,7 @@ export default function AdminContentForm({
       {/* 설명 (뉴스는 미노출) */}
       {variant !== "news" && (
         <div className="space-y-2">
-          <Label htmlFor="description">
+          <Label htmlFor="description" className="cursor-pointer">
             설명 <span className="text-destructive">*</span>
           </Label>
           <Input
@@ -489,7 +501,7 @@ export default function AdminContentForm({
       {/* 태그 (뉴스는 미노출) */}
       {variant !== "news" && (
         <div className="space-y-2">
-          <Label htmlFor="tags">
+          <Label htmlFor="tags" className="cursor-pointer">
             태그{" "}
             <span className="text-text-3 text-xs font-normal">
               (쉼표로 구분)
@@ -510,7 +522,7 @@ export default function AdminContentForm({
 
       {/* MDX 콘텐츠 */}
       <div className="space-y-2">
-        <Label htmlFor="content">
+        <Label htmlFor="content" className="cursor-pointer">
           콘텐츠 (MDX) <span className="text-destructive">*</span>
         </Label>
 
@@ -568,18 +580,19 @@ export default function AdminContentForm({
       </div>
 
       {/* 액션 버튼 */}
-      <div className="flex items-center justify-end gap-3 border-t border-white/10 pt-4">
+      <div className="flex items-center justify-end gap-3 border-t border-black/10 pt-4 dark:border-white/10">
         {onCancel && (
           <Button
             type="button"
             variant="outline"
             onClick={onCancel}
             disabled={isLoading}
+            className="cursor-pointer"
           >
             {cancelLabel}
           </Button>
         )}
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="cursor-pointer">
           {isLoading ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
@@ -587,6 +600,6 @@ export default function AdminContentForm({
           )}
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }

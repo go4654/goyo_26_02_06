@@ -63,15 +63,18 @@ export default function News({ loaderData }: Route.ComponentProps) {
                 index === 0 ? "border-t-0" : ""
               }`}
             >
+              {/* 날짜 */}
               <p className="text-text-2 text-small group-hover:text-text-1 font-extralight transition-colors duration-300 xl:text-[32px]">
                 {formatNewsDate(item.published_at)}
               </p>
 
+              {/* 카테고리 + 제목 */}
               <div className="transition-transform duration-300 group-hover:translate-x-1">
-                <span className="text-secondary text-small xl:text-base">
+                <span className="dark:text-secondary text-primary text-small xl:text-base">
                   {item.category}
                 </span>
 
+                {/* 제목 */}
                 <h3 className="xl:text-h5 group-hover:text-primary text-small-title font-[500] transition-colors duration-300">
                   {item.title}
                 </h3>

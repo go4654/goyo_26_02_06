@@ -197,7 +197,7 @@ export default function MDXEditor({
   return (
     <div className="relative space-y-2">
       {/* 탭 버튼 */}
-      <div className="flex gap-2 border-b border-white/10">
+      <div className="flex gap-2 border-b border-black/10 dark:border-white/10">
         <Button
           type="button"
           variant={activeTab === "edit" ? "default" : "ghost"}
@@ -222,7 +222,7 @@ export default function MDXEditor({
       {activeTab === "edit" ? (
         <div className="space-y-2">
           {/* 에디터 툴바 */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+          <div className="flex items-center justify-between border-b border-black/10 pb-2 dark:border-white/10">
             <div className="flex items-center gap-2">
               {/* 이미지 업로드 버튼 */}
               <Button
@@ -294,9 +294,9 @@ export default function MDXEditor({
               <pre className="text-text-2 font-mono text-sm whitespace-pre-wrap">
                 {value}
               </pre>
-              <p className="text-text-3 mt-4 text-xs">
+              {/* <p className="text-text-3 mt-4 text-xs">
                 💡 실제 MDX 렌더링은 저장 후 상세 페이지에서 확인할 수 있습니다.
-              </p>
+              </p> */}
             </div>
           ) : (
             <div className="text-text-3 py-12 text-center">

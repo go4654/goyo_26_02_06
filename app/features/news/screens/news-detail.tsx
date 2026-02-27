@@ -3,7 +3,7 @@ import type { Route } from "./+types/news-detail";
 import { MoveLeft } from "lucide-react";
 import { Link } from "react-router";
 
-import { MDXContent } from "~/core/components/mdx-content";
+import { MDXNewsContent } from "~/core/components/mdx-news-content";
 import { Separator } from "~/core/components/ui/separator";
 
 import { newsDetailAction } from "../server/news-detail.action";
@@ -30,26 +30,30 @@ export default function NewsDetail({ loaderData }: Route.ComponentProps) {
   const { news } = loaderData;
 
   return (
-    <div className="mx-auto max-w-[800px] px-5 py-24 xl:py-40">
+    <div className="mx-auto max-w-[800px] px-5 py-6 xl:py-16">
       {/* 타이틀 영역 */}
-      <div className="flex flex-col items-start gap-5">
+      <div className="flex flex-col items-start gap-2 xl:gap-5">
         <div>
           <div className="text-small xl:text-small-title text-primary">
             {news.category}
           </div>
           <h1 className="text-h5 xl:text-h3">{news.title}</h1>
         </div>
-        <span className="text-text-2/80 text-small xl:text-small-title font-light">
-          {formatNewsDate(news.published_at)}
+        <div className="text-text-2/80 text-small flex items-center gap-2 font-light xl:text-base">
+          <span>{formatNewsDate(news.published_at)}</span>
+
           {news.view_count > 0 && (
-            <span className="ml-2">· 조회 {news.view_count}</span>
+            <>
+              <span>•</span>
+              <span>조회수 {news.view_count}회</span>
+            </>
           )}
-        </span>
+        </div>
       </div>
 
       <Separator className="my-10" />
 
-      <MDXContent code={loaderData.contentCode} />
+      <MDXNewsContent code={loaderData.contentCode} />
 
       <Separator className="mt-26 mb-6" />
 
