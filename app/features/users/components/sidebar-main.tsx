@@ -53,43 +53,50 @@ export default function SidebarMain({
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={hasActiveChild ?? item.isActive}
+              defaultOpen={item.isActive}
               className="group/collapsible"
             >
-            <SidebarMenuItem>
-              <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                </SidebarMenuButton>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <SidebarMenuSub>
-                  {item.items?.map((subItem) => {
-                    const active = isPathActive(pathname, subItem.url);
-                    return (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild isActive={active}>
-                          <Link to={subItem.url} className="relative flex items-center gap-2">
-                          <span>{subItem.title}</span>
-                          {subItem.badgeCount != null && subItem.badgeCount > 0 && (
-                            <span
-                              className="ml-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white"
-                              aria-label={`미처리 문의 ${subItem.badgeCount}건`}
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton tooltip={item.title}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {item.items?.map((subItem) => {
+                      const active = isPathActive(pathname, subItem.url);
+                      return (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild isActive={active}>
+                            <Link
+                              to={subItem.url}
+                              className="relative flex items-center gap-2"
                             >
-                              {subItem.badgeCount > 99 ? "99+" : subItem.badgeCount}
-                            </span>
-                          )}
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    );
-                  })}
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </SidebarMenuItem>
-          </Collapsible>
+                              <span>{subItem.title}</span>
+                              {subItem.badgeCount != null &&
+                                subItem.badgeCount > 0 && (
+                                  <span
+                                    className="ml-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white"
+                                    aria-label={`미처리 문의 ${subItem.badgeCount}건`}
+                                  >
+                                    {subItem.badgeCount > 99
+                                      ? "99+"
+                                      : subItem.badgeCount}
+                                  </span>
+                                )}
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
           );
         })}
       </SidebarMenu>

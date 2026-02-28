@@ -21,7 +21,7 @@ export default function Tags({
     : 0;
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-2">
+    <div className="mt-1 flex flex-wrap items-center gap-1 xl:gap-2">
       {visibleTags.map((tag, index) => (
         <div
           className={cn(

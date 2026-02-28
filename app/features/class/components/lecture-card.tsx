@@ -116,7 +116,7 @@ export default function LectureCard({
     <Link
       to={linkTo}
       viewTransition
-      className="group space-between flex flex-col items-start transition-all duration-150 active:scale-[0.88] active:opacity-95 xl:gap-1"
+      className="group space-between flex flex-col items-start transition-all duration-150 xl:gap-1"
     >
       {/* img 영역 */}
       <div className="group relative h-full max-h-[200px] min-h-[200px] w-full overflow-hidden rounded-xl bg-gray-400 xl:block xl:max-h-[250px] xl:min-h-[250px] xl:rounded-[20px]">
@@ -147,13 +147,14 @@ export default function LectureCard({
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isLiked
                     ? "bg-primary text-white"
-                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
+                    : "hover:bg-primary bg-white/30 hover:text-white dark:bg-gray-500/30"
                 }`}
               >
                 <Heart
-                  className={`size-3.5 xl:size-5 ${isLiked ? "fill-current" : ""}`}
+                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${isLiked ? "fill-current stroke-0" : ""} `}
                 />
               </motion.button>
+
               <motion.button
                 type="button"
                 onClick={handleSaveClick}
@@ -163,11 +164,11 @@ export default function LectureCard({
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isSaved
                     ? "bg-primary text-white"
-                    : "hover:bg-primary bg-gray-500/30 hover:text-white"
+                    : "hover:bg-primary bg-white/30 hover:text-white dark:bg-gray-500/30"
                 }`}
               >
                 <Bookmark
-                  className={`size-3.5 xl:size-5 ${isSaved ? "fill-current" : ""}`}
+                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${isSaved ? "fill-current stroke-0" : ""} `}
                 />
               </motion.button>
             </div>
@@ -181,7 +182,7 @@ export default function LectureCard({
           {lecture.title}
         </h3>
 
-        <Tags tags={lecture.tags} />
+        <Tags tags={lecture.tags} maxVisible={2} showOverflowCount />
       </div>
     </Link>
   );

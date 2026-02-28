@@ -359,7 +359,7 @@ export default function Join({ actionData }: Route.ComponentProps) {
               to="/login"
               viewTransition
               data-testid="form-signin-link"
-              className="hover:text-primary text-underline font-semibold text-white transition-colors"
+              className="hover:text-primary text-underline font-semibold transition-colors dark:text-white"
             >
               로그인
             </Link>

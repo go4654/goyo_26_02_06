@@ -491,7 +491,7 @@ export function CommentItem({
               <motion.button
                 type="button"
                 className={`group hover:text-primary flex cursor-pointer items-center gap-1 ${
-                  liked ? "text-white" : "text-text-2"
+                  liked ? "text-primary" : "text-text-2"
                 } text-sm xl:text-base`}
                 onClick={handleLikeClick}
                 whileTap={{ scale: 0.5 }}

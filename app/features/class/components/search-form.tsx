@@ -81,7 +81,7 @@ export default function SearchForm({
         {/* 카테고리 파라미터 유지 (검색 시 페이지는 1로 리셋) */}
         <Input type="hidden" name="category" value={category || ""} />
 
-        <InputGroup className="h-[40px] rounded-full px-2 xl:h-[50px]">
+        <InputGroup className="h-[48px] rounded-full px-2">
           <InputGroupInput
             type="text"
             name="search"

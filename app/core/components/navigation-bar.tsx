@@ -397,14 +397,14 @@ export function NavigationBar({
         </SheetTrigger>
         <SheetContent>
           <SheetHeader className="text-h4 mt-20 flex flex-col gap-10">
-            <SheetClose asChild>
+            {/* <SheetClose asChild>
               <Link
                 to="/"
                 className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 Home
               </Link>
-            </SheetClose>
+            </SheetClose> */}
             <SheetClose asChild>
               <Link
                 to="/class"

@@ -84,7 +84,7 @@ export default function UserGraph({ data, error }: UserGraphProps) {
                   );
                 }}
               />
-              <Bar dataKey="views" fill="var(--color-views)" radius={8} />
+              <Bar dataKey="views" fill="#7c4dff" radius={8} />
             </BarChart>
           </ChartContainer>
         ) : (

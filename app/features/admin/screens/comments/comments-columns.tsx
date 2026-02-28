@@ -24,7 +24,6 @@ function formatDate(dateString: string): string {
   return dt.toFormat("yyyy.MM.dd HH:mm");
 }
 
-
 /**
  * 체크박스 컬럼
  */
@@ -100,21 +99,21 @@ export const commentsColumns: ColumnDef<AdminCommentRow>[] = [
     cell: ({ row }) => {
       const { content, isDeleted, parentId } = row.original;
       return (
-        <div className="flex min-w-0 max-w-full items-center gap-2 overflow-hidden">
+        <div className="flex max-w-full min-w-0 items-center gap-2 overflow-hidden">
           {parentId && (
             <Badge
               variant="outline"
-              className="shrink-0 border-primary text-primary text-xs"
+              className="border-primary text-primary shrink-0 text-xs"
             >
               대댓글
             </Badge>
           )}
           <span
-            className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-text-1"
+            className="text-text-1 min-w-0 flex-1 overflow-hidden text-sm text-ellipsis whitespace-nowrap"
             title={isDeleted ? undefined : content}
           >
             {isDeleted ? (
-              <span className="italic text-text-3">삭제된 댓글입니다</span>
+              <span className="text-text-3 italic">삭제된 댓글입니다</span>
             ) : (
               content
             )}
@@ -131,7 +130,11 @@ export const commentsColumns: ColumnDef<AdminCommentRow>[] = [
     header: "클래스",
     cell: ({ row }) => {
       const className = row.original.className;
-      return <div className="text-text-2 text-sm">{className}</div>;
+      return (
+        <div className="text-text-2 overflow-hidden text-sm text-ellipsis whitespace-nowrap">
+          {className}
+        </div>
+      );
     },
     size: 200,
     minSize: 150,

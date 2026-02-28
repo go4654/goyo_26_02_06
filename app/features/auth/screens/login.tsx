@@ -338,7 +338,7 @@ export default function Login({
               to="/join"
               viewTransition
               data-testid="form-signup-link"
-              className="hover:text-primary text-underline font-semibold text-white transition-colors"
+              className="hover:text-primary text-underline font-semibold transition-colors dark:text-white"
             >
               회원가입
             </Link>

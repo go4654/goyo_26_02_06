@@ -40,7 +40,7 @@ export default function Gallery({ highlightedGalleries }: GalleryProps) {
               className="group relative"
             >
               <Link to={`/gallery/${data.slug}`} className="block">
-                <div className="h-[150px] w-full overflow-hidden rounded-2xl md:h-[350px] xl:h-[280px]">
+                <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[350px] xl:h-[280px]">
                   <img
                     src={data.thumbnail_image_url ?? ""}
                     alt={data.title}
@@ -48,7 +48,7 @@ export default function Gallery({ highlightedGalleries }: GalleryProps) {
                   />
                 </div>
 
-                <h3 className="xl:text-h6 group-hover:text-primary mt-2 line-clamp-1 text-base xl:mt-3">
+                <h3 className="xl:text-h6 group-hover:text-primary text-small-title mt-2 line-clamp-1 xl:mt-3">
                   {data.title}
                 </h3>
               </Link>

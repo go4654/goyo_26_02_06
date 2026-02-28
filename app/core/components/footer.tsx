@@ -55,7 +55,7 @@ export default function Footer() {
           </ul>
 
           {/* 이용약관, 개인정보처리방침, 문의 */}
-          <div className="text-text-2 mt-10 flex justify-center gap-5 text-sm xl:mt-0 xl:justify-end">
+          <div className="text-text-3/70 mt-10 flex justify-center gap-5 text-xs xl:mt-0 xl:justify-end">
             <Link
               to="/inquiries/new"
               viewTransition
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         {/* 카피라이트 */}
-        <div className="text-text-2/50 order-2 mt-5 text-sm font-light md:order-none xl:mt-20">
+        <div className="text-text-2/50 order-2 mt-5 text-xs font-light md:order-none xl:mt-20">
           <p>
             &copy; {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME}.
             All rights reserved.

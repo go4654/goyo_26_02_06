@@ -25,7 +25,7 @@ export default function RecentLogs({ recentClasses }: RecentLogsProps) {
           <Link
             key={data.id}
             to={`/class/${data.slug}`}
-            className="group mb-8 flex items-center justify-between transition-all duration-300"
+            className="group mb-8 grid grid-cols-[1fr_6fr] items-center transition-all duration-300"
           >
             {/* 번호 */}
             <p
@@ -49,7 +49,7 @@ export default function RecentLogs({ recentClasses }: RecentLogsProps) {
               </div>
 
               <Plus
-                className="group-hover:text-primary size-10 transition-all duration-300 group-hover:rotate-45"
+                className="group-hover:text-primary size-10 shrink-0 transition-all duration-300 group-hover:rotate-45"
                 strokeWidth={1}
               />
             </div>

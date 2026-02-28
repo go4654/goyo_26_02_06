@@ -179,16 +179,17 @@ export default function AdminComments({ loaderData }: Route.ComponentProps) {
         ]}
       />
 
-      {/* 가시성 토글 확인 다이얼로그 */}
+      {/* 공개/숨김 변경 확인 다이얼로그 */}
       <AlertDialog
         open={visibilityDialogOpen}
         onOpenChange={setVisibilityDialogOpen}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>가시성 변경 확인</AlertDialogTitle>
+            <AlertDialogTitle>공개/숨김 변경 확인</AlertDialogTitle>
             <AlertDialogDescription>
-              선택한 {selectedRows.length}개 댓글의 가시성을 변경하시겠습니까?
+              선택한 {selectedRows.length}개 댓글의 공개/숨김을
+              변경하시겠습니까?
               <br />
               현재 공개 상태인 댓글은 숨김으로, 숨김 상태인 댓글은 공개로
               전환됩니다.

@@ -50,13 +50,15 @@ export default function Category({ category }: { category: string | null }) {
                           stiffness: 400,
                           damping: 35,
                         }}
-                        className="border-primary bg-primary/40 absolute inset-0 -z-10 rounded-full border"
+                        className="dark:border-primary border-secondary dark:bg-primary/40 bg-primary/80 absolute inset-0 -z-10 rounded-full border"
                       />
                     )}
 
                     <span
                       className={`${
-                        isActive ? "text-secondary" : "xl:hover:text-secondary"
+                        isActive
+                          ? "dark:text-secondary text-white"
+                          : "xl:hover:text-secondary"
                       }`}
                     >
                       {skill.name}

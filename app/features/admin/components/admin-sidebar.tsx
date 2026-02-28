@@ -3,6 +3,7 @@ import {
   GalleryVerticalEndIcon,
   LayoutDashboardIcon,
   MessageCircleIcon,
+  MoonIcon,
   NewspaperIcon,
   Settings2Icon,
   UsersIcon,
@@ -65,26 +66,26 @@ const NAV_MAIN_BASE = [
   },
 ];
 
-const data = {
-  navMain: NAV_MAIN_BASE,
-  projects: [
-    {
-      name: "클래스",
-      url: "/admin/classes",
-      icon: BookOpenIcon,
-    },
-    {
-      name: "갤러리",
-      url: "/admin/gallery",
-      icon: GalleryVerticalEndIcon,
-    },
-    {
-      name: "뉴스",
-      url: "/admin/news",
-      icon: NewspaperIcon,
-    },
-  ],
-};
+// const data = {
+//   navMain: NAV_MAIN_BASE,
+//   projects: [
+//     {
+//       name: "클래스",
+//       url: "/admin/classes",
+//       icon: BookOpenIcon,
+//     },
+//     {
+//       name: "갤러리",
+//       url: "/admin/gallery",
+//       icon: GalleryVerticalEndIcon,
+//     },
+//     {
+//       name: "뉴스",
+//       url: "/admin/news",
+//       icon: NewspaperIcon,
+//     },
+//   ],
+// };
 
 export interface AdminSidebarProps
   extends React.ComponentProps<typeof Sidebar> {
@@ -117,9 +118,9 @@ export default function AdminSidebar({
     <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
         <div className="flex items-center justify-between pb-3">
-          <Link to="/admin">
+          {/* <Link to="/admin">
             <img src={LOGO_URL_WHITE} alt="logo" width={100} height={100} />
-          </Link>
+          </Link> */}
           <Link to="/">
             <img src={LOGO_URL} alt="logo" width={100} height={100} />
           </Link>
@@ -141,6 +142,7 @@ export default function AdminSidebar({
           }}
         />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

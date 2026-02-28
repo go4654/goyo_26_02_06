@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
+import ThemeSwitcher from "~/core/components/theme-switcher";
 import {
   Card,
   CardContent,
@@ -43,9 +44,13 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
 
       {/* 전체 통계 */}
       <div>
-        <h2 className="text-small-title mb-4">전체 통계</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-small-title mb-4">전체 통계</h2>
+          {/* 테마 스위처 컴포넌트 (라이트/다크 모드) */}
+          <ThemeSwitcher />
+        </div>
         <div className="grid auto-rows-min gap-4 xl:grid-cols-3">
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 전체 방문 수
@@ -62,7 +67,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
             </CardContent>
           </Card>
 
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 총 회원 수
@@ -76,7 +81,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
             </CardContent>
           </Card>
 
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 오늘 가입자 수
@@ -100,7 +105,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
         <h2 className="text-small-title mt-8 mb-4">클래스 통계</h2>
         <div className="grid auto-rows-min gap-4 md:grid-cols-4">
           {/* 가장 많이 열람된 클래스 TOP 3 */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 가장 많이 열람된 클래스 TOP 3
@@ -124,7 +129,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 저장 많은 클래스 TOP 3 */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 저장 많은 클래스 TOP 3
@@ -148,7 +153,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 최근 7일 댓글 수 */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 최근 7일 댓글 수
@@ -163,7 +168,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 숨김 댓글 수 */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 숨김 댓글 수
@@ -184,7 +189,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
         <h2 className="text-small-title mt-8 mb-4">갤러리 통계</h2>
         <div className="grid auto-rows-min gap-4 md:grid-cols-4">
           {/* 좋아요 TOP 갤러리 (카드 1개 안에 3개 데이터) */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 좋아요 TOP 갤러리
@@ -229,7 +234,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           </Card>
 
           {/* 가장 많이 저장된 갤러리 TOP 3 */}
-          <Card className="bg-text-2/20 aspect-video rounded-xl">
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
                 가장 많이 저장된 갤러리 TOP 3

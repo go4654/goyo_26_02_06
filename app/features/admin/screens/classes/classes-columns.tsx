@@ -68,7 +68,7 @@ const actionColumn: ColumnDef<AdminClassRow> = {
               className="cursor-pointer"
               onSelect={(e) => {
                 e.preventDefault();
-                console.log("edit", item.id);
+                // console.log("edit", item.id);
               }}
             >
               수정
@@ -77,7 +77,7 @@ const actionColumn: ColumnDef<AdminClassRow> = {
               className="text-destructive focus:text-destructive cursor-pointer"
               onSelect={(e) => {
                 e.preventDefault();
-                console.log("delete", item.id);
+                // console.log("delete", item.id);
               }}
             >
               삭제

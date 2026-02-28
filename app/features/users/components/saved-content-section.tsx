@@ -154,7 +154,7 @@ export function SavedContentSection({
                 variant="outline"
                 onClick={handleLoadMoreClass}
                 disabled={moreClassFetcher.state !== "idle"}
-                className="border-primary text-secondary hover:bg-primary/10 cursor-pointer"
+                className="border-primary hover:bg-primary/10 hover:!text-secondary cursor-pointer text-black"
               >
                 {moreClassFetcher.state === "loading" ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -184,19 +184,20 @@ export function SavedContentSection({
               />
             ))}
           </div>
+
           {galleryHasMore && (
-            <div className="mt-10 flex justify-center xl:mt-16">
+            <div className="text-gray mt-10 flex justify-center xl:mt-16">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleLoadMoreGallery}
                 disabled={moreGalleryFetcher.state !== "idle"}
-                className="border-primary text-secondary hover:bg-primary/10 cursor-pointer"
+                className="border-primary hover:bg-primary/10 hover:!text-secondary cursor-pointer text-black"
               >
                 {moreGalleryFetcher.state === "loading" ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
-                  "더보기 +"
+                  "더 보기 +"
                 )}
               </Button>
             </div>

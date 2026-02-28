@@ -39,7 +39,7 @@ export function ProfileOverviewSection({
   return (
     <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
       {/* 프로필 카드, 가장많이 탐색, 마지막 학습일, 이번주 학습 */}
-      <div className="flex flex-col gap-8 rounded-[20px] bg-[#0F1117] p-4 xl:p-10">
+      <div className="flex flex-col gap-8 rounded-[20px] bg-gray-100/50 p-4 xl:p-10 dark:bg-[#0F1117]">
         <h3 className="text-h5">Profile</h3>
 
         <div className="flex flex-col items-center gap-6 xl:mt-8 xl:flex-row">
@@ -53,7 +53,7 @@ export function ProfileOverviewSection({
             </AvatarFallback>
           </Avatar>
 
-          <div className="flex flex-col items-center xl:gap-2">
+          <div className="flex flex-col items-center xl:items-start xl:gap-2">
             <span className="text-small-title xl:text-h6">{profile.name}</span>
             <span className="text-muted-foreground text-small xl:text-sm">
               {email}
@@ -122,7 +122,7 @@ export function ProfileOverviewSection({
       {/* 기록 카드, 저장한 클래스, 저장한 갤러리, 최근 학습 주제 */}
       <div className="flex flex-col gap-5 rounded-[20px]">
         <ul className="grid grid-cols-3 gap-3 xl:gap-5">
-          <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-14">
+          <li className="flex flex-col items-center gap-1 rounded-xl bg-gray-100/50 p-4 xl:p-14 dark:bg-[#0F1117]">
             <p className="text-text-2/80 text-[10px] xl:text-sm">
               저장한 클래스
             </p>
@@ -131,7 +131,7 @@ export function ProfileOverviewSection({
               <span className="text-text-2/80 text-sm">개</span>
             </div>
           </li>
-          <li className="flex flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:p-14">
+          <li className="flex flex-col items-center gap-1 rounded-xl bg-gray-100/50 p-4 xl:p-14 dark:bg-[#0F1117]">
             <p className="text-text-2/80 text-[10px] xl:text-sm">
               저장한 갤러리
             </p>
@@ -140,7 +140,7 @@ export function ProfileOverviewSection({
               <span className="text-text-2/80 text-sm">개</span>
             </div>
           </li>
-          <li className="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-[#0F1117] p-4 xl:px-6 xl:py-14">
+          <li className="flex min-w-0 flex-col items-center gap-1 rounded-xl bg-gray-100/50 p-4 xl:px-6 xl:py-14 dark:bg-[#0F1117]">
             <p className="text-text-2/80 text-[10px] xl:text-sm">
               최근 학습 주제
             </p>
