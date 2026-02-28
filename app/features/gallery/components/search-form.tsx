@@ -77,7 +77,7 @@ export default function SearchForm({
             name="search"
             defaultValue={search || ""}
             placeholder="찾고싶은 갤러리가 있으신가요?"
-            className="placeholder:text-text-2/40 text-sm"
+            className="placeholder:text-text-2/40"
             maxLength={100}
           />
           <InputGroupAddon>

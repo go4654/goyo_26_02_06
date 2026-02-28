@@ -62,7 +62,7 @@ export const meta: Route.MetaFunction = ({ data }) => {
   // For valid policy documents, use frontmatter for metadata
   return [
     {
-      title: `${data.frontmatter.title} | ${import.meta.env.VITE_APP_NAME}`,
+      title: `이용약관 및 개인정보 처리방침 | ${import.meta.env.VITE_APP_NAME}`,
     },
     {
       name: "description",

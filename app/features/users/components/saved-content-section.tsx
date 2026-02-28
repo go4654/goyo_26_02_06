@@ -115,6 +115,7 @@ export function SavedContentSection({
       <div className="mt-3 flex items-center gap-6 border-b xl:mt-5">
         <Link
           to="?category=class"
+          preventScrollReset
           className={`border-b-3 border-transparent pb-2 text-sm font-medium transition-colors xl:text-base ${
             activeTab === "class"
               ? "border-primary text-primary !font-bold"
@@ -125,6 +126,7 @@ export function SavedContentSection({
         </Link>
         <Link
           to="?category=gallery"
+          preventScrollReset
           className={`border-b-3 border-transparent pb-2 text-sm font-medium transition-colors xl:text-base ${
             activeTab === "gallery"
               ? "border-primary text-primary !font-bold"

@@ -29,7 +29,7 @@ export default function Section1() {
     },
   };
   return (
-    <section className="relative h-[70vh] w-full xl:h-screen">
+    <section className="relative h-[80vh] w-full xl:h-screen">
       {/* 별 흩어진 효과 */}
       <div className="light:hidden absolute top-0 left-0 hidden h-screen w-full overflow-hidden md:block">
         <Particles quantity={500} />

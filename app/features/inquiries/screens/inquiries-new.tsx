@@ -1,3 +1,4 @@
+import type { InquiryCategory } from "../lib/mock-inquiries";
 import type { Route } from "./+types/inquiries-new";
 
 import { Form } from "react-router";
@@ -15,7 +16,6 @@ import { Label } from "~/core/components/ui/label";
 import { Textarea } from "~/core/components/ui/textarea";
 
 import { INQUIRY_CATEGORY_LABELS } from "../lib/mock-inquiries";
-import type { InquiryCategory } from "../lib/mock-inquiries";
 import { inquiriesCreateAction } from "../server/inquiries.action";
 
 export const meta: Route.MetaFunction = () => {
@@ -27,7 +27,7 @@ export const action = inquiriesCreateAction;
 /** 문의 작성 폼 (제목, 카테고리, 내용만 전송. status/profile_id는 서버에서 설정) */
 export default function InquiriesNew() {
   return (
-    <div className="mx-auto mt-20 w-full px-4 pb-40 xl:mt-25 xl:max-w-[800px]">
+    <div className="mx-auto w-full px-4 py-6 xl:max-w-[800px] xl:py-12">
       <Card>
         <CardHeader>
           <CardTitle>문의하기</CardTitle>
@@ -62,12 +62,16 @@ export default function InquiriesNew() {
                 defaultValue="general"
                 className="border-input bg-background focus-visible:ring-ring flex h-[45px] w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
               >
-                {(Object.entries(INQUIRY_CATEGORY_LABELS) as [InquiryCategory, string][]).map(
-                  ([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
+                {(
+                  Object.entries(INQUIRY_CATEGORY_LABELS) as [
+                    InquiryCategory,
+                    string,
+                  ][]
+                ).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
 

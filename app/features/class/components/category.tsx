@@ -39,6 +39,7 @@ export default function Category({ category }: { category: string | null }) {
               return (
                 <li key={skill.id} className="relative">
                   <Link
+                    preventScrollReset
                     to={`/class?category=${categoryValue}`}
                     className="relative z-10 px-2 py-1 text-sm xl:px-5 xl:py-2 xl:text-[18px]"
                   >

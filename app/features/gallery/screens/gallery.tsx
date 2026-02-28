@@ -108,6 +108,7 @@ export default function Gallery({ loaderData }: Route.ComponentProps) {
             return (
               <li key={slug} className="relative">
                 <Link
+                  preventScrollReset
                   to={to}
                   className={
                     isActive
