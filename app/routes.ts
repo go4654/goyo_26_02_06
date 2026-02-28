@@ -61,7 +61,6 @@ export default [
       ),
     ]),
     ...prefix("/cron", [route("/mailer", "features/cron/api/mailer.tsx")]),
-    ...prefix("/blog", [route("/og", "features/blog/api/og.tsx")]),
   ]),
 
   // ============================================================================
@@ -145,9 +144,6 @@ export default [
       route("/logout", "features/auth/screens/logout.tsx"),
     ]),
 
-    // 공개 접근 가능한 기타 라우트
-    route("/contact", "features/contact/screens/contact-us.tsx"),
-
     // 결제 관련 라우트
     ...prefix("/payments", [
       route("/checkout", "features/payments/screens/checkout.tsx"),
@@ -225,14 +221,4 @@ export default [
   // 법적 문서 라우트 (공개 접근 가능)
   // ============================================================================
   ...prefix("/legal", [route("/:slug", "features/legal/screens/policy.tsx")]),
-
-  // ============================================================================
-  // 블로그 레이아웃 (공개 접근 가능, 블로그 전용 레이아웃 포함)
-  // ============================================================================
-  layout("features/blog/layouts/blog.layout.tsx", [
-    ...prefix("/blog", [
-      index("features/blog/screens/posts.tsx"),
-      route("/:slug", "features/blog/screens/post.tsx"),
-    ]),
-  ]),
 ] satisfies RouteConfig;

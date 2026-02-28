@@ -261,7 +261,7 @@ function Actions() {
  * Features:
  * - Responsive design with desktop navigation and mobile drawer
  * - Application branding with localized title
- * - Main navigation links (Blog, Contact, Payments)
+ * - Main navigation links (Payments 등)
  * - User authentication state handling (loading, authenticated, unauthenticated)
  * - User profile menu with avatar for authenticated users
  * - Sign in/sign up buttons for unauthenticated users

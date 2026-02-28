@@ -168,10 +168,9 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
   // 로더에서 가져온 로케일을 기반으로 i18next 언어 설정
   useChangeLanguage(data?.locale ?? "en");
 
-  // 현재 라우트가 사전 렌더링된 페이지(블로그 또는 법적 페이지)인지 감지
+  // 현재 라우트가 사전 렌더링된 페이지(법적 페이지)인지 감지
   // 이러한 페이지는 특별한 테마 처리가 필요합니다
-  const isPreRendered =
-    pathname.includes("/legal") || pathname.includes("/blog");
+  const isPreRendered = pathname.includes("/legal");
 
   return (
     <html
