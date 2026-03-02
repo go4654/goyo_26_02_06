@@ -16,7 +16,7 @@ const NEWS_BUCKET = "news";
 
 export interface CreateNewsData {
   title: string;
-  category: string;
+  category: "notice" | "update" | "news";
   contentMdx: string;
   isPublished: boolean;
   visibility: "public" | "member";
@@ -181,7 +181,7 @@ export async function createNews(
   client: SupabaseClient<Database>,
   params: {
     title: string;
-    category: string;
+    category: "notice" | "update" | "news";
     contentMdx: string;
     isPublished: boolean;
     visibility: "public" | "member";

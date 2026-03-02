@@ -1,33 +1,30 @@
 /**
- * Sentry Error Monitoring Debug Module
+ * Sentry 에러 모니터링 디버그 모듈
  *
- * This module provides a test page for verifying that the Sentry error monitoring integration
- * is working correctly. It allows developers and administrators to deliberately trigger a test
- * error and verify that it's being properly captured and reported to Sentry.
+ * Sentry 에러 모니터링 연동이 정상 동작하는지 확인하기 위한 테스트 페이지를 제공합니다.
+ * 개발자나 관리자가 의도적으로 테스트 에러를 발생시키고, 해당 에러가 Sentry에
+ * 정상적으로 포착·보고되는지 확인할 수 있습니다.
  *
- * The page includes:
- * - A simple UI with a button to trigger a test error
- * - An action function that throws an error when the form is submitted
+ * 이 페이지에는 다음이 포함됩니다.
+ * - 테스트 에러를 발생시키는 버튼이 있는 간단한 UI
+ * - 폼 제출 시 에러를 던지는 액션 함수
  *
- * This is useful during development and after deployment to ensure that error monitoring
- * is functioning as expected without having to create actual error conditions in production code.
- * It helps verify the complete error reporting pipeline from client to Sentry dashboard.
+ * 실제 프로덕션 코드에서 에러 상황을 만들지 않고도, 개발 및 배포 이후에
+ * 에러 모니터링이 정상 동작하는지 검증할 때 유용합니다.
+ * 클라이언트부터 Sentry 대시보드까지 전체 에러 리포팅 파이프라인을 확인할 수 있습니다.
  */
-import type { Route } from "./+types/sentry";
 
 import { Form } from "react-router";
 
 import { Button } from "~/core/components/ui/button";
 
 /**
- * Meta function for setting page metadata
- * 
- * This function sets the page title for the Sentry test page,
- * using the application name from environment variables.
- * 
- * @returns Array of metadata objects for the page
+ * 페이지 메타데이터 설정 함수
+ *
+ * Sentry 테스트 페이지의 제목을 설정합니다.
+ * 애플리케이션 이름은 환경 변수에서 가져옵니다.
  */
-export const meta: Route.MetaFunction = () => {
+export const meta = () => {
   return [
     {
       title: `Sentry Test | ${import.meta.env.VITE_APP_NAME}`,
@@ -36,33 +33,25 @@ export const meta: Route.MetaFunction = () => {
 };
 
 /**
- * Action function that deliberately throws an error
- * 
- * This function is called when the form is submitted. It intentionally throws
- * an error with a descriptive message to test that Sentry is properly capturing
- * and reporting errors from server-side actions.
- * 
- * The error should appear in the Sentry dashboard with the full stack trace and
- * any additional context that Sentry is configured to capture.
- * 
- * @throws Error - A test error to be captured by Sentry
+ * 의도적으로 에러를 던지는 액션 함수
+ *
+ * 폼이 제출되면 호출되며, 설명이 포함된 에러를 의도적으로 던져
+ * Sentry가 서버 액션에서 발생한 에러를 올바르게 포착·보고하는지 테스트합니다.
+ *
+ * 에러는 Sentry 대시보드에 전체 스택 트레이스와 함께 표시되어야 합니다.
  */
 export function action() {
   throw new Error("This is a test error, you should see it in Sentry");
 }
 
 /**
- * Sentry Test Component
- * 
- * This component renders a simple interface for testing Sentry error monitoring integration.
- * It displays a button that triggers a test error when clicked by submitting a form that
- * calls the action function, which throws an error.
- * 
- * The component uses React Router's Form component to handle the form submission.
- * When the button is clicked, the action function is called, an error is thrown,
- * and Sentry should capture and report it.
- * 
- * @returns React component for testing Sentry error monitoring
+ * Sentry 테스트 컴포넌트
+ *
+ * Sentry 에러 모니터링 연동을 테스트하기 위한 간단한 인터페이스를 렌더링합니다.
+ * 버튼 클릭 시 에러를 발생시키는 폼을 제출하여 `action` 함수가 호출되도록 합니다.
+ *
+ * React Router의 `Form` 컴포넌트를 사용해 폼 제출을 처리하며,
+ * 에러가 발생하면 Sentry가 이를 포착해 보고해야 합니다.
  */
 export default function TriggerError() {
   return (

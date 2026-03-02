@@ -1,19 +1,18 @@
 /**
- * Google Analytics Debug Module
+ * Google Analytics 디버그 모듈
  *
- * This module provides a test page for verifying that the Google Analytics (GA4) integration
- * is working correctly. It allows developers and administrators to trigger a test event
- * and verify that it's being properly sent to Google Analytics.
+ * Google Analytics(GA4) 연동이 정상 동작하는지 확인하기 위한 테스트 페이지를 제공합니다.
+ * 개발자나 관리자가 테스트 이벤트를 발생시키고, 해당 이벤트가 Google Analytics로
+ * 정상 전송되는지 확인할 수 있습니다.
  *
- * The page includes:
- * - A simple UI with a button to trigger a test event
- * - Visual feedback when the event is successfully triggered
- * - Loading state during event submission
+ * 이 페이지에는 다음이 포함됩니다.
+ * - 테스트 이벤트를 발생시키는 버튼이 있는 간단한 UI
+ * - 이벤트 전송 성공 시 시각적 피드백
+ * - 전송 중 로딩 상태 표시
  *
- * This is useful during development and after deployment to ensure that analytics
- * tracking is functioning as expected without having to perform actual user flows.
+ * 실제 사용자 플로우를 수행하지 않고도, 개발 및 배포 이후에 분석 추적이
+ * 정상적으로 동작하는지 검증할 때 유용합니다.
  */
-import type { Route } from "./+types/analytics";
 
 import { CheckCircle2Icon, LoaderCircleIcon } from "lucide-react";
 import { Form, useNavigation } from "react-router";
@@ -22,14 +21,12 @@ import { Button } from "~/core/components/ui/button";
 import trackEvent from "~/core/lib/analytics.client";
 
 /**
- * Meta function for setting page metadata
- * 
- * This function sets the page title for the Google Analytics test page,
- * using the application name from environment variables.
- * 
- * @returns Array of metadata objects for the page
+ * 페이지 메타데이터 설정 함수
+ *
+ * Google Analytics 테스트 페이지의 제목을 설정합니다.
+ * 애플리케이션 이름은 환경 변수에서 가져옵니다.
  */
-export const meta: Route.MetaFunction = () => {
+export const meta = () => {
   return [
     {
       title: `Google Tag Test | ${import.meta.env.VITE_APP_NAME}`,
@@ -38,43 +35,42 @@ export const meta: Route.MetaFunction = () => {
 };
 
 /**
- * Client action function for triggering a test analytics event
- * 
- * This function is called when the form is submitted. It uses the trackEvent
- * utility to send a test event to Google Analytics with some sample data,
- * including a timestamp. After sending the event, it returns a success response
- * that will be displayed to the user.
- * 
- * @returns Object indicating success status
+ * 테스트 분석 이벤트를 트리거하는 클라이언트 액션 함수
+ *
+ * 폼이 제출되면 호출되며, `trackEvent` 유틸을 사용해
+ * 타임스탬프가 포함된 테스트 이벤트를 Google Analytics로 전송합니다.
+ * 전송 후에는 UI에서 확인 메시지를 표시하기 위한 성공 여부를 반환합니다.
  */
 export async function clientAction() {
-  // Send a test event to Google Analytics with timestamp
+  // 타임스탬프를 포함한 테스트 이벤트를 Google Analytics로 전송
   trackEvent("test_event", {
     test: "test",
     time: new Date().toISOString(),
   });
   
-  // Return success response to show confirmation message
+  // 확인 메시지 표시에 사용할 성공 응답 반환
   return {
     success: true,
   };
 }
 
+interface TriggerEventProps {
+  actionData?: {
+    success?: boolean;
+  } | null;
+}
+
 /**
- * Google Analytics Test Component
- * 
- * This component renders a simple interface for testing Google Analytics integration.
- * It displays a button that triggers a test event when clicked, shows a loading spinner
- * during submission, and displays a success message when the event is sent.
- * 
- * The component uses React Router's Form and useNavigation hooks to handle the form
- * submission and track the submission state for UI feedback.
- * 
- * @param actionData - Data returned from the clientAction function
- * @returns React component for testing Google Analytics
+ * Google Analytics 테스트 컴포넌트
+ *
+ * Google Analytics 연동을 테스트하기 위한 간단한 인터페이스를 렌더링합니다.
+ * 버튼 클릭 시 테스트 이벤트를 발생시키고, 전송 중에는 로딩 스피너를,
+ * 전송 후에는 성공 메시지를 표시합니다.
+ *
+ * React Router의 `Form`과 `useNavigation` 훅을 사용해 폼 제출과 상태를 관리합니다.
  */
-export default function TriggerEvent({ actionData }: Route.ComponentProps) {
-  // Get the current navigation state to show loading indicator
+export default function TriggerEvent({ actionData }: TriggerEventProps) {
+  // 현재 네비게이션 상태를 가져와 로딩 인디케이터를 표시
   const { state } = useNavigation();
   
   return (
