@@ -188,6 +188,26 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         ) : (
           <PreventFlashOnWrongTheme ssrTheme={Boolean(data?.theme)} />
         )}
+
+        {/* 구글 에널리틱스 */}
+        {import.meta.env.PROD && (
+          <>
+            <script
+              async
+              src="https://www.googletagmanager.com/gtag/js?id=G-RXYK4C59MK"
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', 'G-RXYK4C59MK');
+              `,
+              }}
+            />
+          </>
+        )}
       </head>
       <body className="relative h-full">
         {children}

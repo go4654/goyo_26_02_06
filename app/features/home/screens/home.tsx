@@ -100,6 +100,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       {/* sentry 테스트 버튼 */}
       {/* <button
         onClick={() => {
+          Sentry.captureException(new Error("This is your first error!"));
           try {
             throw new Error("This is your first error!");
           } catch (err) {
