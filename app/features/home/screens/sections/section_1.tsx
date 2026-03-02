@@ -71,7 +71,7 @@ export default function Section1() {
         </motion.div>
       </motion.div>
 
-      <div className="absolute bottom-0 left-0 w-full md:h-[200px] dark:bg-[linear-gradient(to_top,#000,#00000000)]" />
+      <div className="light:bg-transparent absolute bottom-0 left-0 w-full md:h-[200px] dark:bg-[linear-gradient(to_top,#000,#00000000)]" />
     </section>
   );
 }

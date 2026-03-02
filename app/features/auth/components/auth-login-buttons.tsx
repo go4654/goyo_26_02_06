@@ -91,7 +91,7 @@ function _SignInButtons() {
     <>
       <AuthLoginButton
         logo={<MailIcon className="size-4 scale-110 dark:text-white" />}
-        label="이메일"
+        label="OTP"
         href="/auth/otp/start"
       />
       {/* <AuthLoginButton

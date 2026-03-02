@@ -29,6 +29,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const identities = client.auth.getUserIdentities();
 
+  // Admin 여부 확인
+  const { data: roleProfile } = await client
+    .from("profiles")
+    .select("role")
+    .eq("profile_id", user.id)
+    .single();
+
   // getUserProfile 함수가 내부적으로 userId 검증을 수행하므로
   // 다른 사용자의 프로필 조회 시도는 자동으로 차단됨
   const profile = getUserProfile(client, { userId: user.id });
@@ -37,11 +44,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     user,
     identities,
     profile,
+    isAdmin: roleProfile?.role === "admin",
   };
 }
 
 export default function Account({ loaderData }: Route.ComponentProps) {
-  const { user, identities, profile } = loaderData;
+  const { user, identities, profile, isAdmin } = loaderData;
   const hasEmailIdentity = user?.identities?.some(
     (identity) => identity.provider === "email",
   );
@@ -78,7 +86,10 @@ export default function Account({ loaderData }: Route.ComponentProps) {
       {/* <ChangeEmailForm email={user?.email ?? ""} /> */}
 
       {/* 비밀번호 변경 폼 */}
-      <ChangePasswordForm hasPassword={hasEmailIdentity ?? false} />
+
+      {!isAdmin && (
+        <ChangePasswordForm hasPassword={hasEmailIdentity ?? false} />
+      )}
 
       {/* <Suspense
         fallback={
@@ -113,7 +124,7 @@ export default function Account({ loaderData }: Route.ComponentProps) {
           }}
         </Await>
       </Suspense> */}
-      <DeleteAccountForm />
+      {!isAdmin && <DeleteAccountForm />}
     </div>
   );
 }
