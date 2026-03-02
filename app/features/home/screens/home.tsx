@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 
+import * as Sentry from "@sentry/react-router";
 import { useRouteLoaderData } from "react-router";
 
 import Container from "~/core/layouts/container";
@@ -90,23 +91,31 @@ export async function loader({ request }: Route.LoaderArgs) {
  */
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { recentClasses, highlightedGalleries, recentNews } = loaderData;
-  const rootData = useRouteLoaderData("root") as
-    | { user?: unknown }
-    | undefined;
+  const rootData = useRouteLoaderData("root") as { user?: unknown } | undefined;
   const isLoggedIn = Boolean(rootData?.user);
 
   return (
     <>
       <Section1 />
+      <button
+        onClick={() => {
+          try {
+            throw new Error("This is your first error!");
+          } catch (err) {
+            Sentry.captureException(err);
+          }
+        }}
+        className="cursor-pointer"
+      >
+        Break the world@@
+      </button>
 
       <Container>
         <SkillCategories />
 
         <RecentLogs recentClasses={recentClasses} />
 
-        {isLoggedIn && (
-          <Gallery highlightedGalleries={highlightedGalleries} />
-        )}
+        {isLoggedIn && <Gallery highlightedGalleries={highlightedGalleries} />}
 
         <LogEverythingText />
 

@@ -25,10 +25,10 @@ export default [
   // ============================================================================
   // 디버그 라우트 (프로덕션에서는 삭제해야 합니다)
   // ============================================================================
-  ...prefix("/debug", [
-    route("/sentry", "debug/sentry.tsx"),
-    route("/analytics", "debug/analytics.tsx"),
-  ]),
+  // ...prefix("/debug", [
+  //   route("/sentry", "debug/sentry.tsx"),
+  //   route("/analytics", "debug/analytics.tsx"),
+  // ]),
 
   // ============================================================================
   // API 라우트 (액션과 로더를 내보내지만 UI는 없는 라우트)
@@ -76,6 +76,9 @@ export default [
     // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
     ...prefix("/class", [index("features/class/screens/class.tsx")]),
     ...prefix("/news", [index("features/news/screens/news.tsx")]),
+
+    // tools 라우트 추가
+    // ...prefix("/tools", [index("features/tools/screens/tools.tsx")]),
 
     // 공개 레이아웃 (인증되지 않은 사용자만 접근 가능, 로그인 시 대시보드로 리다이렉트)
     layout("core/layouts/public.layout.tsx", [
