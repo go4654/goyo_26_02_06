@@ -21,7 +21,7 @@ const NEWS_BUCKET = "news";
 
 export interface UpdateNewsInput {
   title: string;
-  category: string;
+  category: "notice" | "update" | "news";
   content: string;
   visibility: "public" | "member";
   isPublished: boolean;
