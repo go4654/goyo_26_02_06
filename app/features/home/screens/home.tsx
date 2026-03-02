@@ -97,7 +97,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <Section1 />
-      <button
+      {/* sentry 테스트 버튼 */}
+      {/* <button
         onClick={() => {
           try {
             throw new Error("This is your first error!");
@@ -108,7 +109,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         className="cursor-pointer"
       >
         Break the world@@
-      </button>
+      </button> */}
 
       <Container>
         <SkillCategories />
