@@ -161,7 +161,7 @@ export default function GalleryDetail({ loaderData }: Route.ComponentProps) {
             <span className="text-text-2/70 text-h6">이미지 없음</span>
           </div>
         )}
-        <div className="absolute inset-x-0 top-[60%] bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
+        <div className="absolute inset-x-0 top-[60%] bottom-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-black dark:via-black/80" />
       </div>
 
       <div className="mx-auto xl:max-w-[70%]">
