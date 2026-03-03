@@ -92,11 +92,11 @@ export function MDXGalleryGrid({
       {siteUrl && (
         <Button
           variant="outline"
-          className="group cursor-pointer"
+          className="group !border-primary/80 hover:border-primary w-fit cursor-pointer"
           asChild
           disabled={!siteUrl}
         >
-          <a href={siteUrl ?? ""}>
+          <a href={siteUrl ?? ""} target="_blank" rel="noopener noreferrer">
             사이트 바로가기 <ArrowRight className="size-4" />
           </a>
         </Button>
