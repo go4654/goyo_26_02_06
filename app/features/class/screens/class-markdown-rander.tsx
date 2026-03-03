@@ -80,7 +80,7 @@ export default function MDXRenderer({ code }: { code: string }) {
           /** 일반 본문 텍스트 */
           p: (props) => (
             <p
-              className="text-text-2 mt-4 text-base leading-relaxed font-medium"
+              className="text-text-2/80 mt-4 text-base leading-relaxed font-medium"
               {...props}
             />
           ),
