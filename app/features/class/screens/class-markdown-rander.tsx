@@ -122,6 +122,21 @@ export default function MDXRenderer({ code }: { code: string }) {
           img: (props) => (
             <img className="my-8 rounded-2xl shadow-xl" {...props} />
           ),
+
+          a: ({ href = "", ...props }) => {
+            const isExternal = href.startsWith("http");
+
+            // ✔ http로 시작하면 외부 링크, 내부 라우팅 /class/{classId} 형식으로
+            return (
+              <a
+                href={href}
+                className="text-primary hover:underline"
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                {...props}
+              />
+            );
+          },
         }}
       />
     </div>

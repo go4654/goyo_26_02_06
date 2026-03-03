@@ -98,19 +98,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <>
       <Section1 />
       {/* sentry 테스트 버튼 */}
-      {/* <button
-        onClick={() => {
-          Sentry.captureException(new Error("This is your first error!"));
-          try {
-            throw new Error("This is your first error!");
-          } catch (err) {
-            Sentry.captureException(err);
-          }
-        }}
-        className="cursor-pointer"
-      >
-        Break the world@@
-      </button> */}
 
       <Container>
         <SkillCategories />
@@ -122,6 +109,20 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <LogEverythingText />
 
         <News recentNews={recentNews} />
+        {/* <button
+          onClick={() => {
+            Sentry.captureException(new Error("This is your first error!"));
+            console.log("g");
+            try {
+              throw new Error("This is your first error!");
+            } catch (err) {
+              Sentry.captureException(err);
+            }
+          }}
+          className="cursor-pointer bg-red-400"
+        >
+          Break the world@@
+        </button> */}
       </Container>
     </>
   );
