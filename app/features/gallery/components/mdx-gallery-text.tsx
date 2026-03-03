@@ -35,6 +35,9 @@ export function MDXGalleryGrid({
   responsiveImageUrl,
   children,
 }: Props) {
+  const hasResponsiveImage =
+    responsiveImageUrl && responsiveImageUrl.trim() !== "#";
+
   return (
     <div className="my-10 flex flex-col gap-10 xl:my-20">
       {/* 상단 메인 설명 */}
@@ -49,7 +52,11 @@ export function MDXGalleryGrid({
 
       <div className="flex flex-col gap-10 xl:flex-row xl:justify-between">
         {/* 왼쪽 영역: 메인 이미지 + 상세 설명 카드들 */}
-        <div className="flex flex-col gap-8 xl:w-[70%]">
+        <div
+          className={`flex flex-col gap-8 ${
+            hasResponsiveImage ? "xl:w-[70%]" : "xl:w-full"
+          }`}
+        >
           <div className="overflow-hidden rounded-2xl border border-white/5 shadow-2xl">
             <img src={imageUrl} alt={title} className="w-full object-cover" />
           </div>
@@ -59,15 +66,17 @@ export function MDXGalleryGrid({
         </div>
 
         {/* 오른쪽 영역: 반응형 이미지 */}
-        <div className="xl:mt-[30%] xl:w-[25%]">
-          <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/5 shadow-2xl">
-            <img
-              src={responsiveImageUrl}
-              alt={`${title} responsive`}
-              className="w-full object-contain"
-            />
+        {hasResponsiveImage && (
+          <div className="xl:mt-[30%] xl:w-[25%]">
+            <div className="sticky top-24 overflow-hidden rounded-2xl border border-white/5 shadow-2xl">
+              <img
+                src={responsiveImageUrl}
+                alt={`${title} responsive`}
+                className="w-full object-contain"
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
