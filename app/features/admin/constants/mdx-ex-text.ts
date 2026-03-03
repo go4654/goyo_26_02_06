@@ -56,12 +56,13 @@ export const MDX_EX_TEXT = `
 `;
 
 export const MDX_GALLERY_EX_TEXT = `
-  <MDXGalleryGrid 
+  <MDXGalleryGrid
     title="포트폴리오 제목"
     description="설명"
     studentName="학생 이름"
     imageUrl="이미지 경로"
     responsiveImageUrl="반응형 이미지 경로"
+    siteUrl="https://example.com"
   >
 
   <MDXGalleryGrid.Item title="01. 항목 제목">

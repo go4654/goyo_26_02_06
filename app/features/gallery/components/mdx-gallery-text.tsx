@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+import { ArrowRight } from "lucide-react";
+
+import { Button } from "~/core/components/ui/button";
+
 interface Props {
   title: string;
   description: string;
@@ -7,24 +11,29 @@ interface Props {
   imageUrl: string;
   responsiveImageUrl: string;
   children?: ReactNode; // 추가적인 상세 설명 카드들을 담기 위함
+  siteUrl?: string;
 }
 
 {
-  /* <MDXGalleryGrid 
+  /*
+  사이트 바로가기 URL은 siteUrl prop으로 전달합니다. 없으면 버튼이 안 보입니다.
+  <MDXGalleryGrid
     title="포트폴리오 제목"
     studentName="학생 이름"
     description="설명"
     imageUrl="이미지 경로"
     responsiveImageUrl="반응형 이미지 경로"
-    >
-  <MDXGalleryGrid.Item title="01. 항목 제목">
-    항목 설명
-  </MDXGalleryGrid.Item>
-  
-  <MDXGalleryGrid.Item title="02. 항목 제목">
-    항목 설명
-  </MDXGalleryGrid.Item>
-</MDXGalleryGrid> */
+    siteUrl="https://example.com"
+  >
+    <MDXGalleryGrid.Item title="01. 항목 제목">
+      항목 설명
+    </MDXGalleryGrid.Item>
+
+    <MDXGalleryGrid.Item title="02. 항목 제목">
+      항목 설명
+    </MDXGalleryGrid.Item>
+  </MDXGalleryGrid>
+  */
 }
 
 export function MDXGalleryGrid({
@@ -34,6 +43,7 @@ export function MDXGalleryGrid({
   imageUrl,
   responsiveImageUrl,
   children,
+  siteUrl,
 }: Props) {
   const hasResponsiveImage =
     responsiveImageUrl && responsiveImageUrl.trim() !== "#";
@@ -78,6 +88,19 @@ export function MDXGalleryGrid({
           </div>
         )}
       </div>
+
+      {siteUrl && (
+        <Button
+          variant="outline"
+          className="group cursor-pointer"
+          asChild
+          disabled={!siteUrl}
+        >
+          <a href={siteUrl ?? ""}>
+            사이트 바로가기 <ArrowRight className="size-4" />
+          </a>
+        </Button>
+      )}
     </div>
   );
 }
