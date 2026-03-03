@@ -119,7 +119,7 @@ export default function LectureCard({
       className="group space-between flex flex-col items-start transition-all duration-150 xl:gap-1"
     >
       {/* img 영역 */}
-      <div className="group relative h-full max-h-[200px] min-h-[200px] w-full overflow-hidden rounded-xl bg-gray-100 xl:block xl:max-h-[250px] xl:min-h-[250px] xl:rounded-[20px] dark:bg-gray-900">
+      <div className="group relative h-full max-h-[200px] min-h-[200px] w-full overflow-hidden rounded-xl bg-gray-100 xl:block xl:max-h-[400px] xl:min-h-[400px] xl:rounded-[20px] dark:bg-gray-900">
         {lecture.imageUrl ? (
           <img
             src={lecture.imageUrl}

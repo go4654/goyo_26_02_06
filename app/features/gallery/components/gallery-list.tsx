@@ -200,7 +200,7 @@ export function GalleryCard({
 
   return (
     <Link to={`/gallery/${item.slug}`} key={item.id} className="group">
-      <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[500px] lg:h-[500px]">
+      <div className="h-[200px] w-full overflow-hidden rounded-2xl md:h-[600px] lg:h-[600px]">
         <img
           src={item.thumbnail_image_url ?? ""}
           alt={item.title}
