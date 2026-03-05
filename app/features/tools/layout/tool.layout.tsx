@@ -11,10 +11,10 @@ export default function ToolLayout() {
   const location = useLocation();
 
   return (
-    <div className="mx-auto min-h-screen max-w-[1280px] px-4 py-6 pb-8 xl:px-0">
-      <h1 className="text-h4 xl:text-h1 max-w-[800px] tracking-tighter">
+    <div className="mx-auto min-h-screen max-w-[980px] px-4 py-6 pb-8 xl:px-0">
+      {/* <h1 className="text-h4 xl:text-h1 max-w-[800px] tracking-tighter">
         Tools for Your Own
-      </h1>
+      </h1> */}
 
       {/* 탭 메뉴 */}
       <nav

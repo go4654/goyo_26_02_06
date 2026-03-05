@@ -1,5 +1,17 @@
+import type { Route } from "./+types/random-choice";
+
 import { Loader2, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: "랜덤 선택 | GOYO" },
+    {
+      name: "description",
+      content: "내용을 입력하면 무작위로 순서를 결정할 수 있습니다.",
+    },
+  ];
+};
 
 /** textarea에서 이름 목록 파싱 (빈 줄 제거, trim, 탭 제거) */
 function parseNames(text: string): string[] {
@@ -123,7 +135,7 @@ export default function RandomChoice() {
           htmlFor="names-input"
           className="mb-2 block text-sm font-medium text-zinc-400"
         >
-          학생 이름 (한 줄에 한 명)
+          섞을 내용 (한 줄에 한 개)
         </label>
 
         <textarea
@@ -131,7 +143,7 @@ export default function RandomChoice() {
           value={namesText}
           onChange={(e) => setNamesText(e.target.value)}
           onFocus={() => setError(null)}
-          placeholder={"김철수\n이영희\n박민수\n최지훈"}
+          placeholder={"예)\n김철수\n이영희\n박민수\n최지훈"}
           rows={6}
           disabled={isShuffling}
           className="w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 focus:outline-none disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500"
