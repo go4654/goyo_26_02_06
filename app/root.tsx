@@ -128,6 +128,28 @@ export const handle = {
 };
 
 /**
+ * 루트 메타: 기본 title, description, Open Graph 메타 태그
+ */
+export const meta: Route.MetaFunction = () => [
+  { title: "GOYO" },
+  {
+    name: "description",
+    content: "배움과 창작이 만나는 공간",
+  },
+  { property: "og:title", content: "GOYO" },
+  {
+    property: "og:description",
+    content: "배움과 창작이 만나는 공간",
+  },
+  { property: "og:type", content: "website" },
+  { property: "og:url", content: "https://goyos.kr" },
+  {
+    property: "og:image",
+    content: "/img/logo_og.jpg",
+  },
+];
+
+/**
  * 기본 레이아웃 컴포넌트
  *
  * 이 컴포넌트는 다크/라이트 모드 기능을 활성화하기 위해 ThemeProvider로
@@ -214,6 +236,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <Toaster richColors position="bottom-right" />
         <ScrollRestoration />
         <Scripts />
+
+        {/* 구글태그 */}
         {import.meta.env.VITE_GOOGLE_TAG_ID &&
           import.meta.env.VITE_GOOGLE_TAG_ID !== "" && (
             <>
