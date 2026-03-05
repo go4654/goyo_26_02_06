@@ -178,15 +178,18 @@ export default function GalleryNew(_props: Route.ComponentProps) {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+      <div className="rounded-2xl border bg-white/5 p-6 backdrop-blur-sm dark:border-white/10">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 썸네일 이미지 (클래스와 동일 UX) */}
           <div className="space-y-2">
             <Label htmlFor="thumbnail">썸네일 이미지</Label>
-            <div className="space-y-3">
+            <Label
+              htmlFor="thumbnail"
+              className="block cursor-pointer space-y-3"
+            >
               {thumbnailPreview ? (
                 <div className="relative inline-block">
-                  <div className="relative h-48 w-48 overflow-hidden rounded-lg border border-white/10">
+                  <div className="relative h-48 w-48 overflow-hidden rounded-lg border dark:border-white/10">
                     <img
                       src={thumbnailPreview}
                       alt="썸네일 미리보기"
@@ -205,7 +208,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                   </Button>
                 </div>
               ) : (
-                <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5">
+                <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-black/10 bg-white/5 dark:border-white/20">
                   <div className="flex flex-col items-center gap-2">
                     <Image className="text-text-3 size-8" />
                     <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
@@ -255,12 +258,14 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                   </span>
                 )}
               </p>
-            </div>
+            </Label>
           </div>
 
           {/* 타이틀 */}
           <div className="space-y-2">
-            <Label htmlFor="title">타이틀 *</Label>
+            <Label htmlFor="title">
+              타이틀 <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="title"
               value={formData.title}
@@ -287,7 +292,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
 
           {/* 카테고리 */}
           <div className="space-y-2">
-            <Label htmlFor="category">카테고리 *</Label>
+            <Label htmlFor="category">
+              카테고리 <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.category}
               onValueChange={(v) =>
@@ -320,7 +327,9 @@ export default function GalleryNew(_props: Route.ComponentProps) {
 
           {/* 본문 MDX (클래스 content_mdx = 갤러리 description) */}
           <div className="space-y-2">
-            <Label htmlFor="description">본문 (MDX) *</Label>
+            <Label htmlFor="description">
+              본문 (MDX) <span className="text-destructive">*</span>
+            </Label>
             <MDXEditor
               value={formData.description}
               onChange={(value) => updateField("description", value)}
@@ -336,7 +345,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
           </div>
 
           {/* 캡션 MDX (갤러리만의 추가 MDX) */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="caption">캡션 (MDX, 선택)</Label>
             <MDXEditor
               value={formData.caption}
@@ -346,7 +355,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                 setPendingImages((prev) => updater(prev))
               }
             />
-          </div>
+          </div> */}
 
           {/* 공개 여부 */}
           <div className="flex items-center space-x-2">
