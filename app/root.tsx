@@ -205,10 +205,17 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* 기본 OG 메타: 자식 라우트 메타와 별개로 항상 head에 출력 (SNS 공유용) */}
         <meta property="og:title" content="GOYO" />
-        <meta property="og:description" content="당신의 성장을 돕는 고요한 조력자" />
+        <meta
+          property="og:description"
+          content="당신의 성장을 돕는 고요한 조력자"
+        />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://goyos.kr" />
         <meta property="og:image" content="https://goyos.kr/img/logo_og.jpg" />
+        <meta
+          name="naver-site-verification"
+          content="1e9d9dd072d84b58b307c578f0b30e936cdddee0"
+        />
         <Meta />
         <Links />
         {isPreRendered ? (
