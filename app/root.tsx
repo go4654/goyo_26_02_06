@@ -134,12 +134,12 @@ export const meta: Route.MetaFunction = () => [
   { title: "GOYO" },
   {
     name: "description",
-    content: "배움과 창작이 만나는 공간",
+    content: "당신의 성장을 돕는 고요한 조력자",
   },
   { property: "og:title", content: "GOYO" },
   {
     property: "og:description",
-    content: "배움과 창작이 만나는 공간",
+    content: "당신의 성장을 돕는 고요한 조력자",
   },
   { property: "og:type", content: "website" },
   { property: "og:url", content: "https://goyos.kr" },
@@ -203,6 +203,12 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* 기본 OG 메타: 자식 라우트 메타와 별개로 항상 head에 출력 (SNS 공유용) */}
+        <meta property="og:title" content="GOYO" />
+        <meta property="og:description" content="당신의 성장을 돕는 고요한 조력자" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://goyos.kr" />
+        <meta property="og:image" content="https://goyos.kr/img/logo_og.jpg" />
         <Meta />
         <Links />
         {isPreRendered ? (
