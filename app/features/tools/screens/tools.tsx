@@ -1,10 +1,11 @@
-/**
- * /tools 인덱스: 레이아웃의 Outlet에 렌더되는 기본 화면
- */
-export default function Tools() {
-  return (
-    <p className="text-text-2 text-sm">
-      위 탭에서 사용할 도구를 선택해 주세요.
-    </p>
-  );
+import { redirect } from "react-router";
+
+/** /tools 접속 시 랜덤 선택 페이지로 리다이렉트 */
+export function loader() {
+  throw redirect("/tools/random-choice");
+}
+
+/** 리다이렉트 시에는 렌더되지 않음 */
+export default function ToolsIndex() {
+  return null;
 }

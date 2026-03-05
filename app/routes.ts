@@ -81,7 +81,6 @@ export default [
         index("features/tools/screens/tools.tsx"),
         route("/random-choice", "features/tools/screens/random-choice.tsx"),
         route("/wheel", "features/tools/screens/wheel.tsx"),
-        route("/timer", "features/tools/screens/timer.tsx"),
       ]),
     ]),
 

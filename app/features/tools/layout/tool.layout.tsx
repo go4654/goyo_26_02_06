@@ -4,7 +4,6 @@ import { Link, Outlet, useLocation } from "react-router";
 const TOOL_TABS = [
   { path: "/tools/random-choice", label: "랜덤 선택" },
   { path: "/tools/wheel", label: "돌림판" },
-  { path: "/tools/timer", label: "타이머" },
 ] as const;
 
 export default function ToolLayout() {
@@ -18,7 +17,7 @@ export default function ToolLayout() {
 
       {/* 탭 메뉴 */}
       <nav
-        className="text-h6 text-text-2/60 mt-10 flex flex-wrap gap-8 font-light"
+        className="text-small-title xl:text-h6 text-text-2/60 mt-4 flex flex-wrap gap-8 font-light xl:mt-10"
         aria-label="도구 메뉴"
       >
         {TOOL_TABS.map(({ path, label }) => {
