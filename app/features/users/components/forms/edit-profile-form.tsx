@@ -24,10 +24,15 @@ import { Input } from "~/core/components/ui/input";
 import { Label } from "~/core/components/ui/label";
 
 import {
+  AVATAR_COMPRESSION_OPTIONS,
   compressImageToWebp,
   isImageFile,
   validateFileSize,
 } from "../../../admin/utils/image-upload";
+
+import { AvatarCropModal } from "../avatar-crop-modal";
+
+const MAX_AVATAR_SIZE_MB = 3;
 
 export default function EditProfileForm({
   name,
@@ -41,6 +46,11 @@ export default function EditProfileForm({
   const fetcher = useFetcher<Route.ComponentProps["actionData"]>();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(avatarUrl);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [pendingCropImage, setPendingCropImage] = useState<string | null>(null);
+
   useEffect(() => {
     if (fetcher.data && "success" in fetcher.data && fetcher.data.success) {
       formRef.current?.blur();
@@ -49,73 +59,88 @@ export default function EditProfileForm({
       });
     }
   }, [fetcher.data]);
-  const [avatar, setAvatar] = useState<string | null>(avatarUrl);
-  const [avatarError, setAvatarError] = useState<string | null>(null);
-  const onChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  // 파일 선택 시 검증만 하고 크롭 모달을 연다 (업로드용 파일 설정은 크롭 확인 후 수행)
+  const onChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
     if (!isImageFile(file)) {
       setAvatarError("이미지 파일만 업로드할 수 있습니다.");
       setAvatar(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
-
-    const maxSizeMB = 3;
-    if (!validateFileSize(file, maxSizeMB)) {
+    if (!validateFileSize(file, MAX_AVATAR_SIZE_MB)) {
       setAvatarError(
         "이미지 용량이 3MB를 초과했습니다. 이미지 용량을 다시 확인해주세요.",
       );
       setAvatar(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    try {
-      const compressedFile = await compressImageToWebp(file);
+    if (pendingCropImage) URL.revokeObjectURL(pendingCropImage);
+    setPendingCropImage(URL.createObjectURL(file));
+    setCropModalOpen(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-      if (!validateFileSize(compressedFile, maxSizeMB)) {
+  const handleCropConfirm = async (blob: Blob) => {
+    if (!fileInputRef.current || !pendingCropImage) return;
+
+    try {
+      // getCroppedImageBlob에서 이미 webp로 반환하므로 File로 변환
+      const croppedFile = new File([blob], "avatar.webp", {
+        type: "image/webp",
+      });
+
+      // 크롭된 이미지를 아바타용으로 압축
+      const compressedFile = await compressImageToWebp(
+        croppedFile,
+        AVATAR_COMPRESSION_OPTIONS,
+      );
+
+      // 압축 후 용량 체크
+      if (!validateFileSize(compressedFile, MAX_AVATAR_SIZE_MB)) {
         setAvatarError(
-          "압축된 이미지 용량이 3MB를 초과했습니다. 더 작은 이미지를 선택해주세요.",
+          "압축된 이미지 용량이 3MB를 초과했습니다. 더 작은 영역을 선택해주세요.",
         );
         setAvatar(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
+        URL.revokeObjectURL(pendingCropImage);
+        setPendingCropImage(null);
+        setCropModalOpen(false);
         return;
       }
 
+      // 폼 input에 압축된 파일 설정
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(compressedFile);
+      fileInputRef.current.files = dataTransfer.files;
 
-      if (fileInputRef.current) {
-        fileInputRef.current.files = dataTransfer.files;
-      }
-
+      // 미리보기 갱신
       setAvatar(URL.createObjectURL(compressedFile));
       setAvatarError(null);
-    } catch {
-      // 압축 라이브러리 오류 시, 검증을 통과한 원본 이미지를 그대로 사용
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.files = dataTransfer.files;
-      }
-
-      setAvatar(URL.createObjectURL(file));
-      // 별도 에러 메시지는 표시하지 않고 조용히 폴백
-      setAvatarError(null);
+    } catch (error) {
+      console.error("아바타 처리 오류:", error);
+      setAvatarError(
+        `이미지 처리 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
+      );
+      setAvatar(null);
+    } finally {
+      URL.revokeObjectURL(pendingCropImage);
+      setPendingCropImage(null);
+      setCropModalOpen(false);
     }
   };
+
+  const handleCropCancel = () => {
+    if (pendingCropImage) URL.revokeObjectURL(pendingCropImage);
+    setPendingCropImage(null);
+    setCropModalOpen(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <fetcher.Form
       method="post"
@@ -226,6 +251,13 @@ export default function EditProfileForm({
           ) : null}
         </CardFooter>
       </Card>
+
+      <AvatarCropModal
+        open={cropModalOpen}
+        imageSrc={pendingCropImage}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </fetcher.Form>
   );
 }

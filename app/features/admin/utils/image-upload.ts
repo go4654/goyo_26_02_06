@@ -12,7 +12,7 @@ import imageCompression from "browser-image-compression";
  * - 썸네일/콘텐츠 이미지가 과도하게 흐려지지 않도록
  *   해상도와 품질을 여유 있게 유지한다.
  */
-const COMPRESSION_OPTIONS = {
+const DEFAULT_COMPRESSION_OPTIONS = {
   maxSizeMB: 3, // 최대 파일 크기 (MB)
   maxWidthOrHeight: 7000, // 최대 너비 또는 높이
   useWebWorker: true, // 웹 워커 사용 (성능 향상)
@@ -20,14 +20,28 @@ const COMPRESSION_OPTIONS = {
   fileType: "image/webp" as const, // webp 형식으로 변환
 };
 
+/** 아바타용 압축 옵션: 해상도·용량을 낮춰 업로드 부담을 줄인다. */
+export const AVATAR_COMPRESSION_OPTIONS = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 512,
+  useWebWorker: true,
+  quality: 0.9,
+  fileType: "image/webp" as const,
+};
+
 /**
  * 이미지 파일을 webp 형식으로 압축합니다.
  *
  * @param file - 압축할 이미지 파일
+ * @param optionsOverrides - 기본 옵션을 덮어쓸 부분 (예: 아바타용 maxWidthOrHeight)
  * @returns 압축된 webp 형식의 File 객체
  * @throws 이미지 압축 실패 시 에러
  */
-export async function compressImageToWebp(file: File): Promise<File> {
+export async function compressImageToWebp(
+  file: File,
+  optionsOverrides?: Partial<typeof DEFAULT_COMPRESSION_OPTIONS>,
+): Promise<File> {
+  const options = { ...DEFAULT_COMPRESSION_OPTIONS, ...optionsOverrides };
   try {
     // 이미지 파일인지 확인
     if (!file.type.startsWith("image/")) {
@@ -35,20 +49,14 @@ export async function compressImageToWebp(file: File): Promise<File> {
     }
 
     // browser-image-compression으로 압축 및 webp 변환
-    const compressedFile = await imageCompression(file, COMPRESSION_OPTIONS);
+    const compressedBlob = await imageCompression(file, options);
 
-    // webp 형식으로 변환되었는지 확인
-    if (compressedFile.type !== "image/webp") {
-      // webp로 변환되지 않은 경우, 이름만 변경
-      return new File(
-        [compressedFile],
-        compressedFile.name.replace(/\.[^.]+$/, ".webp"),
-        {
-          type: "image/webp",
-          lastModified: compressedFile.lastModified,
-        },
-      );
-    }
+    // imageCompression이 File이 아닌 Blob을 반환할 수 있으므로 명시적으로 File로 변환
+    const fileName = file.name.replace(/\.[^.]+$/, ".webp");
+    const compressedFile = new File([compressedBlob], fileName, {
+      type: "image/webp",
+      lastModified: Date.now(),
+    });
 
     return compressedFile;
   } catch (error) {
