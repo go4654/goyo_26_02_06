@@ -45,10 +45,19 @@ BEGIN
                 VALUES (new.id, 'Anonymous', TRUE);
             END IF;
         ELSE
-            -- Handle OAuth providers (Google, GitHub, etc.)
-            -- Use the profile data provided by the OAuth provider
+            -- OAuth 제공자(Google, GitHub 등) 처리
+            -- OAuth 제공자 프로필 정보에서 이름과 아바타 URL을 사용하고, 이름이 없으면 기본값으로 대체
             INSERT INTO public.profiles (profile_id, name, avatar_url, marketing_consent)
-            VALUES (new.id, new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'avatar_url', TRUE);
+            VALUES (
+                new.id,
+                COALESCE(
+                    new.raw_user_meta_data ->> 'full_name',
+                    new.raw_user_meta_data ->> 'name',
+                    'Anonymous'
+                ),
+                new.raw_user_meta_data ->> 'avatar_url',
+                TRUE
+            );
         END IF;
     END IF;
     RETURN NEW; -- Return the user record that triggered this function
