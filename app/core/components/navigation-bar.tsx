@@ -278,6 +278,7 @@ const NAV_ITEMS = [
   { label: "CLASS", path: "/class", key: "class" },
   { label: "GALLERY", path: "/gallery", key: "gallery" },
   { label: "NEWS", path: "/news", key: "news" },
+  { label: "TOOLS", path: "/tools", key: "tools" },
 ];
 
 export function NavigationBar({
@@ -427,6 +428,14 @@ export function NavigationBar({
                 className="hover:text-primary focus:text-primary cursor-pointer"
               >
                 NEWS
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                to="/tools"
+                className="hover:text-primary focus:text-primary cursor-pointer"
+              >
+                TOOLS
               </Link>
             </SheetClose>
           </SheetHeader>

@@ -76,6 +76,14 @@ export default [
     // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
     ...prefix("/class", [index("features/class/screens/class.tsx")]),
     ...prefix("/news", [index("features/news/screens/news.tsx")]),
+    ...prefix("/tools", [
+      layout("features/tools/layout/tool.layout.tsx", [
+        index("features/tools/screens/tools.tsx"),
+        route("/random-choice", "features/tools/screens/random-choice.tsx"),
+        route("/wheel", "features/tools/screens/wheel.tsx"),
+        route("/timer", "features/tools/screens/timer.tsx"),
+      ]),
+    ]),
 
     // tools 라우트 추가
     // ...prefix("/tools", [index("features/tools/screens/tools.tsx")]),
