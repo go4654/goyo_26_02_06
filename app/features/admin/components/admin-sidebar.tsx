@@ -18,7 +18,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "~/core/components/ui/sidebar";
-import { LOGO_URL, LOGO_URL_WHITE } from "~/core/constant/imgUrls";
+import { LOGO_URL } from "~/core/constant/imgUrls";
 import SidebarMain from "~/features/users/components/sidebar-main";
 import SidebarUser from "~/features/users/components/sidebar-user";
 
@@ -95,22 +95,28 @@ export interface AdminSidebarProps
     avatarUrl: string;
   };
   pendingInquiryCount: number;
+  todayUsersCount: number;
 }
 
 export default function AdminSidebar({
   user,
   pendingInquiryCount,
+  todayUsersCount,
   ...props
 }: AdminSidebarProps) {
   const navMain = NAV_MAIN_BASE.map((group) => {
     if (group.title !== "유저 관리" || !group.items) return group;
     return {
       ...group,
-      items: group.items.map((sub) =>
-        sub.url === "/admin/users/inquiries"
-          ? { ...sub, badgeCount: pendingInquiryCount }
-          : sub,
-      ),
+      items: group.items.map((sub) => {
+        if (sub.url === "/admin/users/inquiries") {
+          return { ...sub, badgeCount: pendingInquiryCount, badgeLabel: "미처리 문의" };
+        }
+        if (sub.url === "/admin/users") {
+          return { ...sub, badgeCount: todayUsersCount, badgeLabel: "오늘 가입" };
+        }
+        return sub;
+      }),
     };
   });
 

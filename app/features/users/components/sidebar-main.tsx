@@ -36,6 +36,8 @@ export default function SidebarMain({
       title: string;
       url: string;
       badgeCount?: number;
+      /** 스크린리더용 라벨 (예: "미처리 문의", "오늘 가입") */
+      badgeLabel?: string;
     }[];
   }[];
 }) {
@@ -81,7 +83,11 @@ export default function SidebarMain({
                                 subItem.badgeCount > 0 && (
                                   <span
                                     className="ml-2 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white"
-                                    aria-label={`미처리 문의 ${subItem.badgeCount}건`}
+                                    aria-label={
+                                      subItem.badgeLabel
+                                        ? `${subItem.badgeLabel} ${subItem.badgeCount}건`
+                                        : `알림 ${subItem.badgeCount}건`
+                                    }
                                   >
                                     {subItem.badgeCount > 99
                                       ? "99+"

@@ -14,7 +14,7 @@ import { loader as adminLayoutLoader } from "../server/admin-layout.loader";
 export const loader = adminLayoutLoader;
 
 export default function AdminLayout({ loaderData }: Route.ComponentProps) {
-  const { user, pendingInquiryCount } = loaderData ?? {};
+  const { user, pendingInquiryCount, todayUsersCount } = loaderData ?? {};
 
   if (!user) {
     return <div>사용자 정보를 불러올 수 없습니다.</div>;
@@ -24,6 +24,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
     <SidebarProvider>
       <AdminSidebar
         pendingInquiryCount={pendingInquiryCount ?? 0}
+        todayUsersCount={todayUsersCount ?? 0}
         user={{
           name: user.user_metadata?.name ?? "",
           avatarUrl: user.user_metadata?.avatar_url ?? "",
