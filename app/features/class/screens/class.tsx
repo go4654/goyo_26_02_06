@@ -1,4 +1,5 @@
 import type { Route } from "./+types/class";
+
 import { useNavigation } from "react-router";
 
 import Container from "~/core/layouts/container";
@@ -36,10 +37,10 @@ export default function Class({ loaderData }: Route.ComponentProps) {
       <Container>
         {/* 상단 타이틀 및 검색 */}
         <div className="flex flex-col items-start justify-between xl:flex-row xl:items-end">
-          <h1 className="text-h4 xl:text-h1 max-w-[600px] tracking-tighter">
+          {/* <h1 className="text-h4 xl:text-h1 max-w-[600px] tracking-tighter">
             From Lecture to <br /> Your Own{" "}
             <span className="text-primary">Logs.</span>
-          </h1>
+          </h1> */}
 
           {/* 검색 폼 */}
           <SearchForm category={category} search={search} />
