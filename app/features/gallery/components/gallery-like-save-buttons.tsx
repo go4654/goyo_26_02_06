@@ -38,9 +38,12 @@ export default function GalleryLikeSaveButtons({
       <motion.button
         type="button"
         onClick={onLikeClick}
-        whileTap={{ scale: 0.5 }}
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        animate={
+          isLiked
+            ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+            : { scale: 1, rotate: 0 }
+        }
+        transition={{ duration: 0.25, ease: "easeOut" }}
         className="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-inherit transition-colors"
       >
         <Heart
@@ -57,9 +60,12 @@ export default function GalleryLikeSaveButtons({
       <motion.button
         type="button"
         onClick={onSaveClick}
-        whileTap={{ scale: 0.5 }}
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        animate={
+          isSaved
+            ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+            : { scale: 1, rotate: 0 }
+        }
+        transition={{ duration: 0.25, ease: "easeOut" }}
         className="flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-inherit transition-colors"
       >
         <Bookmark

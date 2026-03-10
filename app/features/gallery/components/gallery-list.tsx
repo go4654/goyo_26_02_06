@@ -214,9 +214,12 @@ export function GalleryCard({
           <motion.button
             type="button"
             onClick={handleLikeClick}
-            whileTap={{ scale: 0.5 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            animate={
+              isLiked
+                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
           >
             <Heart
@@ -229,9 +232,12 @@ export function GalleryCard({
           <motion.button
             type="button"
             onClick={handleSaveClick}
-            whileTap={{ scale: 0.5 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            animate={
+              isSaved
+                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="text-text-2 hover:text-primary flex cursor-pointer items-center gap-1 transition-colors"
           >
             <Bookmark

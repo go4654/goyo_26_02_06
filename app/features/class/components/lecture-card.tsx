@@ -141,9 +141,12 @@ export default function LectureCard({
               <motion.button
                 type="button"
                 onClick={handleLikeClick}
-                whileTap={{ scale: 0.5 }}
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                animate={
+                  isLiked
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isLiked
                     ? "bg-primary text-white"
@@ -151,16 +154,21 @@ export default function LectureCard({
                 }`}
               >
                 <Heart
-                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${isLiked ? "fill-current stroke-0" : ""} `}
+                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${
+                    isLiked ? "fill-current stroke-0" : ""
+                  } `}
                 />
               </motion.button>
 
               <motion.button
                 type="button"
                 onClick={handleSaveClick}
-                whileTap={{ scale: 0.5 }}
-                whileHover={{ scale: 1.1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                animate={
+                  isSaved
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
                 className={`cursor-pointer rounded-full p-2 transition-colors xl:p-3 ${
                   isSaved
                     ? "bg-primary text-white"
@@ -168,7 +176,9 @@ export default function LectureCard({
                 }`}
               >
                 <Bookmark
-                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${isSaved ? "fill-current stroke-0" : ""} `}
+                  className={`size-4.5 stroke-gray-700 xl:size-5 dark:stroke-white/60 ${
+                    isSaved ? "fill-current stroke-0" : ""
+                  } `}
                 />
               </motion.button>
             </div>

@@ -163,9 +163,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
           <motion.button
             type="button"
             onClick={handleLikeClick}
-            whileTap={{ scale: 0.5 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            animate={
+              isLiked
+                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
             <Heart
@@ -182,9 +185,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
           <motion.button
             type="button"
             onClick={handleSaveClick}
-            whileTap={{ scale: 0.5 }}
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            animate={
+              isSaved
+                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
           >
             <Bookmark
@@ -247,12 +253,15 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
 
           {/* 좋아요, 북마크 버튼 (갤러리와 동일: 활성 시 빨간 하트 / success 색상) */}
           <div className="text-small-title text-text-3 flex items-center gap-2">
-            <motion.button
+          <motion.button
               type="button"
               onClick={handleLikeClick}
-              whileTap={{ scale: 0.5 }}
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              animate={
+                isLiked
+                  ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                  : { scale: 1, rotate: 0 }
+              }
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
               <Heart
@@ -269,9 +278,12 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
             <motion.button
               type="button"
               onClick={handleSaveClick}
-              whileTap={{ scale: 0.5 }}
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+              animate={
+                isSaved
+                  ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                  : { scale: 1, rotate: 0 }
+              }
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
             >
               <Bookmark
