@@ -1,7 +1,7 @@
 import type { Route } from "./+types/class-detail";
 
 import { motion } from "framer-motion";
-import { Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
+import { ArrowRight, Bookmark, Heart, MoveLeft, MoveRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useFetcher, useNavigate } from "react-router";
 
@@ -44,6 +44,8 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
     isAdmin,
     isLiked: initialLiked,
     isSaved: initialSaved,
+    isAuthenticated,
+    previewText,
   } = loaderData;
 
   const likeFetcher = useFetcher();
@@ -117,6 +119,11 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   }, [saveFetcher.state, saveFetcher.data]);
 
   const handleLikeClick = () => {
+    if (!currentUserId) {
+      navigate(`/login?redirectTo=/class/${classData.slug}`);
+      return;
+    }
+
     // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
     const newLiked = !isLiked;
     setIsLiked(newLiked);
@@ -133,6 +140,11 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
   };
 
   const handleSaveClick = () => {
+    if (!currentUserId) {
+      navigate(`/login?redirectTo=/class/${classData.slug}`);
+      return;
+    }
+
     // 낙관적 업데이트: 즉시 UI 반영 (UX 향상)
     const newSaved = !isSaved;
     setIsSaved(newSaved);
@@ -159,48 +171,52 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
       <div className="border-b pb-6">
         <div className="text-small xl:text-small-title text-text-3 flex items-center gap-2">
           <span>{displayDate}</span>
-          <span className="text-text-3/50">•</span>
-          <motion.button
-            type="button"
-            onClick={handleLikeClick}
-            animate={
-              isLiked
-                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
-                : { scale: 1, rotate: 0 }
-            }
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
-          >
-            <Heart
-              className={cn(
-                "size-4 xl:size-5",
-                isLiked ? "fill-red-500 text-red-500" : "",
-              )}
-            />
-            <span>{likeCount}</span>
-          </motion.button>
+          {currentUserId && (
+            <>
+              <span className="text-text-3/50">•</span>
+              <motion.button
+                type="button"
+                onClick={handleLikeClick}
+                animate={
+                  isLiked
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+              >
+                <Heart
+                  className={cn(
+                    "size-4 xl:size-5",
+                    isLiked ? "fill-red-500 text-red-500" : "",
+                  )}
+                />
+                <span>{likeCount}</span>
+              </motion.button>
 
-          <span className="text-text-3/50">•</span>
+              <span className="text-text-3/50">•</span>
 
-          <motion.button
-            type="button"
-            onClick={handleSaveClick}
-            animate={
-              isSaved
-                ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
-                : { scale: 1, rotate: 0 }
-            }
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
-          >
-            <Bookmark
-              className={cn(
-                "size-4 xl:size-5",
-                isSaved ? "fill-success text-success" : "",
-              )}
-            />
-            <span>{saveCount}</span>
-          </motion.button>
+              <motion.button
+                type="button"
+                onClick={handleSaveClick}
+                animate={
+                  isSaved
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+              >
+                <Bookmark
+                  className={cn(
+                    "size-4 xl:size-5",
+                    isSaved ? "fill-success text-success" : "",
+                  )}
+                />
+                <span>{saveCount}</span>
+              </motion.button>
+            </>
+          )}
         </div>
 
         <div className="mt-4">
@@ -226,14 +242,41 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
           </div>
         )}
 
-      {/* ✅ 여기부터가 새로 추가된 "본문 MDX 영역" */}
-      <div>
+      {/* ✅ 여기부터가 "본문 MDX 영역" + 비로그인 프리뷰 처리 */}
+      <div className="mt-10">
         {hasMdxError ? (
           <p className="text-text-3 mt-24 text-sm">
             콘텐츠를 불러오는 중 오류가 발생했습니다.
           </p>
+        ) : isAuthenticated ? (
+          <MDXRenderer code={code} />
         ) : (
-          <MDXRenderer code={loaderData.code} />
+          <div className="relative">
+            {/* 실제 본문 프리뷰 영역 (약 20%) */}
+            <div className="max-h-[420px] overflow-hidden">
+              <p className="text-text-2/90 text-base leading-relaxed whitespace-pre-line">
+                {previewText ?? "로그인 후 전체 내용을 확인할 수 있습니다."}
+              </p>
+            </div>
+
+            {/* 전체 프리뷰를 과감하게 가리는 투명 블러 오버레이 + 카드 */}
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-xs dark:bg-slate-900/40">
+              <div className="pointer-events-auto flex max-w-[480px] flex-col items-center gap-3 rounded-2xl border border-white/40 bg-white/10 px-6 py-8 text-center shadow-[0_18px_45px_rgba(15,23,42,0.55)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/40">
+                <p className="text-text-2/80 text-base">
+                  로그인 후 전체 내용을 확인할 수 있습니다.
+                </p>
+                <button
+                  type="button"
+                  className="bg-primary hover:bg-primary/90 mt-1 inline-flex items-center justify-center rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition"
+                  onClick={() =>
+                    navigate(`/login?redirectTo=/class/${classData.slug}`)
+                  }
+                >
+                  로그인 <ArrowRight className="size-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
@@ -252,59 +295,63 @@ export default function ClassDetail({ loaderData }: Route.ComponentProps) {
           </div>
 
           {/* 좋아요, 북마크 버튼 (갤러리와 동일: 활성 시 빨간 하트 / success 색상) */}
-          <div className="text-small-title text-text-3 flex items-center gap-2">
-          <motion.button
-              type="button"
-              onClick={handleLikeClick}
-              animate={
-                isLiked
-                  ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
-                  : { scale: 1, rotate: 0 }
-              }
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
-            >
-              <Heart
-                className={cn(
-                  "size-4 xl:size-5",
-                  isLiked ? "fill-red-500 text-red-500" : "",
-                )}
-              />
-              <span className="text-sm xl:text-base">{likeCount}</span>
-            </motion.button>
+          {currentUserId && (
+            <div className="text-small-title text-text-3 flex items-center gap-2">
+              <motion.button
+                type="button"
+                onClick={handleLikeClick}
+                animate={
+                  isLiked
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -10, 3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+              >
+                <Heart
+                  className={cn(
+                    "size-4 xl:size-5",
+                    isLiked ? "fill-red-500 text-red-500" : "",
+                  )}
+                />
+                <span className="text-sm xl:text-base">{likeCount}</span>
+              </motion.button>
 
-            <span className="text-text-3/50">•</span>
+              <span className="text-text-3/50">•</span>
 
-            <motion.button
-              type="button"
-              onClick={handleSaveClick}
-              animate={
-                isSaved
-                  ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
-                  : { scale: 1, rotate: 0 }
-              }
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
-            >
-              <Bookmark
-                className={cn(
-                  "size-4 xl:size-5",
-                  isSaved ? "fill-success text-success" : "",
-                )}
-              />
-              <span className="text-sm xl:text-base">{saveCount}</span>
-            </motion.button>
-          </div>
+              <motion.button
+                type="button"
+                onClick={handleSaveClick}
+                animate={
+                  isSaved
+                    ? { scale: [1, 1.25, 0.95, 1], rotate: [0, 10, -3, 0] }
+                    : { scale: 1, rotate: 0 }
+                }
+                transition={{ duration: 0.25, ease: "easeOut" }}
+                className="text-text-3 hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+              >
+                <Bookmark
+                  className={cn(
+                    "size-4 xl:size-5",
+                    isSaved ? "fill-success text-success" : "",
+                  )}
+                />
+                <span className="text-sm xl:text-base">{saveCount}</span>
+              </motion.button>
+            </div>
+          )}
         </div>
       </div>
 
-      <ClassComment
-        classId={classData.id}
-        comments={loaderData.comments}
-        totalTopLevelComments={loaderData.totalTopLevelComments}
-        currentUserId={currentUserId}
-        isAdmin={isAdmin}
-      />
+      {currentUserId && (
+        <ClassComment
+          classId={classData.id}
+          comments={loaderData.comments}
+          totalTopLevelComments={loaderData.totalTopLevelComments}
+          currentUserId={currentUserId}
+          isAdmin={isAdmin}
+        />
+      )}
     </div>
   );
 }

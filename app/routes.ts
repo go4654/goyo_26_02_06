@@ -73,8 +73,11 @@ export default [
     route("/error", "core/screens/error.tsx"),
     route("/blocked", "core/screens/blocked.tsx"),
 
-    // 공개 인덱스 페이지들 (로그인 불필요, 누구나 접근 가능)
-    ...prefix("/class", [index("features/class/screens/class.tsx")]),
+    // 공개 인덱스 / 상세 페이지들 (로그인 불필요, 누구나 접근 가능)
+    ...prefix("/class", [
+      index("features/class/screens/class.tsx"),
+      route("/:slug", "features/class/screens/class-detail.tsx"),
+    ]),
     ...prefix("/news", [index("features/news/screens/news.tsx")]),
     ...prefix("/tools", [
       layout("features/tools/layout/tool.layout.tsx", [
@@ -118,9 +121,6 @@ export default [
 
     // 인증이 필요한 상세 페이지들 (로그인하지 않은 사용자는 /login으로 리다이렉트)
     layout("core/layouts/private.layout.tsx", { id: "private-content" }, [
-      // 클래스 상세 페이지
-      route("/class/:slug", "features/class/screens/class-detail.tsx"),
-
       // 갤러리 상세 페이지
       ...prefix("/gallery", [
         index("features/gallery/screens/gallery.tsx"),
