@@ -15,13 +15,16 @@ export function action(_args: Route.ActionArgs) {
 
 /** 라우트 메타 */
 export const meta: Route.MetaFunction = () => {
+  const title = "돌림판 랜덤 추첨 도구 | 고요 GOYO";
+  const description =
+    "항목을 추가하고 돌림판을 돌려 무작위로 당첨자·메뉴·아이디어를 뽑을 수 있는 랜덤 추첨 도구입니다.";
+
   return [
-    { title: "돌림판 | GOYO" },
-    {
-      name: "description",
-      content:
-        "항목을 추가하고 돌림판을 돌려 무작위로 결과를 뽑을 수 있습니다.",
-    },
+    { title },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
   ];
 };
 

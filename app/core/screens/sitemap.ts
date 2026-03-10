@@ -43,7 +43,16 @@ export async function loader() {
     .map((file) => `/legal/${file.replace(".mdx", "")}`);
 
   // Define static routes that should be included in the sitemap
-  const customUrls = ["/", "/login", "/join"];
+  // 로그인/회원가입 등 인증 전용 페이지는 제외하고,
+  // 실제 공개 콘텐츠/도구 진입점 위주로 노출
+  const customUrls = [
+    "/",
+    "/class",
+    "/news",
+    "/tools",
+    "/tools/random-choice",
+    "/tools/wheel",
+  ];
 
   // Combine all URLs and format them according to sitemap protocol
   const sitemapUrls = [...legalUrls, ...customUrls].map((url) => {

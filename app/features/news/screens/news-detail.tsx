@@ -9,8 +9,28 @@ import { Separator } from "~/core/components/ui/separator";
 import { newsDetailAction } from "../server/news-detail.action";
 import { newsDetailLoader } from "../server/news-detail.loader";
 
-export const meta: Route.MetaFunction = () => {
-  return [{ title: "뉴스 상세 페이지" }];
+export const meta: Route.MetaFunction = ({ data }) => {
+  if (!data || !data.news) {
+    return [{ title: "뉴스 상세 | 고요 GOYO" }];
+  }
+
+  const news = data.news;
+  const title = `${news.title} – 고요 GOYO 소식`;
+  const description = `${news.category} 카테고리의 공지/소식입니다.`;
+  const canonical = `https://goyos.kr/news/${encodeURIComponent(news.slug)}`;
+
+  return [
+    { title },
+    { name: "description", content: description },
+    { rel: "canonical", href: canonical },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "article" },
+    { property: "og:url", content: canonical },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+  ];
 };
 
 export const loader = newsDetailLoader;

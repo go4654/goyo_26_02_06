@@ -8,7 +8,24 @@ import { newsAction } from "../server/news.action";
 import { newsLoader } from "../server/news.loader";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "뉴스 페이지" }];
+  return [
+    { title: "뉴스 – 고요 GOYO 소식" },
+    {
+      name: "description",
+      content:
+        "고요(GOYO)의 업데이트, 공지, 서비스 소식을 뉴스 섹션에서 한눈에 확인하세요.",
+    },
+    {
+      property: "og:title",
+      content: "뉴스 – 고요 GOYO 소식",
+    },
+    {
+      property: "og:description",
+      content:
+        "고요(GOYO)의 업데이트, 공지, 서비스 소식을 뉴스 섹션에서 한눈에 확인하세요.",
+    },
+    { property: "og:type", content: "website" },
+  ];
 };
 
 export const loader = newsLoader;

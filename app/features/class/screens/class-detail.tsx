@@ -38,13 +38,21 @@ export const meta: Route.MetaFunction = ({ data }) => {
     data.previewText ??
     classData.description ??
     "디자인, 퍼블리싱, 개발 실무에 도움이 되는 클래스 학습 콘텐츠입니다.";
+  const canonical = `https://goyos.kr/class/${encodeURIComponent(
+    classData.slug,
+  )}`;
 
   return [
     { title },
     { name: "description", content: description },
+    { rel: "canonical", href: canonical },
     { property: "og:title", content: title },
     { property: "og:description", content: description },
     { property: "og:type", content: "article" },
+    { property: "og:url", content: canonical },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
   ];
 };
 

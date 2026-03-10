@@ -4,12 +4,16 @@ import { Loader2, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const meta: Route.MetaFunction = () => {
+  const title = "랜덤 선택 도구 – 순서·발표자 셔플 | 고요 GOYO";
+  const description =
+    "이름이나 항목을 입력하면 무작위로 순서를 섞어 발표자·조 편성·순번을 정할 수 있는 랜덤 선택 도구입니다.";
+
   return [
-    { title: "랜덤 선택 | GOYO" },
-    {
-      name: "description",
-      content: "내용을 입력하면 무작위로 순서를 결정할 수 있습니다.",
-    },
+    { title },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
   ];
 };
 
