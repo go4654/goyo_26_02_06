@@ -345,17 +345,19 @@ export default function GalleryNew(_props: Route.ComponentProps) {
           </div>
 
           {/* 캡션 MDX (갤러리만의 추가 MDX) */}
-          {/* <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="caption">캡션 (MDX, 선택)</Label>
             <MDXEditor
               value={formData.caption}
               onChange={(value) => updateField("caption", value)}
               placeholder="추가 MDX (선택 사항)"
+              hideImageHint
+              minHeightPx={200}
               onPendingImagesChange={(updater) =>
                 setPendingImages((prev) => updater(prev))
               }
             />
-          </div> */}
+          </div>
 
           {/* 공개 여부 */}
           <div className="flex items-center space-x-2">

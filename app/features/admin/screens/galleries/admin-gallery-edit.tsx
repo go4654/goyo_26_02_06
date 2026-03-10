@@ -79,11 +79,6 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   );
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
-  const [keptImageUrls, setKeptImageUrls] = useState<string[]>(
-    gallery.image_urls ?? [],
-  );
-  const [newGalleryImageFiles, setNewGalleryImageFiles] = useState<File[]>([]);
-  const galleryImageInputRef = useRef<HTMLInputElement>(null);
 
   const updateField = <K extends keyof GalleryEditFormData>(
     field: K,
@@ -120,9 +115,8 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
         const compressed = await compressImageToWebp(thumbnailFile);
         form.append("thumbnail", compressed);
       }
-      keptImageUrls.forEach((url) => form.append("keptImageUrls", url));
-      newGalleryImageFiles.forEach((file) =>
-        form.append("galleryImages", file),
+      (gallery.image_urls ?? []).forEach((url) =>
+        form.append("keptImageUrls", url),
       );
       pendingImages.forEach((p) => {
         form.append("contentImages", p.file);
@@ -180,23 +174,6 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   };
 
   const handleThumbnailUploadClick = () => thumbnailInputRef.current?.click();
-
-  const removeKeptImage = (index: number) => {
-    setKeptImageUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const addGalleryImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    const valid = files.filter(
-      (f) => f.type.startsWith("image/") && f.size <= 10 * 1024 * 1024,
-    );
-    setNewGalleryImageFiles((prev) => [...prev, ...valid]);
-    if (galleryImageInputRef.current) galleryImageInputRef.current.value = "";
-  };
-
-  const removeNewGalleryImage = (index: number) => {
-    setNewGalleryImageFiles((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const isLoading = isSubmitting || fetcher.state === "submitting";
 
@@ -287,7 +264,9 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title">타이틀 *</Label>
+            <Label htmlFor="title">
+              타이틀 <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="title"
               value={formData.title}
@@ -312,7 +291,9 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">카테고리 *</Label>
+            <Label htmlFor="category">
+              카테고리 <span className="text-destructive">*</span>
+            </Label>
             <Select
               value={formData.category}
               onValueChange={(v) =>
@@ -343,7 +324,9 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">본문 (MDX) *</Label>
+            <Label htmlFor="description">
+              본문 (MDX) <span className="text-destructive">*</span>
+            </Label>
             <MDXEditor
               value={formData.description}
               onChange={(value) => updateField("description", value)}
@@ -364,83 +347,12 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
               value={formData.caption}
               onChange={(value) => updateField("caption", value)}
               placeholder="추가 MDX (선택 사항)"
+              hideImageHint
+              minHeightPx={200}
               onPendingImagesChange={(updater) =>
                 setPendingImages((prev) => updater(prev))
               }
             />
-          </div>
-
-          {/* 갤러리 이미지 (image_urls) */}
-          <div className="space-y-2">
-            <Label>갤러리 이미지</Label>
-            <p className="text-text-3 text-xs">
-              기존 이미지 제거 시 저장 후 해당 파일이 Storage에서 삭제됩니다. 새
-              이미지는 추가 시 업로드됩니다.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {keptImageUrls.map((url, index) => (
-                <div
-                  key={`${url}-${index}`}
-                  className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-white/10"
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1 size-6"
-                    onClick={() => removeKeptImage(index)}
-                    aria-label="이미지 제거"
-                  >
-                    <X className="size-3" />
-                  </Button>
-                </div>
-              ))}
-              {newGalleryImageFiles.map((file, index) => (
-                <div
-                  key={`new-${index}`}
-                  className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-white/10"
-                >
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1 size-6"
-                    onClick={() => removeNewGalleryImage(index)}
-                    aria-label="새 이미지 제거"
-                  >
-                    <X className="size-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <input
-              ref={galleryImageInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={addGalleryImages}
-              className="hidden"
-              aria-label="갤러리 이미지 추가"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => galleryImageInputRef.current?.click()}
-              disabled={isLoading}
-            >
-              <Image className="mr-2 size-4" />
-              이미지 추가
-            </Button>
           </div>
 
           <div className="flex items-center space-x-2">

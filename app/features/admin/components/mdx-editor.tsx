@@ -45,6 +45,10 @@ interface MDXEditorProps {
   onPendingImagesChange?: (
     updater: (prev: PendingImage[]) => PendingImage[],
   ) => void;
+  /** true면 하단 "이미지 업로드" 안내 문구 숨김 (캡션 등 이미지 불필요 시) */
+  hideImageHint?: boolean;
+  /** 에디터 최소 높이(px). 미지정 시 800 */
+  minHeightPx?: number;
 }
 
 export default function MDXEditor({
@@ -54,6 +58,8 @@ export default function MDXEditor({
   error,
   classId,
   onPendingImagesChange,
+  hideImageHint = false,
+  minHeightPx = 800,
 }: MDXEditorProps) {
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
   const [isUploading, setIsUploading] = useState(false);
@@ -261,8 +267,7 @@ export default function MDXEditor({
           {/* 텍스트 에리어 */}
           <Textarea
             ref={textareaRef}
-            defaultValue={MDX_GALLERY_EX_TEXT}
-            value={value}
+            // value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
               if (
@@ -276,16 +281,19 @@ export default function MDXEditor({
               }
             }}
             placeholder={placeholder}
-            className="text-text-3 min-h-[400px] font-mono !text-base"
+            className="text-text-3 font-mono !text-base"
+            style={{ minHeight: `${minHeightPx}px` }}
             aria-invalid={error ? "true" : undefined}
           />
 
           {error && <p className="text-destructive text-sm">{error}</p>}
-          <p className="text-text-3 text-xs">
-            💡 MDX 문법을 사용하여 콘텐츠를 작성할 수 있습니다. 미리보기 탭에서
-            결과를 확인하세요. 이미지 업로드 버튼을 클릭하여 이미지를 추가할 수
-            있습니다.
-          </p>
+          {!hideImageHint && (
+            <p className="text-text-3 text-xs">
+              💡 MDX 문법을 사용하여 콘텐츠를 작성할 수 있습니다. 미리보기
+              탭에서 결과를 확인하세요. 이미지 업로드 버튼을 클릭하여 이미지를
+              추가할 수 있습니다.
+            </p>
+          )}
         </div>
       ) : (
         <div className="min-h-[400px] overflow-auto rounded-md border border-white/10 bg-white/5 p-6">
