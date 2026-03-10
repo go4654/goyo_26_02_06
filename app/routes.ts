@@ -21,6 +21,7 @@ export default [
   // ============================================================================
   route("/robots.txt", "core/screens/robots.ts"),
   route("/sitemap.xml", "core/screens/sitemap.ts"),
+  route("/rss.xml", "core/screens/rss.ts"),
 
   // ============================================================================
   // 디버그 라우트 (프로덕션에서는 삭제해야 합니다)
