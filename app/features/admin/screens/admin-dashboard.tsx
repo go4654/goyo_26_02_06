@@ -2,6 +2,7 @@ import type { Route } from "./+types/admin-dashboard";
 
 import {
   BarChart3,
+  Clock,
   Eye,
   EyeOff,
   Heart,
@@ -49,7 +50,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
           {/* 테마 스위처 컴포넌트 (라이트/다크 모드) */}
           <ThemeSwitcher />
         </div>
-        <div className="grid auto-rows-min gap-4 xl:grid-cols-3">
+        <div className="grid auto-rows-min gap-4 xl:grid-cols-4">
           <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-text-2 text-sm font-medium">
@@ -63,6 +64,23 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
               </div>
               <p className="text-muted-foreground mt-4 text-xs">
                 클래스 뷰 이벤트 기준
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="dark:bg-text-2/20 aspect-video rounded-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-text-2 text-sm font-medium">
+                오늘 방문 수
+              </CardTitle>
+              <Clock className="text-muted-foreground h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-h4 font-bold">
+                {formatNumber(traffic.today_views)}
+              </div>
+              <p className="text-muted-foreground mt-4 text-xs">
+                UTC 기준 당일 클래스·갤러리 뷰
               </p>
             </CardContent>
           </Card>

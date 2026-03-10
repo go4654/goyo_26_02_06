@@ -16,6 +16,7 @@ export interface AdminDashboardStats {
   traffic: {
     total_views: number;
     gallery_views: number;
+    today_views: number;
   };
   users: {
     total_users: number;
@@ -41,6 +42,7 @@ const adminDashboardStatsSchema: z.ZodType<AdminDashboardStats> = z.object({
   traffic: z.object({
     total_views: countSchema,
     gallery_views: countSchema,
+    today_views: countSchema,
   }),
   users: z.object({
     total_users: countSchema,
