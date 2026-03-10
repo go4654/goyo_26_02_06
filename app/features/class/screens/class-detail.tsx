@@ -26,8 +26,26 @@ function formatDate(dateString: string | null): string {
   return `${year}.${month}.${day}`;
 }
 
-export const meta: Route.MetaFunction = () => {
-  return [{ title: "CLASS | 고요" }];
+export const meta: Route.MetaFunction = ({ data }) => {
+  const fallbackTitle = "클래스 상세 | 고요 GOYO";
+  if (!data || !data.class) {
+    return [{ title: fallbackTitle }];
+  }
+
+  const classData = data.class;
+  const title = `${classData.title} – 클래스 학습 콘텐츠 | 고요 GOYO`;
+  const description =
+    data.previewText ??
+    classData.description ??
+    "디자인, 퍼블리싱, 개발 실무에 도움이 되는 클래스 학습 콘텐츠입니다.";
+
+  return [
+    { title },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "article" },
+  ];
 };
 
 export const loader = classDetailLoader;

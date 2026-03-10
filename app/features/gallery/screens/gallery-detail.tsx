@@ -13,12 +13,24 @@ import GalleryLikeSaveButtons from "../components/gallery-like-save-buttons";
 import { galleryDetailAction } from "../server/gallery-detail.action";
 import { galleryDetailLoader } from "../server/gallery-detail.loader";
 
-export const meta: Route.MetaFunction = ({
-  params,
-}: {
-  params: { slug?: string };
-}) => {
-  return [{ title: `갤러리 · ${params.slug ?? "상세"}` }];
+export const meta: Route.MetaFunction = ({ data }) => {
+  if (!data || !data.gallery) {
+    return [{ title: "갤러리 상세 | 고요 GOYO" }];
+  }
+
+  const gallery = data.gallery;
+  const title = `${gallery.title} – 포트폴리오 갤러리 | 고요 GOYO`;
+  const description =
+    gallery.subtitle ??
+    "고요(GOYO)에서 진행한 수업과 함께 만들어진 포트폴리오 작업물입니다.";
+
+  return [
+    { title },
+    { name: "description", content: description },
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "article" },
+  ];
 };
 
 export const loader = galleryDetailLoader;

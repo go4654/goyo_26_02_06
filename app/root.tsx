@@ -131,15 +131,20 @@ export const handle = {
  * 루트 메타: 기본 title, description, Open Graph 메타 태그
  */
 export const meta: Route.MetaFunction = () => [
-  { title: "GOYO" },
+  { title: "고요 GOYO – 디자인·퍼블리싱·개발 학습 아카이브" },
   {
     name: "description",
-    content: "당신의 성장을 돕는 고요한 조력자",
+    content:
+      "고요(GOYO)는 디자인, 퍼블리싱, 개발 실무에 도움이 되는 클래스 콘텐츠와 포트폴리오 작업물을 모아둔 학습 아카이브입니다.",
   },
-  { property: "og:title", content: "GOYO" },
+  {
+    property: "og:title",
+    content: "고요 GOYO – 디자인·퍼블리싱·개발 학습 아카이브",
+  },
   {
     property: "og:description",
-    content: "당신의 성장을 돕는 고요한 조력자",
+    content:
+      "고요(GOYO)는 디자인, 퍼블리싱, 개발 실무에 도움이 되는 클래스 콘텐츠와 포트폴리오 작업물을 모아둔 학습 아카이브입니다.",
   },
   { property: "og:type", content: "website" },
   { property: "og:url", content: "https://goyos.kr" },

@@ -12,7 +12,16 @@ import { classAction } from "../server/class.action";
 import { classLoader } from "../server/class.loader";
 
 export const meta: Route.MetaFunction = () => {
-  return [{ title: "CLASS | 고요" }];
+  return [
+    {
+      title: "클래스 – 디자인·퍼블리싱·개발 학습 콘텐츠 | 고요 GOYO",
+    },
+    {
+      name: "description",
+      content:
+        "디자인, 퍼블리싱, 개발과 관련된 고요(GOYO)의 클래스 학습 콘텐츠를 한 곳에서 모아볼 수 있는 아카이브입니다.",
+    },
+  ];
 };
 
 export const loader = classLoader;
