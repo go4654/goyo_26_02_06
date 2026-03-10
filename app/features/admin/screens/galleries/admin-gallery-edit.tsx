@@ -79,6 +79,7 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   );
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
 
   const updateField = <K extends keyof GalleryEditFormData>(
     field: K,
@@ -147,9 +148,8 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
     }
   }, [fetcher.data, navigate]);
 
-  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  /** 썸네일 파일 검증 및 미리보기 설정 */
+  function handleThumbnailFile(file: File) {
     if (!file.type.startsWith("image/")) {
       toast.error("이미지 파일만 업로드 가능합니다.");
       return;
@@ -163,6 +163,12 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
       URL.revokeObjectURL(thumbnailPreview);
     setThumbnailPreview(URL.createObjectURL(file));
     setThumbnailFile(file);
+  }
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
   };
 
   const handleThumbnailRemove = () => {
@@ -174,6 +180,32 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
   };
 
   const handleThumbnailUploadClick = () => thumbnailInputRef.current?.click();
+
+  const handleThumbnailDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(true);
+  };
+
+  const handleThumbnailDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleThumbnailDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+  };
+
+  const handleThumbnailDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+    const file = e.dataTransfer.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
+  };
 
   const isLoading = isSubmitting || fetcher.state === "submitting";
 
@@ -213,10 +245,24 @@ export default function GalleryEdit({ loaderData }: Route.ComponentProps) {
                   </Button>
                 </div>
               ) : (
-                <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5">
+                <div
+                  className={
+                    "flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed bg-white/5 transition-colors" +
+                    (isThumbnailDragging
+                      ? " border-primary/60 bg-primary/5"
+                      : " border-white/20")
+                  }
+                  onClick={handleThumbnailUploadClick}
+                  onDragEnter={handleThumbnailDragEnter}
+                  onDragOver={handleThumbnailDragOver}
+                  onDragLeave={handleThumbnailDragLeave}
+                  onDrop={handleThumbnailDrop}
+                >
                   <div className="flex flex-col items-center gap-2">
                     <Image className="text-text-3 size-8" />
-                    <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
+                    <p className="text-text-3 text-sm">
+                      이미지를 선택하거나 이 영역으로 드래그하세요
+                    </p>
                   </div>
                 </div>
               )}

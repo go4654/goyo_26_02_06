@@ -76,6 +76,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
 
   const updateField = <K extends keyof GalleryFormData>(
     field: K,
@@ -137,9 +138,8 @@ export default function GalleryNew(_props: Route.ComponentProps) {
     }
   }, [fetcher.data, navigate]);
 
-  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  /** 썸네일 파일 검증 및 미리보기 설정 */
+  function handleThumbnailFile(file: File) {
     if (!file.type.startsWith("image/")) {
       alert("이미지 파일만 업로드 가능합니다.");
       return;
@@ -153,6 +153,12 @@ export default function GalleryNew(_props: Route.ComponentProps) {
       URL.revokeObjectURL(thumbnailPreview);
     setThumbnailPreview(URL.createObjectURL(file));
     setThumbnailFile(file);
+  }
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
   };
 
   const handleThumbnailRemove = () => {
@@ -165,6 +171,32 @@ export default function GalleryNew(_props: Route.ComponentProps) {
 
   const handleThumbnailUploadClick = () => {
     thumbnailInputRef.current?.click();
+  };
+
+  const handleThumbnailDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(true);
+  };
+
+  const handleThumbnailDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleThumbnailDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+  };
+
+  const handleThumbnailDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+    const file = e.dataTransfer.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
   };
 
   const isLoading = isSubmitting || fetcher.state === "submitting";
@@ -183,10 +215,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
           {/* 썸네일 이미지 (클래스와 동일 UX) */}
           <div className="space-y-2">
             <Label htmlFor="thumbnail">썸네일 이미지</Label>
-            <Label
-              htmlFor="thumbnail"
-              className="block cursor-pointer space-y-3"
-            >
+            <div className="block space-y-3">
               {thumbnailPreview ? (
                 <div className="relative inline-block">
                   <div className="relative h-48 w-48 overflow-hidden rounded-lg border dark:border-white/10">
@@ -201,17 +230,35 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                     variant="destructive"
                     size="icon"
                     className="absolute -top-2 -right-2 size-6"
-                    onClick={handleThumbnailRemove}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleThumbnailRemove();
+                    }}
                     aria-label="썸네일 제거"
                   >
                     <X className="size-4" />
                   </Button>
                 </div>
               ) : (
-                <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed border-black/10 bg-white/5 dark:border-white/20">
+                <div
+                  className={
+                    "flex h-48 w-full items-center justify-center rounded-lg border-2 border-dashed bg-white/5 transition-colors dark:border-white/20" +
+                    (isThumbnailDragging
+                      ? " border-primary/60 bg-primary/5"
+                      : " border-black/10")
+                  }
+                  onClick={handleThumbnailUploadClick}
+                  onDragEnter={handleThumbnailDragEnter}
+                  onDragOver={handleThumbnailDragOver}
+                  onDragLeave={handleThumbnailDragLeave}
+                  onDrop={handleThumbnailDrop}
+                >
                   <div className="flex flex-col items-center gap-2">
                     <Image className="text-text-3 size-8" />
-                    <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
+                    <p className="text-text-3 text-sm">
+                      이미지를 선택하거나 이 영역으로 드래그하세요
+                    </p>
                   </div>
                 </div>
               )}
@@ -258,7 +305,7 @@ export default function GalleryNew(_props: Route.ComponentProps) {
                   </span>
                 )}
               </p>
-            </Label>
+            </div>
           </div>
 
           {/* 타이틀 */}

@@ -197,6 +197,7 @@ export default function AdminContentForm({
   );
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
+  const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
   // 뉴스 전용: 맴버만 공개 (기본값 false = public)
   const [memberOnly, setMemberOnly] = useState(
     initialData.visibility === "member",
@@ -244,14 +245,8 @@ export default function AdminContentForm({
     }
   };
 
-  /**
-   * 썸네일 이미지 파일 선택 핸들러
-   * 파일 선택 시 미리보기 URL을 생성하고 File 객체를 저장합니다.
-   */
-  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  /** 썸네일 파일 검증 및 미리보기 설정 */
+  function handleThumbnailFile(file: File) {
     // 이미지 파일인지 확인
     if (!file.type.startsWith("image/")) {
       alert("이미지 파일만 업로드 가능합니다.");
@@ -269,6 +264,16 @@ export default function AdminContentForm({
     const previewUrl = URL.createObjectURL(file);
     setThumbnailPreview(previewUrl);
     setThumbnailFile(file);
+  }
+
+  /**
+   * 썸네일 이미지 파일 선택 핸들러
+   * 파일 선택 시 미리보기 URL을 생성하고 File 객체를 저장합니다.
+   */
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
   };
 
   /**
@@ -292,6 +297,36 @@ export default function AdminContentForm({
    */
   const handleThumbnailUploadClick = () => {
     thumbnailInputRef.current?.click();
+  };
+
+  /** 썸네일 드래그 진입 */
+  const handleThumbnailDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(true);
+  };
+
+  /** 썸네일 드래그 오버 */
+  const handleThumbnailDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  /** 썸네일 드래그 이탈 */
+  const handleThumbnailDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+  };
+
+  /** 썸네일 드롭 처리 */
+  const handleThumbnailDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsThumbnailDragging(false);
+    const file = e.dataTransfer.files?.[0] ?? null;
+    if (!file) return;
+    handleThumbnailFile(file);
   };
 
   return (
@@ -324,11 +359,22 @@ export default function AdminContentForm({
           ) : (
             <div
               onClick={handleThumbnailUploadClick}
-              className="flex h-48 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-black/10 bg-white/5 dark:border-white/10"
+              onDragEnter={handleThumbnailDragEnter}
+              onDragOver={handleThumbnailDragOver}
+              onDragLeave={handleThumbnailDragLeave}
+              onDrop={handleThumbnailDrop}
+              className={
+                "flex h-48 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-white/5 transition-colors dark:border-white/10" +
+                (isThumbnailDragging
+                  ? " border-primary/60 bg-primary/5"
+                  : " border-black/10")
+              }
             >
               <div className="flex flex-col items-center gap-2">
                 <Image className="text-text-3 size-8" />
-                <p className="text-text-3 text-sm">이미지를 선택해주세요</p>
+                <p className="text-text-3 text-sm">
+                  이미지를 선택하거나 이 영역으로 드래그하세요
+                </p>
               </div>
             </div>
           )}
