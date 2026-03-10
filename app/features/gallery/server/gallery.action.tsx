@@ -37,12 +37,16 @@ export async function galleryAction({ request }: Route.ActionArgs) {
 
         const isLiked = await toggleGalleryLike(client, galleryId, user.id);
 
-        // 업데이트된 좋아요 카운트 조회 (트리거/denormalized 컬럼에 의존하지 않고 실제 레코드 수로 계산)
-        const { count: likeCount, error: likeCountError } = await client
-          .from("gallery_likes")
-          .select("id", { count: "exact", head: true })
-          .eq("gallery_id", galleryId);
-        if (likeCountError) throw likeCountError;
+        // 갤러리 테이블의 denormalized like_count 컬럼을 그대로 사용
+        const { data: galleryRow, error: galleryError } = await client
+          .from("galleries")
+          .select("like_count")
+          .eq("id", galleryId)
+          .single();
+        if (galleryError) throw galleryError;
+
+        const likeCount = (galleryRow as { like_count: number } | null)
+          ?.like_count;
 
         return data(
           { success: true, isLiked, likeCount: likeCount ?? 0 },
@@ -60,11 +64,16 @@ export async function galleryAction({ request }: Route.ActionArgs) {
 
         const isSaved = await toggleGallerySave(client, galleryId, user.id);
 
-        const { count: saveCount, error: saveCountError } = await client
-          .from("gallery_saves")
-          .select("id", { count: "exact", head: true })
-          .eq("gallery_id", galleryId);
-        if (saveCountError) throw saveCountError;
+        // 갤러리 테이블의 denormalized save_count 컬럼을 그대로 사용
+        const { data: galleryRow, error: galleryError } = await client
+          .from("galleries")
+          .select("save_count")
+          .eq("id", galleryId)
+          .single();
+        if (galleryError) throw galleryError;
+
+        const saveCount = (galleryRow as { save_count: number } | null)
+          ?.save_count;
 
         return data(
           { success: true, isSaved, saveCount: saveCount ?? 0 },

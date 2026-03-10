@@ -52,11 +52,15 @@ export async function galleryDetailAction({ request }: Route.ActionArgs) {
   try {
     if (normalizedAction === "toggleLike") {
       const isLiked = await toggleGalleryLike(client, galleryId, userId);
-      const { count: likeCount, error: likeCountError } = await client
-        .from("gallery_likes")
-        .select("id", { count: "exact", head: true })
-        .eq("gallery_id", galleryId);
-      if (likeCountError) throw likeCountError;
+      const { data: galleryRow, error: galleryError } = await client
+        .from("galleries")
+        .select("like_count")
+        .eq("id", galleryId)
+        .single();
+      if (galleryError) throw galleryError;
+
+      const likeCount = (galleryRow as { like_count: number } | null)
+        ?.like_count;
 
       return data(
         { success: true, isLiked, likeCount: likeCount ?? 0 },
@@ -65,11 +69,15 @@ export async function galleryDetailAction({ request }: Route.ActionArgs) {
     }
 
     const isSaved = await toggleGallerySave(client, galleryId, userId);
-    const { count: saveCount, error: saveCountError } = await client
-      .from("gallery_saves")
-      .select("id", { count: "exact", head: true })
-      .eq("gallery_id", galleryId);
-    if (saveCountError) throw saveCountError;
+    const { data: galleryRow, error: galleryError } = await client
+      .from("galleries")
+      .select("save_count")
+      .eq("id", galleryId)
+      .single();
+    if (galleryError) throw galleryError;
+
+    const saveCount = (galleryRow as { save_count: number } | null)
+      ?.save_count;
 
     return data(
       { success: true, isSaved, saveCount: saveCount ?? 0 },

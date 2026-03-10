@@ -50,36 +50,12 @@ export async function galleryDetailLoader({
   } = await client.auth.getUser();
   const userId = user?.id ?? null;
 
-  const [countsResult, userActions, adjacent] = await Promise.all([
-    // 좋아요/저장 카운트는 denormalized 컬럼에만 의존하지 않고 실제 레코드 수로 계산
-    Promise.all([
-      client
-        .from("gallery_likes")
-        .select("id", { count: "exact", head: true })
-        .eq("gallery_id", gallery.id)
-        .then((r) => ({ count: r.count ?? 0, error: r.error })),
-      client
-        .from("gallery_saves")
-        .select("id", { count: "exact", head: true })
-        .eq("gallery_id", gallery.id)
-        .then((r) => ({ count: r.count ?? 0, error: r.error })),
-    ]).catch((error) => {
-      logger.error("갤러리 좋아요/저장 카운트 계산 실패:", error);
-      return [{ count: 0, error: null }, { count: 0, error: null }];
-    }),
+  const [userActions, adjacent] = await Promise.all([
     userId
       ? getGalleryUserActions(client, gallery.id, userId)
       : Promise.resolve({ liked: false, saved: false }),
     getAdjacentGallerySlugs(client, gallery.slug, gallery.created_at),
   ]);
-
-  const [likeCountResult, saveCountResult] = countsResult;
-
-  const galleryWithCounts = {
-    ...gallery,
-    like_count: likeCountResult.count,
-    save_count: saveCountResult.count,
-  };
 
   // 조회 이벤트 기록 (트리거로 galleries.view_count 자동 증가). 실패해도 페이지는 노출
   incrementGalleryView(client, gallery.id, userId).catch((err) => {
@@ -94,7 +70,7 @@ export async function galleryDetailLoader({
 
   return data(
     {
-      gallery: galleryWithCounts,
+      gallery,
       hasLiked: userActions.liked,
       hasSaved: userActions.saved,
       adjacent,
