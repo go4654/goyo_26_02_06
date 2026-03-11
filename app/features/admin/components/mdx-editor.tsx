@@ -264,10 +264,10 @@ export default function MDXEditor({
             </div>
           </div>
 
-          {/* 텍스트 에리어 */}
+          {/* 텍스트 영역 */}
           <Textarea
             ref={textareaRef}
-            // value={value}
+            value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
               if (
